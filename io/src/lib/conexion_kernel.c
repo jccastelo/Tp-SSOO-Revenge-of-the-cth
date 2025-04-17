@@ -47,17 +47,15 @@ void escucha_peticiones_kernel() {
 
 int handshake(int conexion)
 {
-    size_t bytes;
+    // size_t bytes;
 	int32_t handshake = 1;
 	int32_t result;
 
-	bytes = send(conexion, &handshake, sizeof(int32_t), 0);
-	bytes = recv(conexion, &result, sizeof(int32_t), MSG_WAITALL);
+	send(conexion, &handshake, sizeof(int32_t), 0);
+	recv(conexion, &result, sizeof(int32_t), MSG_WAITALL);
 
 	if (result != 0) {
         return -1;
     } else 
         return 0;
-
-    return;
-};
+}

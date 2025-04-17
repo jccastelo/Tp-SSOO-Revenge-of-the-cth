@@ -1,8 +1,10 @@
-#include "include/utils.h"
+#include "main.h"
 
 int main(int argc, char* argv[]) {
     
-    char* ip_kernel, log_level, puerto_kernel;
+    char *ip_kernel = NULL;
+    char *log_level = NULL;
+    char *puerto_kernel = NULL;
 
     iniciar_logger();
 

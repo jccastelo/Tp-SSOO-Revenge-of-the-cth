@@ -1,10 +1,11 @@
 #include "../include/logger.h"
+t_log* logger;
 
 //POSIBLE MEJORA: char* nombre para el nombre del modulo
-t_log* iniciar_logger(void) {
-    t_log* nuevo_logger = log_create("../../io.log","LOGGER.io", true, LOG_LEVEL_INFO);
+void iniciar_logger(void) {
+    logger = log_create("../../io.log","LOGGER.io", true, LOG_LEVEL_INFO);
 
-    if(nuevo_logger == NULL){
+    if(logger == NULL){
         abort();
     }
     

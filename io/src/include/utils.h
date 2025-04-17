@@ -13,4 +13,6 @@
 #include<commons/config.h>
 #include<readline/readline.h>
 
+extern t_log* logger;
+
 #endif  /*UTILS_H_*/
