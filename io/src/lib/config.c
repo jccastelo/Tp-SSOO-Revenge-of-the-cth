@@ -1,5 +1,5 @@
 
-#include <../include/config.h>
+#include "../include/config.h"
 
 void leer_configuraciones(char *ip_kernel, char *puerto_kernel, char *level_info_kernel){
 

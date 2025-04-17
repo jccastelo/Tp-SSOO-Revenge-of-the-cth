@@ -1,4 +1,4 @@
-#include <../include/logger.h>
+#include "../include/logger.h"
 
 //POSIBLE MEJORA: char* nombre para el nombre del modulo
 t_log* iniciar_logger(void) {
