@@ -1,4 +1,4 @@
-#include <../include/conexion_kernel.h>
+#include "../include/conexion_kernel.h"
 
 int crear_conexion(const char* server_name, char* ip, char* puerto) {
 
