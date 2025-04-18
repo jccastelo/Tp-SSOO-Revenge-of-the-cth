@@ -8,5 +8,6 @@
 #include "kernel-config.h"
 #include "kernel-state.h"
 #include "kernel-connection.h"
+#include "kernel-servers.h"
 
 #endif // KERNEL_H

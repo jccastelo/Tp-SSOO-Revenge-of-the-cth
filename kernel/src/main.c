@@ -6,14 +6,10 @@ int main() {
 
     // Inicializamos la configuración del kernel y los servidores:
     kernel_config_init();
-
-    // Inializa los servidores de escucha de IO, DISPATCH e INTERRUPT
     kernel_servers_init();
 
-    // lei escuchati
-    kernel_servers();
-
-    // liberar kernel-server
+    // Comenzamos a escuchar las conexiones de los clientes:
+    kernel_server_io_listening();
 
     return 0;
 }
