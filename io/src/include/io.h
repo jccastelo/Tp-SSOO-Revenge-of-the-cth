@@ -7,5 +7,6 @@
 // Incluyo las bibliotecas necesarias internas:
 #include "io-config.h"
 #include "io-state.h"
+#include "io-connection.h"
 
 #endif // IO_H

@@ -2,3 +2,4 @@
 
 // Definimos las variables globales:
 t_config_io *config_io;
+int socket_kernel;

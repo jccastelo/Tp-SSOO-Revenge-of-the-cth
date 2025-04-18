@@ -8,5 +8,6 @@
 
 // Definimos las variables globales:
 extern t_config_io *config_io;
+extern int socket_kernel;
 
 #endif 
