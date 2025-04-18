@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <utils/logger.h>
+#include <string.h>
 
 typedef enum {
     MENSAJE, 
@@ -131,9 +132,7 @@ void recibir_handshake(int socket);
 * 
 * @param socket Descriptor del socket hacia el servidor.
 * @param server_name Nombre lógico del servidor (para mensajes de log).
-* @param ip IP del servidor (solo informativo).
-* @param puerto Puerto del servidor (solo informativo).
 */
-void generar_handshake(int socket, char *server_name, char *ip, char *puerto);
+void generar_handshake(int socket, char *server_name);
  
 #endif /* PROTOCOL_H */

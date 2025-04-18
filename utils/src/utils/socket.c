@@ -54,7 +54,6 @@ int iniciar_servidor(const char* name, char* ip, char* puerto) {
 
 
 int crear_conexion(const char* server_name, char* ip, char* puerto) {
-
     struct addrinfo hints, *servinfo;
 
     // Init de hints
@@ -62,7 +61,6 @@ int crear_conexion(const char* server_name, char* ip, char* puerto) {
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
-
 
     // Recibe addrinfo
     getaddrinfo(ip, puerto, &hints, &servinfo);

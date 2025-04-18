@@ -20,7 +20,6 @@ void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio) {
 	paquete->buffer->size += tamanio;
 }
 
-
 void enviar_paquete(t_paquete* paquete, int socket_cliente) {
 	int bytes = paquete->buffer->size + 2 *sizeof(int);
 	void* a_enviar = serializar_paquete(paquete, bytes);
@@ -82,7 +81,7 @@ void recibir_handshake(int socket) {
 		send(socket, &resultError, sizeof(int32_t), 0);
 }
 
-void generar_handshake(int socket, char *server_name, char *ip, char *puerto) {
+void generar_handshake(int socket, char *server_name) {
     int32_t handshake = 1;
     int32_t result;
 
