@@ -1,6 +1,12 @@
-#include <utils/hello.h>
+#include "kernel.h"
 
-int main(int argc, char* argv[]) {
-    saludar("kernel");
+int main() {
+    // Inicializamos un logger
+    logger = log_create("kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
+
+    // Inicializamos la configuración del kernel y los servidores:
+    kernel_config_init();
+    // kernel_servers_init();
+
     return 0;
 }
