@@ -1,17 +1,12 @@
-#include "main.h"
+#include "kernel.h"
 
+int main() {
+    // Inicializamos un logger
+    logger = log_create("kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
 
-int main(int argc, char* argv[]) {
-
-    t_config_kernel* config_kernel;
-
-    leer_configuraciones(config_kernel);
-
-    iniciar_logger(config_kernel->log_level);
-
-    int servidor = iniciar_servidor();
-
-    escuchar_peticiones();//WTF!!!
+    // Inicializamos la configuración del kernel y los servidores:
+    kernel_config_init();
+    // kernel_servers_init();
 
     return 0;
 }
