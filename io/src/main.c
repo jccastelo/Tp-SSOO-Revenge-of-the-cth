@@ -9,8 +9,8 @@ int main(int argc, char* argv[]) {
     iniciar_logger();
 
     leer_configuraciones(&ip_kernel, &puerto_kernel, &log_level);
-    crear_conexion("KERNEL", ip_kernel, puerto_kernel); 
-    log_info(logger, "Conectado a kernel en %s:%s", ip_kernel, puerto_kernel);
+    crear_conexion_con_kernel(ip_kernel, puerto_kernel); 
+    
     
     escucha_peticiones_kernel();
 

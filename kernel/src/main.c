@@ -11,7 +11,7 @@ int main() {
     kernel_servers_init();
 
     // lei escuchati
-    // kernel_servers_oid();
+    kernel_servers();
 
     // liberar kernel-server
 
