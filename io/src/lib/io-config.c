@@ -1,4 +1,4 @@
-#include "io-config.h"
+#include "include/io-config.h"
 
 t_config_io *inicializar_config_io() {
     t_config_io *config_io = malloc(sizeof(t_config_io));
