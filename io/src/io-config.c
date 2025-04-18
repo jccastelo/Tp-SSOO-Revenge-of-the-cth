@@ -22,6 +22,7 @@ void io_config_init() {
         exit(EXIT_FAILURE);
     }
 
+    // To Do: Implementar una función que valide la existencia de los parámetros en el archivo de configuración
     // Establecemos la configuración de IO:
     configurar_valores_de_kernel(config_io, config);
     configurar_valores_de_log(config_io, config);

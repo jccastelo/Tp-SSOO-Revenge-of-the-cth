@@ -1,5 +1,5 @@
-#ifndef IO_VARIABLES_GLOBALES_H_
-#define IO_VARIABLES_GLOBALES_H_
+#ifndef IO_STATE_H_
+#define IO_STATE_H_
 
 // Incluimos las bibliotecas necesarias:
 
@@ -9,4 +9,4 @@
 // Definimos las variables globales:
 extern t_config_io *config_io;
 
-#endif 
+#endif // IO_STATE_H_
