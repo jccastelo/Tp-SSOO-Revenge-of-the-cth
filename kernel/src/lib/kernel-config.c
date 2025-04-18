@@ -1,4 +1,4 @@
-#include "kernel-config.h"
+#include "../include/kernel-config.h"
 
 t_config_kernel* inicializar_config_kernel() {
     t_config_kernel* config_kernel = malloc(sizeof(t_config_kernel));

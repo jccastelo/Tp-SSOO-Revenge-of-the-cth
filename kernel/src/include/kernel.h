@@ -1,5 +1,5 @@
-#ifndef IO_H
-#define IO_H
+#ifndef KERNEL_H
+#define KERNEL_H
 
 // Incluye las bibliotecas necesarias externas:
 #include <utils/logger.h>
@@ -7,5 +7,6 @@
 // Incluyo las bibliotecas necesarias internas:
 #include "kernel-config.h"
 #include "kernel-state.h"
+#include "kernel-connection.h"
 
-#endif // IO_H
+#endif // KERNEL_H

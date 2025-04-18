@@ -2,6 +2,7 @@
 #define KERNEL_STATE_H_
 
 // Incluimos las bibliotecas necesarias:
+#include <stdlib.h>
 
 // Incluimos bibliotecas propias:
 #include "kernel-types.h"
