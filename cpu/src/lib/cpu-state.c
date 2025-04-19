@@ -4,3 +4,4 @@
 t_config_cpu *config_cpu;
 int socket_dispatch;
 int socket_interrupt;
+int socket_memoria;
