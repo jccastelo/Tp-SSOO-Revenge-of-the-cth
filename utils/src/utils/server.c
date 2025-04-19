@@ -10,7 +10,7 @@ void server_clients(
     // Inicializamos el logger:
     log_info(logger, "Esperando conexiones en %s", server_name);
 
-    for (;;) {
+    while (1) {
         int client_socket = esperar_cliente(server_name, server_socket);
 
         if (client_socket == -1) {

@@ -9,6 +9,9 @@ void conection_strategy_persistence(void * args) {
 
     for(;;) {
         int operation = recibir_operacion(client_socket);
+        // ToDo: Loguear la operación recibida
+        // op_code_log(logger, operation);
+        log_info(logger, "Operacion recibida: %d", operation);
 
         // Si la operación es -1, significa que hubo un error al recibir la operación:
         if (operation == -1) 
