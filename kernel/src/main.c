@@ -9,8 +9,12 @@ int main() {
     kernel_servers_init();
 
     // Comenzamos a escuchar las conexiones de los clientes:
-    kernel_server_io_listening();
+    kernel_servers_listening();
 
+    // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
+    // Ya que detachamos los hilos, no podemos esperar a que terminen.
+    while(1) {}
+ 
     return 0;
 }
 
