@@ -1,4 +1,4 @@
-#include "../include/memoria_servers_listening.h"
+#include "../include/memoria-servers-listening.h"
 
 void memoria_servers_listening() {
 
@@ -9,6 +9,4 @@ void memoria_servers_listening() {
         "Memoria ESCUCHA", 
         conection_strategy_once, 
         memoria_server_escucha_handler);
-
-    return NULL;
 }

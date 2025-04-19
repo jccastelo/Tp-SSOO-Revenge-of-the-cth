@@ -11,6 +11,7 @@
 // Incluyo las bibliotecas necesarias internas:
 #include "memoria-state.h"
 
+void memoria_servers_init(void);
 void set_escucha_id (int id_server);
 void set_escucha_id (int id_server);
 
