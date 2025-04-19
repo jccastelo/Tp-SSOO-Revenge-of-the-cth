@@ -1,6 +1,12 @@
-#include <utils/hello.h>
+#include "include/cpu.h"
 
 int main(int argc, char* argv[]) {
-    saludar("cpu");
+    // Inicializamos un logger:
+    logger = log_create("cpu.log", "CPU", true, LOG_LEVEL_INFO);
+
+    // Inicializamos la configuración del kernel y nos conectamos a él:
+    cpu_config_init();
+    cpu_connect();
+    
     return 0;
 }
