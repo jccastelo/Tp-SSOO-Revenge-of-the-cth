@@ -2,8 +2,8 @@
 
 void cpu_connect() {
     // Incializamos variables necesarias para la conexión:
-    char *puerto_dispatch = string_itoa(config_cpu->PUERTO_KERNEL_DISPATCH);
-    char *puerto_interrupt = string_itoa(config_cpu->PUERTO_KERNEL_INTERRUPT);
+    //char *puerto_dispatch = string_itoa(config_cpu->PUERTO_KERNEL_DISPATCH);
+    //char *puerto_interrupt = string_itoa(config_cpu->PUERTO_KERNEL_INTERRUPT);
     char *puerto_memoria = string_itoa(config_cpu->PUERTO_MEMORIA);
 
     // Establecemos la conexión con el kernel dispatch y el kernel interrupt:
