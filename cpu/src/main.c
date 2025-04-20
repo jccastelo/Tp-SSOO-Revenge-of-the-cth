@@ -6,6 +6,8 @@ int main(int argc, char* argv[]) {
 
     // Inicializamos la configuración del kernel y nos conectamos a él:
     cpu_config_init();
+
+    //Conectamos CPU a Kernel
     cpu_connect();
     
     return 0;
