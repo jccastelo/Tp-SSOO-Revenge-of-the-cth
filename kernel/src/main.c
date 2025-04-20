@@ -11,7 +11,8 @@ int main() {
     // Comenzamos a escuchar las conexiones de los clientes:
     kernel_servers_listening();
 
-    
+    //Nos conectamos a la memoria como clientes
+    kernel_memory_connection();
 
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
     // Ya que detachamos los hilos, no podemos esperar a que terminen.]
