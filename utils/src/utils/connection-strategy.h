@@ -19,7 +19,7 @@
 typedef struct {
     int client_socket;
     const char* server_name;
-    void (*client_handler)(int client_socket, int operation, char *server_name);
+    void (*client_handler)(int client_socket, int operation, const char *server_name);
 } client_args_t;
 
 /**

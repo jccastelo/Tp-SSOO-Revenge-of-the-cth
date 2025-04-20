@@ -4,8 +4,8 @@ void server_clients(
     int server_socket,
     const char* server_name,
     void (*connection_strategy)(void *),
-    void (*server_strategy)(int, const char* server_name, void (*connection_strategy)(void *args), void (*client_handler)(int, int, char *)),
-    void (*client_handler)(int client_socket, int operation, char *server_name)
+    void (*server_strategy)(int, const char* server_name, void (*connection_strategy)(void *args), void (*client_handler)(int, int, const char *)),
+    void (*client_handler)(int client_socket, int operation, const char *server_name)
 ) {
     // Inicializamos el logger:
     log_info(logger, "Esperando conexiones en %s", server_name);
@@ -26,7 +26,7 @@ void server_strategy_thread(
     int client_socket,
     const char* server_name,
     void (*connection_strategy)(void *args),
-    void (*client_handler)(int client_socket, int operation, char *server_name)
+    void (*client_handler)(int client_socket, int operation, const char *server_name)
 ) {
     // Inicializamos variables necesarias para el manejo de la conexión:
     pthread_t thread;
@@ -44,7 +44,7 @@ void server_strategy_unique_thread(
     int client_socket,
     const char* server_name,
     void (*connection_strategy)(void *args),
-    void (*client_handler)(int client_socket, int operation, char *server_name)
+    void (*client_handler)(int client_socket, int operation, const char *server_name)
 ) {
     // Inicializamos variables necesarias para el manejo de la conexión:
     client_args_t* args = malloc(sizeof(client_args_t));
@@ -62,7 +62,7 @@ void server_with_thread(
     int server_socket, 
     const char* server_name, 
     void (*connection_strategy)(void *args),
-    void (*client_handler)(int client_socket, int operation, char *server_name)
+    void (*client_handler)(int client_socket, int operation, const char *server_name)
 ) {
     server_clients(server_socket, server_name, connection_strategy, server_strategy_thread, client_handler);
 }
@@ -71,7 +71,7 @@ void server_with_unique_thread(
     int server_socket, 
     const char* server_name, 
     void (*connection_strategy)(void *args),
-    void (*client_handler)(int client_socket, int operation, char *server_name)
+    void (*client_handler)(int client_socket, int operation, const char *server_name)
 ) {
     server_clients(server_socket, server_name, connection_strategy, server_strategy_unique_thread, client_handler);
 }

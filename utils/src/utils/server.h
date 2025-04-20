@@ -31,8 +31,8 @@ void server_clients(
     int server_socket,
     const char* server_name,
     void (*connection_strategy)(void *args),
-    void (*server_strategy)(int, const char* server_name, void (*connection_strategy)(void *args), void (*client_handler)(int, int, char *)),
-    void (*client_handler)(int client_socket, int operation, char *server_name)
+    void (*server_strategy)(int, const char* server_name, void (*connection_strategy)(void *args), void (*client_handler)(int, int, const char *)),
+    void (*client_handler)(int client_socket, int operation, const char *server_name)
 );
 
 /**
@@ -51,7 +51,7 @@ void server_strategy_thread(
     int client_socket,
     const char* server_name,
     void (*connection_strategy)(void *args),
-    void (*client_handler)(int client_socket, int operation, char *server_name)
+    void (*client_handler)(int client_socket, int operation, const char *server_name)
 );
 
 /**
@@ -70,7 +70,7 @@ void server_strategy_thread(
     int client_socket,
     const char* server_name,
     void (*connection_strategy)(void *args),
-    void (*client_handler)(int client_socket, int operation, char *server_name)
+    void (*client_handler)(int client_socket, int operation, const char *server_name)
 );
 
 /**
@@ -89,7 +89,7 @@ void server_strategy_unique_thread(
     int client_socket,
     const char* server_name,
     void (*connection_strategy)(void *args),
-    void (*client_handler)(int client_socket, int operation, char *server_name)
+    void (*client_handler)(int client_socket, int operation, const char *server_name)
 );
 
 /**
@@ -109,7 +109,7 @@ void server_with_thread(
     int server_socket, 
     const char* server_name, 
     void (*connection_strategy)(void *args),
-    void (*client_handler)(int client_socket, int operation, char *server_name)
+    void (*client_handler)(int client_socket, int operation, const char *server_name)
 );
 
 /**
@@ -129,7 +129,7 @@ void server_with_unique_thread(
     int server_socket, 
     const char* server_name, 
     void (*connection_strategy)(void *args),
-    void (*client_handler)(int client_socket, int operation, char *server_name)
+    void (*client_handler)(int client_socket, int operation, const char *server_name)
 );
 
 #endif /* SERVER_H_ */
