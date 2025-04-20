@@ -23,7 +23,7 @@ void* kernel_server_io_listening(void* _) {
     server_with_thread(
         server_socket, 
         "Kernel IO", 
-        conection_strategy_once, 
+        conection_strategy_once, // TADE; ESTO TENDRIA QUE ESTAR EN PERSISTANCE
         kernel_server_io_handler);
 
     return NULL;
@@ -35,7 +35,7 @@ void* kernel_server_dispatcher_listening(void* _) {
     server_with_thread(
         server_socket, 
         "Kernel DISPATCH", 
-        conection_strategy_persistence, 
+        conection_strategy_once, // TADE; ESTO TENDRIA QUE ESTAR EN PERSISTANCE bueno no grites loko
         kernel_server_dispatch_handler);
 
     return NULL;
@@ -47,7 +47,7 @@ void* kernel_server_interrupt_listening(void* _) {
     server_with_thread(
         server_socket, 
         "Kernel INTERRUPT", 
-        conection_strategy_persistence, 
+        conection_strategy_once, //estrategia persistance?
         kernel_server_interrupt_handler);
 
     return NULL;

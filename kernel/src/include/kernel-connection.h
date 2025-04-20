@@ -31,7 +31,7 @@ void kernel_servers_init(void);
  * @param id_server ID del servidor asignado.
 */
 void set_dispatcher_id (int id_server);
- 
+
 /**
  * @brief Asigna el ID del servidor al campo IO de la estructura kernel_servers.
  * 

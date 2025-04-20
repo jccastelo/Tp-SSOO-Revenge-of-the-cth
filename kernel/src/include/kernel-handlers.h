@@ -40,7 +40,7 @@
  * @param operation Código numérico que representa la operación de I/O a ejecutar.
  * @param server_name Nombre lógico del servidor, útil para logs o identificación en el sistema.
  */
-void kernel_server_io_handler(int client_socket, int operation, char *server_name);
+void kernel_server_io_handler(int client_socket, int operation, const char *server_name);
 
 /**
  * @brief Maneja una operación enviada al servidor de dispatch del kernel.
@@ -56,7 +56,7 @@ void kernel_server_io_handler(int client_socket, int operation, char *server_nam
  * @param operation Código numérico que representa la operación de dispatch a ejecutar.
  * @param server_name Nombre lógico del servidor, útil para logs o trazabilidad.
  */
-void kernel_server_dispatch_handler(int client_socket, int operation, char *server_name);
+void kernel_server_dispatch_handler(int client_socket, int operation, const char *server_name);
 
 /**
  * @brief Maneja una operación enviada al servidor de interrupciones del kernel.
@@ -72,6 +72,6 @@ void kernel_server_dispatch_handler(int client_socket, int operation, char *serv
  * @param operation Código numérico que representa el tipo de interrupción o evento.
  * @param server_name Nombre lógico del servidor, útil para logs o identificación del contexto.
  */
-void kernel_server_interrupt_handler(int client_socket, int operation, char *server_name);
+void kernel_server_interrupt_handler(int client_socket, int operation, const char *server_name);
 
 #endif // KERNEL_HANDLERS_H
