@@ -5,5 +5,5 @@
 #include <utils/logger.h>
 #include <utils/protocolo.h>
 
-void memoria_server_escucha_handler(int, int , char*);
+void memoria_server_escucha_handler(int, int , const char*);
 #endif //MEMORIA_HANDLERS_H
