@@ -1,7 +1,7 @@
 
 #include "../include/kernel-memory-connection.h"
 
-void kernel_memory_connection() {
+void kernel_memory_connection(void) {
     // Incializamos variables necesarias para la conexión:
     char *puerto_memoria = string_itoa(config_kernel->PUERTO_MEMORIA);
 

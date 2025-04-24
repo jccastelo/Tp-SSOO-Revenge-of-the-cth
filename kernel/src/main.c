@@ -12,10 +12,24 @@ int main() {
     kernel_servers_listening();
 
     //Nos conectamos a la memoria como clientes
-    kernel_memory_connection();
+    //kernel_memory_connection();
 
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
     // Ya que detachamos los hilos, no podemos esperar a que terminen.]
+
+    //PLANIFICADOR LARGO PLAZO FIFO
+    planner_init();
+    log_info(logger,"PLANIFICADOR INICIADO");
+    //int proceso = crear_proceso(); //Le llega de memoria el proceso a crear
+
+    //mover_proceso_a_cola_new(proceso);
+
+    //solicitar_memoria_para_proceso(proceso); //Aca adentro se mueve a READY o ESPERA
+
+    
+    //CORTO PLAZO (procesos YA EN READY)
+
+
 
     while(1) {
         

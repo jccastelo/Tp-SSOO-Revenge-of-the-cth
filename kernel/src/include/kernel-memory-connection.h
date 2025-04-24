@@ -6,12 +6,13 @@
 #include <utils/socket.h>
 #include <utils/connection.h>
 #include <commons/string.h>
+#include <stdio.h>
 
 // Incluyo las bibliotecas necesarias internas:
 #include "kernel.h"
 #include "kernel-state.h"
 
-void kernel_memory_connection();
+void kernel_memory_connection(void);
 void set_socket_memoria(int);
 
 #endif // KERNEL_MEMORY_CONNECTION_H
