@@ -17,18 +17,19 @@ int main() {
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
     // Ya que detachamos los hilos, no podemos esperar a que terminen.]
 
-    //PLANIFICADOR LARGO PLAZO FIFO
+    //PLANIFICADOR LARGO y CORTO PLAZO
     planner_init();
-    log_info(logger,"PLANIFICADOR INICIADO");
-    //int proceso = crear_proceso(); //Le llega de memoria el proceso a crear
+    
+    
 
-    //mover_proceso_a_cola_new(proceso);
+    //t_pcb *process = kernel_process_create(); //Le llega desde cpu el proceso a crear
+
+    //mover_proceso_a_cola_new(process);
 
     //solicitar_memoria_para_proceso(proceso); //Aca adentro se mueve a READY o ESPERA
 
     
     //CORTO PLAZO (procesos YA EN READY)
-
 
 
     while(1) {
