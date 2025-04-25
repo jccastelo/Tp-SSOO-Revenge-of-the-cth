@@ -1,8 +1,17 @@
 #include "include/cpu.h"
 
 int main(int argc, char* argv[]) {
+
+    // Conseguimos la ID de la CPU ./cpu [ID]
+    if (argc < 2) {
+        abort(); // aborta si no se le pasó un identificador
+    }
+    id_cpu = argv[1];
+
     // Inicializamos un logger:
-    logger = log_create("cpu.log", "CPU", true, LOG_LEVEL_INFO);
+    char log_name[10];
+    sprintf(log_name, "cpu%s.log", id_cpu);
+    logger = log_create(log_name, "CPU", true, LOG_LEVEL_INFO);
 
     // Inicializamos la configuración del kernel y nos conectamos a él:
     cpu_config_init();

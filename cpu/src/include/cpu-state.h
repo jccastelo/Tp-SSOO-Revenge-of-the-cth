@@ -12,5 +12,6 @@ extern t_config_cpu *config_cpu;
 extern int socket_dispatch;
 extern int socket_interrupt;
 extern int socket_memoria;
+extern char *id_cpu;
 
 #endif // CPU_STATE_H_
