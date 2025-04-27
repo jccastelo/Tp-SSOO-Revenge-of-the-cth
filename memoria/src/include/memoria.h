@@ -1,10 +1,10 @@
 #ifndef MEMORIA_H
 #define MEMORIA_H
 
-//Librerias externas
+// Incluimos las bibliotecas necesarias:
 #include <utils/logger.h>
 
-//Librerias internas
+// Incluimos las bibliotecas internas:
 #include "memoria-state.h"
 #include "memoria-config.h"
 #include "memoria-handlers.h"
