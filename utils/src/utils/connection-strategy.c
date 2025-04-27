@@ -13,7 +13,6 @@ void conection_strategy_persistence(void * args) {
 
     while(execute_server) {
         // Validamos si el socket del cliente sigue activo:
-        connection_validate(&execute_server, client_socket);
         int operation = recibir_operacion(client_socket);
         
         // Loggeamos la operación recibida:
@@ -22,9 +21,10 @@ void conection_strategy_persistence(void * args) {
         
         // Si la operación es -1, significa que hubo un error al recibir la operación:
         if (operation == -1) 
-        log_error(logger, "Error al recibir la operacion");
+           log_error(logger, "Error al recibir la operacion");
         
         client_handler(client_socket, operation, server_name);
+        connection_validate(&execute_server, client_socket);
     }
 }
 
