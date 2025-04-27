@@ -26,3 +26,16 @@ void setup_connection_with_server(char *server_name, char *ip, char *puerto, voi
     // Llamamos al callback con el socket del cliente, donde se puede asignar el socket_client:
     callback(socket_client);
 }
+
+void connection_validate(int *execute_server, int client_socket) {
+    // Inicializamos la variable para controlar el bucle de atención al cliente:
+    int buffer;
+    int sigue_conectado = recv(client_socket, &buffer, sizeof(int), MSG_PEEK | MSG_DONTWAIT);
+
+    log_info(logger, "Valor de sigue_conectado: %d", sigue_conectado);
+    
+    if(!sigue_conectado) {
+        log_error(logger, "El cliente se ha desconectado");
+        *execute_server = 0;
+    }
+}

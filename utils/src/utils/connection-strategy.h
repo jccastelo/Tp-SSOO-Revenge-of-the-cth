@@ -15,6 +15,7 @@
 #include "logger.h"
 #include "connection-strategy.h"
 #include "protocolo.h"
+#include "connection.h"
 
 typedef struct {
     int client_socket;

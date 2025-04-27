@@ -1,5 +1,6 @@
 #include "connection-strategy.h"
 
+
 void conection_strategy_persistence(void * args) {
     // Inicializamos las variables necesarias para el manejo de la conexión:
     client_args_t* args_t = (client_args_t*) args;
@@ -7,16 +8,22 @@ void conection_strategy_persistence(void * args) {
     const char* server_name = args_t->server_name;
     void (*client_handler)(int client_socket, int operation, const char *server_name) = args_t->client_handler;
 
-    for(;;) {
-        int operation = recibir_operacion(client_socket);
-        // ToDo: Loguear la operación recibida
-        // op_code_log(logger, operation);
-        log_info(logger, "Operacion recibida: %d", operation);
+    // Inicializamos la variable para controlar el bucle de atención al cliente:
+    int execute_server = 1;
 
+    while(execute_server) {
+        // Validamos si el socket del cliente sigue activo:
+        connection_validate(&execute_server, client_socket);
+        int operation = recibir_operacion(client_socket);
+        
+        // Loggeamos la operación recibida:
+        log_info(logger, "Valor de execute_server: %d", execute_server);
+        log_info(logger, "Operacion recibida: %d", operation);
+        
         // Si la operación es -1, significa que hubo un error al recibir la operación:
         if (operation == -1) 
-            log_error(logger, "Error al recibir la operacion");
-
+        log_error(logger, "Error al recibir la operacion");
+        
         client_handler(client_socket, operation, server_name);
     }
 }
@@ -37,3 +44,5 @@ void conection_strategy_once(void * args) {
 
     client_handler(client_socket, operation, server_name);
 }
+
+
