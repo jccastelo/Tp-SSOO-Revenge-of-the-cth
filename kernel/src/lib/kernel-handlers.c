@@ -5,11 +5,18 @@ void kernel_server_io_handler(int client_socket, int operation, const char *serv
         recibir_handshake(client_socket);
     } else 
         log_error(logger, "Operación no válida para el servidor IO: %d", operation);
+    
+    return;
 }
 
-
-
-
+void kernel_server_interrupt_handler(int client_socket, int operation, const char *server_name) {
+    if (operation == HANDSHAKE) {
+        recibir_handshake(client_socket);
+    } else 
+        log_error(logger, "Operación no válida para el servidor Interrupt: %d", operation);
+    
+    return;
+}
 
 void kernel_server_dispatch_handler(int client_socket, int operation, const char *server_name) {
 
@@ -17,7 +24,7 @@ void kernel_server_dispatch_handler(int client_socket, int operation, const char
     new_buffer->size = 0;
     new_buffer->stream = NULL;
 
-    t_buffer *buffer = recibir_buffer(& new_buffer->size,client_socket);
+    new_buffer = recibir_buffer(& new_buffer->size,client_socket);
 
     switch(operation)
     {
@@ -51,6 +58,7 @@ void kernel_server_dispatch_handler(int client_socket, int operation, const char
         break;
     }
 
-    free(buffer);
+    free(new_buffer);
     
+    return;
 }

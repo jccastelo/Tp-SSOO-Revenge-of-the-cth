@@ -46,9 +46,6 @@ void* kernel_server_dispatcher_listening(void* _) {
       return NULL;
 
     }
-    
-
-   
 
 void* kernel_server_interrupt_listening(void* _) {
     int server_socket = kernel_servers->id_server_interrupt;

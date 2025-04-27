@@ -26,27 +26,6 @@ typedef struct {
     int id_server_io;
 } t_kernel_servers;
 
-
-//Planificador
-typedef struct {
-
-    t_queue* queue_READY;
-    char *algoritmoPlanificador_short;
-
-} t_short_term;
-
-typedef struct {
-
-    t_queue* queue_NEW;
-    t_queue* queue_BLOCKED;
-    char *algoritmoPlanificador_long;
-} t_long_term;
-typedef struct {
-
-    t_short_term *short_term;
-    t_long_term *long_term;
-} t_planner;
-
 //Procesos
 
 typedef struct {
@@ -68,12 +47,48 @@ typedef struct {
 }t_metricas_de_tiempo;
 typedef struct {
     char *process_name;
-    int tamano_proceso;
+    int tamanio_proceso;
     int pid;
     int pc;
-    t_metricas_de_estados metricas_de_estado;
-    t_metricas_de_tiempo metricas_de_tiempo;
+    t_metricas_de_estados *metricas_de_estado;
+    t_metricas_de_tiempo *metricas_de_tiempo;
 }t_pcb;
 
+
+//Planificador
+typedef struct {
+
+    t_queue* queue_READY;
+    void (*algoritmo_planificador)(t_pcb* process, t_queue* estado);
+} t_short_term;
+
+typedef struct {
+
+    t_queue* queue_NEW;
+    t_queue* queue_BLOCKED;
+    void (*algoritmo_planificador)(t_pcb* process, t_queue* estado);
+} t_long_term;
+typedef struct {
+
+    t_short_term *short_term;
+    t_long_term *long_term;
+} t_planner;
+
+typedef enum{
+    NEW,
+    READY,
+    EXECUTE,
+    BLOCKED,
+    BLOCKED_SUSPENDED,
+    READY_SUSPENDED,
+    EXIT,
+}t_estados;
+
+typedef enum {
+    FIFO,
+    PMCP,
+    SJFsD,
+    SJFcD,
+}t_planner_algorithm;
 
 # endif // KERNEL_TYPES_H

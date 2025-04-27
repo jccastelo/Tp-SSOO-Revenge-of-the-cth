@@ -12,7 +12,11 @@
 #include "kernel-state.h"
 #include "kernel-handlers.h"
 
-void recibir_proceso(t_buffer *buffer ,int client_socket );
-t_pcb *procces_init();
+void recibir_proceso(t_buffer *buffer ,int client_socket);
+t_pcb *process_init();
+void cargar_proceso(t_pcb* procces, t_buffer* buffer, int client_socket);
+void queue_process(t_pcb* process, int estado);
+void actualizarTiempo(t_temporal *metricas_de_tiempo_estado);
+void queue_FIFO(t_pcb *process, t_queue *queue);
 
 #endif //KERNEL_PROCESS_CREATE_H

@@ -13,6 +13,11 @@
 typedef enum {
     MENSAJE, 
     HANDSHAKE,
+	CONTEXT_PROCESS,
+	CPU_ID,
+	INIT_PROC,
+	DUMP_MEMORY,
+	IO,
 } op_code;
 
 typedef struct
