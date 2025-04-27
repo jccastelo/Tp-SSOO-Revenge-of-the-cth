@@ -35,11 +35,20 @@ void* kernel_server_dispatcher_listening(void* _) {
     server_with_thread(
         server_socket, 
         "Kernel DISPATCH", 
-        conection_strategy_once, // TADE; ESTO TENDRIA QUE ESTAR EN PERSISTANCE bueno no grites loko
+        conection_strategy_persistence, // TADE; ESTO TENDRIA QUE ESTAR EN PERSISTANCE bueno no grites loko
         kernel_server_dispatch_handler);
 
-    return NULL;
-}
+     while(1) {
+        
+        
+     }
+
+      return NULL;
+
+    }
+    
+
+   
 
 void* kernel_server_interrupt_listening(void* _) {
     int server_socket = kernel_servers->id_server_interrupt;

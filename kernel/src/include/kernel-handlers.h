@@ -6,6 +6,8 @@
 #include <utils/protocolo.h>
 
 // Incluyo las bibliotecas internas necesarias:
+#include "kernel-process-create.h"
+
 
 /**
  * @brief Maneja una operación de entrada/salida solicitada al servidor de I/O del kernel.

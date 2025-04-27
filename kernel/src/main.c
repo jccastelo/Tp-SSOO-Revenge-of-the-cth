@@ -20,17 +20,6 @@ int main() {
     //PLANIFICADOR LARGO y CORTO PLAZO
     planner_init();
     
-    
-
-    //t_pcb *process = kernel_process_create(); //Le llega desde cpu el proceso a crear
-
-    //mover_proceso_a_cola_new(process);
-
-    //solicitar_memoria_para_proceso(proceso); //Aca adentro se mueve a READY o ESPERA
-
-    
-    //CORTO PLAZO (procesos YA EN READY)
-
 
     while(1) {
         

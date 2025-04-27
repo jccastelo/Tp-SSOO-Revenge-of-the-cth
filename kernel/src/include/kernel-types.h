@@ -2,7 +2,9 @@
 #define KERNEL_TYPES_H
 
 #include <commons/collections/queue.h>
-#include <time.h>
+#include <commons/temporal.h>
+
+//Configuracion del kernel
 typedef struct {
     char *IP_MEMORIA;
     int PUERTO_MEMORIA;
@@ -17,6 +19,7 @@ typedef struct {
     char *LOG_LEVEL;
 } t_config_kernel;
 
+//Servers del kernel
 typedef struct {
     int id_server_dispatch;
     int id_server_interrupt;
@@ -24,6 +27,7 @@ typedef struct {
 } t_kernel_servers;
 
 
+//Planificador
 typedef struct {
 
     t_queue* queue_READY;
@@ -43,12 +47,7 @@ typedef struct {
     t_long_term *long_term;
 } t_planner;
 
-typedef struct {
-    int pid;
-    int pc;
-    t_metricas_de_estados metricas_de_estado;
-    t_metricas_de_tiempo metricas_de_tiempo;
-}t_pcb;
+//Procesos
 
 typedef struct {
     int new;
@@ -60,13 +59,21 @@ typedef struct {
 }t_metricas_de_estados;
 
 typedef struct {
-    time_t new;
-    time_t  ready;
-    time_t  execute;
-    time_t  blocked;
-    time_t  blocked_suspended;
-    time_t  ready_suspended;
+    t_temporal  *new;
+    t_temporal  *ready;
+    t_temporal  *execute;
+    t_temporal  *blocked;
+    t_temporal  *blocked_suspended;
+    t_temporal  *ready_suspended;
 }t_metricas_de_tiempo;
+typedef struct {
+    char *process_name;
+    int tamano_proceso;
+    int pid;
+    int pc;
+    t_metricas_de_estados metricas_de_estado;
+    t_metricas_de_tiempo metricas_de_tiempo;
+}t_pcb;
 
 
 # endif // KERNEL_TYPES_H

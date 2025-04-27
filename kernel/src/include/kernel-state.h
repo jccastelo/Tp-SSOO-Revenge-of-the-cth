@@ -15,4 +15,5 @@ extern t_planner *planner;
 extern t_short_term *short_term_planner;
 extern t_long_term *long_term_planner;
 
+
 #endif // IO_STATE_H_
