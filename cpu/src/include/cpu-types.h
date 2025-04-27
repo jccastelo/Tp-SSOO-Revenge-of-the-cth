@@ -15,5 +15,11 @@ typedef struct {
     char *LOG_LEVEL;
 } t_config_cpu;
 
+typedef struct {
+    int socket_dispatch;
+    int socket_interrupt;
+    int socket_memoria;
+} t_cpu_servers;
+
 
 #endif // CPU_TYPES_H_ 
