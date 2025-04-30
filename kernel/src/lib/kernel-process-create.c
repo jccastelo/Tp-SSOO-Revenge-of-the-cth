@@ -20,15 +20,24 @@ t_pcb *process_init(){
     new_process->tamanio_proceso = 0;
     new_process->pid = 0;
     new_process->pc = 0;
+    new_process->estado_actual = -1;
     
     new_process->metricas_de_estado->new= 0;
     new_process->metricas_de_estado->ready= 0;
     new_process->metricas_de_estado->execute= 0;
     new_process->metricas_de_estado->blocked= 0;
     new_process->metricas_de_estado->blocked_suspended= 0;
-    new_process->metricas_de_estado->ready_suspended= 0; 
+    new_process->metricas_de_estado->ready_suspended= 0;
+    new_process->metricas_de_estado->exit =0;
 
-    //Las metricas de tiempo se inicializan cuando el proceso entra por primera vez en cada estado
+    new_process->metricas_de_tiempo->new = NULL;
+    new_process->metricas_de_tiempo->ready = NULL;
+    new_process->metricas_de_tiempo->execute = NULL;
+    new_process->metricas_de_tiempo->blocked = NULL;
+    new_process->metricas_de_tiempo->blocked_suspended = NULL;
+    new_process->metricas_de_tiempo->ready_suspended = NULL;
+    new_process->metricas_de_tiempo->metrica_actual = NULL;
+
     return new_process;
 }
 
@@ -66,53 +75,76 @@ void queue_process(t_pcb* process, int estado){
     switch(estado)
     {
     case NEW:
+        process->estado_actual = NEW;
         process->metricas_de_estado->new += 1;
-        actualizarTiempo(process->metricas_de_tiempo->new);
+        actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->new));
         planner->long_term->algoritmo_planificador(process, planner->long_term->queue_NEW);
         // Gestion de memoria
         break;
 
     case READY:
+        process->estado_actual = READY;
         process->metricas_de_estado->ready += 1;
+        actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->ready));
         planner->short_term->algoritmo_planificador(process, planner->short_term->queue_READY);
         break;
 
     case EXECUTE:
+        process->estado_actual = EXECUTE;
         process->metricas_de_estado->execute += 1;
-
+        actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->execute));
         // Aca entra el dispatcher 
         break;
 
     case BLOCKED:
+        process->estado_actual = BLOCKED;
         process->metricas_de_estado->blocked += 1;
-
+        actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->blocked));
         planner->short_term->algoritmo_planificador(process, planner->short_term->queue_READY);
         break;
 
-    case EXIT:
-        //process->metricas_de_estado->exit += 1;
-        // carnuicero();
-        break;
-
     case BLOCKED_SUSPENDED:
-        //process->metricas_de_estado->blocked_suspended += 1;
+        process->estado_actual = BLOCKED_SUSPENDED;
+        process->metricas_de_estado->blocked_suspended += 1;
+        actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->blocked_suspended));
+        //a
         break;
 
     case READY_SUSPENDED:
-        //process->metricas_de_estado->ready_suspended += 1;
+        process->estado_actual = READY_SUSPENDED;
+        process->metricas_de_estado->ready_suspended += 1;
+        actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->ready_suspended));
+        //a
+        break;
+
+    case EXIT:
+        process->estado_actual = EXIT;
+        process->metricas_de_estado->exit += 1;
+        temporal_stop(process->metricas_de_tiempo->metrica_actual);
+        // carnuicero();
         break;
     }
 }
 
-void actualizarTiempo(t_temporal *metricas_de_tiempo_estado){
+void actualizarTiempo(t_temporal **metrica_actual,t_temporal **metricas_de_tiempo_estado) 
+{ //La funcion recibe la metrica que se esta ejecutando y la nueva
     
-    if( metricas_de_tiempo_estado == 0)
+
+    if (*metrica_actual != NULL) 
+    {  
+        temporal_stop(*metrica_actual); //Detengo la metrica actual
+    }
+
+    if( *metricas_de_tiempo_estado == NULL)
     {
-        metricas_de_tiempo_estado= temporal_create();
+        *metricas_de_tiempo_estado= temporal_create(); //Si es la primera vez que entra en el estado se crea e inicializa
     }else{
 
-        temporal_resume(metricas_de_tiempo_estado); 
+        temporal_resume(*metricas_de_tiempo_estado); //Si ya existe entonces lo reanuda
     }
+
+
+    *metrica_actual = *metricas_de_tiempo_estado;
 }
 
 

@@ -35,6 +35,7 @@ typedef struct {
     int blocked;
     int blocked_suspended;
     int ready_suspended;
+    int exit;
 }t_metricas_de_estados;
 
 typedef struct {
@@ -44,12 +45,14 @@ typedef struct {
     t_temporal  *blocked;
     t_temporal  *blocked_suspended;
     t_temporal  *ready_suspended;
+    t_temporal  *metrica_actual;
 }t_metricas_de_tiempo;
 typedef struct {
     char *process_name;
     int tamanio_proceso;
     int pid;
     int pc;
+    int estado_actual;
     t_metricas_de_estados *metricas_de_estado;
     t_metricas_de_tiempo *metricas_de_tiempo;
 }t_pcb;
