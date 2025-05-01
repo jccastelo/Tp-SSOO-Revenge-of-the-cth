@@ -30,7 +30,7 @@ typedef struct {
 //Procesos
 
 typedef struct {
-    int new;
+    int new; 
     int ready;
     int execute;
     int blocked;
