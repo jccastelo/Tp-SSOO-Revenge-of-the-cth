@@ -6,7 +6,8 @@
 #include <utils/protocolo.h>
 
 // Incluyo las bibliotecas internas necesarias:
-#include "kernel-process-create.h"
+#include "kernel-handlers.h"
+#include "kernel-syscalls.h"
 
 
 /**

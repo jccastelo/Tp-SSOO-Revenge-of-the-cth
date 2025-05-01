@@ -27,6 +27,13 @@ typedef struct {
     int id_server_io;
 } t_kernel_servers;
 
+// Colas de estados
+
+typedef struct {
+    t_queue* queue_ESTADO;
+    pthread_mutex_t* mutex;
+}t_mutex_queue;
+
 //Procesos
 
 typedef struct {
@@ -53,7 +60,7 @@ typedef struct {
     int tamanio_proceso;
     int pid;
     int pc;
-    int estado_actual;
+    t_mutex_queue* queue_ESTADO;
     t_metricas_de_estados *metricas_de_estado;
     t_metricas_de_tiempo *metricas_de_tiempo;
 }t_pcb;
@@ -62,15 +69,16 @@ typedef struct {
 //Planificador
 
 typedef struct {
-    t_queue* queue_ESTADO;
-    pthread_mutex_t* mutex;
-}t_mutex_queue;
-
-typedef struct {
 
     t_mutex_queue* queue_READY;
     void (*algoritmo_planificador)(t_pcb* process, t_queue* estado);
 } t_short_term;
+
+typedef struct {
+    t_mutex_queue* queue_BLOCKED_SUSPENDED;
+    t_mutex_queue* queue_READY_SUSPENDED;
+    void (*algoritmo_planificador)(t_pcb* process, t_queue* estado);
+} t_medium_term;
 
 typedef struct {
 
@@ -81,6 +89,7 @@ typedef struct {
 typedef struct {
 
     t_short_term *short_term;
+    t_medium_term *medium_term; 
     t_long_term *long_term;
 } t_planner;
 
