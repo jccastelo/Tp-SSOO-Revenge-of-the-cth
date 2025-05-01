@@ -3,6 +3,7 @@
 
 #include <commons/collections/queue.h>
 #include <commons/temporal.h>
+#include <pthread.h>
 
 //Configuracion del kernel
 typedef struct {
@@ -59,16 +60,22 @@ typedef struct {
 
 
 //Planificador
+
+typedef struct {
+    t_queue* queue_ESTADO;
+    pthread_mutex_t* mutex;
+}t_mutex_queue;
+
 typedef struct {
 
-    t_queue* queue_READY;
+    t_mutex_queue* queue_READY;
     void (*algoritmo_planificador)(t_pcb* process, t_queue* estado);
 } t_short_term;
 
 typedef struct {
 
-    t_queue* queue_NEW;
-    t_queue* queue_BLOCKED;
+    t_mutex_queue* queue_NEW;
+    t_mutex_queue* queue_BLOCKED;
     void (*algoritmo_planificador)(t_pcb* process, t_queue* estado);
 } t_long_term;
 typedef struct {
