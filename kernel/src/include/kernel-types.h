@@ -30,22 +30,22 @@ typedef struct {
 //Procesos
 
 typedef struct {
-    int new; 
-    int ready;
-    int execute;
-    int blocked;
-    int blocked_suspended;
-    int ready_suspended;
-    int exit;
+    int NEW; 
+    int READY;
+    int EXECUTE;
+    int BLOCKED;
+    int BLOCKED_SUSPENDED;
+    int READY_SUSPENDED;
+    int EXIT;
 }t_metricas_de_estados;
 
 typedef struct {
-    t_temporal  *new;
-    t_temporal  *ready;
-    t_temporal  *execute;
-    t_temporal  *blocked;
-    t_temporal  *blocked_suspended;
-    t_temporal  *ready_suspended;
+    t_temporal  *NEW;
+    t_temporal  *READY;
+    t_temporal  *BLOCKED;
+    t_temporal  *EXECUTE;
+    t_temporal  *BLOCKED_SUSPENDED;
+    t_temporal  *READY_SUSPENDED;
     t_temporal  *metrica_actual;
 }t_metricas_de_tiempo;
 typedef struct {

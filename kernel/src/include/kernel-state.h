@@ -3,7 +3,6 @@
 
 // Incluimos las bibliotecas necesarias:
 #include <stdlib.h>
-#include <pthread.h>
 
 // Incluimos bibliotecas propias:
 #include "kernel-types.h"
