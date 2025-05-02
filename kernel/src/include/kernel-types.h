@@ -15,6 +15,7 @@ typedef struct {
     char *ALGORITMO_CORTO_PLAZO;
     char *ALGORITMO_INGRESO_A_READY;
     float ALFA;
+    int ESTIMACION_INICIAL;
     int TIEMPO_SUSPENSION;
     int TIEMPO_DEADLOCK;
     char *LOG_LEVEL;
@@ -37,13 +38,13 @@ typedef struct {
 //Procesos
 
 typedef struct {
-    int NEW; 
-    int READY;
-    int EXECUTE;
-    int BLOCKED;
-    int BLOCKED_SUSPENDED;
-    int READY_SUSPENDED;
-    int EXIT;
+    int new; 
+    int ready;
+    int execute;
+    int blocked;
+    int blocked_suspended;
+    int ready_suspended;
+    int exit;
 }t_metricas_de_estados;
 
 typedef struct {
@@ -60,7 +61,7 @@ typedef struct {
     int tamanio_proceso;
     int pid;
     int pc;
-    t_mutex_queue* queue_ESTADO;
+    t_mutex_queue* queue_ESTADO_Actual;
     t_metricas_de_estados *metricas_de_estado;
     t_metricas_de_tiempo *metricas_de_tiempo;
 }t_pcb;
@@ -69,7 +70,6 @@ typedef struct {
 //Planificador
 
 typedef struct {
-
     t_mutex_queue* queue_READY;
     void (*algoritmo_planificador)(t_pcb* process, t_queue* estado);
 } t_short_term;
@@ -84,6 +84,7 @@ typedef struct {
 
     t_mutex_queue* queue_NEW;
     t_mutex_queue* queue_BLOCKED;
+    t_mutex_queue queue_EXIT;
     void (*algoritmo_planificador)(t_pcb* process, t_queue* estado);
 } t_long_term;
 typedef struct {

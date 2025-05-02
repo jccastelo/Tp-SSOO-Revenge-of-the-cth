@@ -44,23 +44,23 @@ void planner_init(){
         abort();
     }
 
-    planner->short_term->queue_EXECUTE->queue_ESTADO = queue_create();
+    planner->short_term->queue_READY->queue_ESTADO = queue_create();
 
     planner->medium_term->queue_BLOCKED_SUSPENDED->queue_ESTADO = queue_create();
     planner->medium_term->queue_READY_SUSPENDED->queue_ESTADO = queue_create();
 
     planner->long_term->queue_NEW->queue_ESTADO = queue_create();
-    planner->long_term->queue_READY->queue_ESTADO = queue_create();
+    planner->long_term->queue_EXIT->queue_ESTADO = queue_create();
     planner->long_term->queue_BLOCKED->queue_ESTADO = queue_create();
 
-    pthread_mutex_init(planner->short_term->queue_EXECUTE->mutex, NULL);
+    pthread_mutex_init(planner->short_term->queue_READY->mutex, NULL);
 
     pthread_mutex_init(planner->medium_term->queue_BLOCKED_SUSPENDED->mutex, NULL);
     pthread_mutex_init(planner->medium_term->queue_READY_SUSPENDED->mutex, NULL);
 
     pthread_mutex_init(planner->long_term->queue_NEW->mutex, NULL);
-    pthread_mutex_init(planner->long_term->queue_READY->mutex, NULL);
     pthread_mutex_init(planner->long_term->queue_BLOCKED->mutex, NULL);
+    pthread_mutex_init(planner->long_term->queue_EXIT_mutex, NULL);
 
     log_info(logger,"Planificador listo. Esperando para iniciar...");
 
@@ -108,6 +108,7 @@ void queue_process(t_pcb* process, int estado){
     case EXECUTE:
         process->metricas_de_estado->EXECUTE += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->EXECUTE));
+        cambiar_estado(planner->short_term->algoritmo_planificador, process, planner->short_term->queue_EXECUTE);
         // Aca entra el dispatcher 
         break;
 
@@ -120,19 +121,21 @@ void queue_process(t_pcb* process, int estado){
     case BLOCKED_SUSPENDED:
         process->metricas_de_estado->BLOCKED_SUSPENDED += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED_SUSPENDED));
-        cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
+        cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
+        //a
         break;
 
     case READY_SUSPENDED:
         process->metricas_de_estado->READY_SUSPENDED += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY_SUSPENDED));
-        cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->medium_term->queue_READY_SUSPENDED);
+        cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_READY_SUSPENDED);
         //a
         break;
 
     case EXIT:
         process->metricas_de_estado->EXIT += 1;
         temporal_stop(process->metricas_de_tiempo->metrica_actual);
+        cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->medium_term->queue_READY_SUSPENDED);
         // carnuicero(); deberiamos crear una cola de procesos que hicieron exit y eliminar de a uno o hacer hilos con la funcion carnicero
         break;
     }
@@ -144,10 +147,12 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_queue* esta
     pthread_mutex_lock(process->queue_ESTADO_Actual->mutex);
     queue_pop(process->queue_ESTADO_Actual->queue_ESTADO);
     pthread_mutex_unlock(process->queue_ESTADO_Actual->mutex);
+
     // Cerramos el mutex y replanificamos la cola del estado al que pasamos agregando el pcb
     pthread_mutex_lock(sgteEstado->mutex);
     algoritmo_planificador(process, sgteEstado->queue_ESTADO);
     pthread_mutex_unlock(sgteEstado->mutex);
+
     // Cambiamos el estado del pcb
     process->queue_ESTADO_Actual = sgteEstado;
 }
