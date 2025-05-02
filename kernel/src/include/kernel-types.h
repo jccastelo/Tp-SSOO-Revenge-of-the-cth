@@ -21,7 +21,7 @@ typedef struct {
     char *LOG_LEVEL;
 } t_config_kernel;
 
-//Servers del kernel
+// Servers del kernel
 typedef struct {
     int id_server_dispatch;
     int id_server_interrupt;
@@ -35,7 +35,7 @@ typedef struct {
     pthread_mutex_t* mutex;
 }t_mutex_queue;
 
-//Procesos
+// Procesos
 
 typedef struct {
     int new; 
@@ -67,7 +67,7 @@ typedef struct {
 }t_pcb;
 
 
-//Planificador
+// Planificador
 
 typedef struct {
     t_mutex_queue* queue_READY;

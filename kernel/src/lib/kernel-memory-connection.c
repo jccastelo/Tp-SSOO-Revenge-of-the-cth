@@ -10,8 +10,12 @@ void kernel_memory_connection(void) {
 
 void set_socket_memoria(int socket) {
     // Guardamos el socket de la memoria en la variable global:
-    int socket_memoria = socket;
+    socket_memoria = socket;
 
     // Enviamos el handshake a la memoria:
     generar_handshake(socket_memoria, "KERNEL a MEMORIA");
+}
+
+void solicitar_memoria(t_pcb* process) {
+    //hago paquete con tamano de 
 }

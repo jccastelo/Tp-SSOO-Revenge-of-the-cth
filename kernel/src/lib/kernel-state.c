@@ -7,3 +7,5 @@ t_kernel_servers *kernel_servers;
 t_planner *planner;
 t_short_term *short_term_planner;
 t_long_term *long_term_planner;
+
+int socket_memoria;

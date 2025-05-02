@@ -100,7 +100,10 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->new += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->NEW));
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW);
-        // Gestion de memoria
+
+        solicitar_memoria(process);
+        
+        queue_process(process, READY);
         break;
 
     case READY:
@@ -147,10 +150,12 @@ void queue_process(t_pcb* process, int estado){
 
 void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_queue* estado), t_pcb* process, t_mutex_queue* sgteEstado){
     
-    // Cerramos el mutex y sacamos el pcb de la cola del estado en el que estaba el proceso (que esta primero)
-    pthread_mutex_lock(process->queue_ESTADO_ACTUAL->mutex);
-    queue_pop(process->queue_ESTADO_ACTUAL->queue_ESTADO);
-    pthread_mutex_unlock(process->queue_ESTADO_ACTUAL->mutex);
+    if(process->queue_ESTADO_ACTUAL != NULL){
+        // Cerramos el mutex y sacamos el pcb de la cola del estado en el que estaba el proceso (que esta primero)
+        pthread_mutex_lock(process->queue_ESTADO_ACTUAL->mutex);
+        queue_pop(process->queue_ESTADO_ACTUAL->queue_ESTADO);
+        pthread_mutex_unlock(process->queue_ESTADO_ACTUAL->mutex);
+    }
 
     // Cerramos el mutex y replanificamos la cola del estado al que pasamos agregando el pcb
     pthread_mutex_lock(sgteEstado->mutex);

@@ -11,7 +11,6 @@ void kernel_servers_listening() {
     pthread_create(&kernel_server_dispatcher, NULL, (void*) kernel_server_dispatcher_listening, NULL);
     pthread_create(&kernel_server_interrupt, NULL, (void*) kernel_server_interrupt_listening, NULL);
 
-    // Esperamos a que los hilos terminen:
     pthread_detach(kernel_server_io);
     pthread_detach(kernel_server_dispatcher);
     pthread_detach(kernel_server_interrupt);

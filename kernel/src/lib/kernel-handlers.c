@@ -53,6 +53,15 @@ void kernel_server_dispatch_handler(int client_socket, int operation, const char
         log_info(logger,"Se recibio la syscall IO desde el server %s",server_name);
         break;
 
+     case EXIT_Sys:
+        //llega el proceso a eliminar
+        //se preg a memoria
+        //se pasa a cola exit
+        //se libera pcb
+
+        log_info(logger,"Se recibio la syscall EXIT_Sys desde el server %s",server_name);
+        break;
+
     default:
         log_error(logger, "Operación no válida para el servidor INTERRUPT: %d", operation);
         break;
