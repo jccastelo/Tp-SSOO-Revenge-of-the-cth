@@ -20,15 +20,15 @@ t_pcb *process_init(){
     new_process->tamanio_proceso = 0;
     new_process->pid = 0;
     new_process->pc = 0;
-    new_process->queue_ESTADO = planner->long_term->queue_NEW;
+    new_process->queue_ESTADO_ACTUAL = planner->long_term->queue_NEW;
     
-    new_process->metricas_de_estado->NEW= 0;
-    new_process->metricas_de_estado->READY= 0;
-    new_process->metricas_de_estado->EXECUTE= 0;
-    new_process->metricas_de_estado->BLOCKED= 0;
-    new_process->metricas_de_estado->BLOCKED_SUSPENDED= 0;
-    new_process->metricas_de_estado->READY_SUSPENDED= 0;
-    new_process->metricas_de_estado->EXIT = 0;
+    new_process->metricas_de_estado->new = 0;
+    new_process->metricas_de_estado->ready = 0;
+    new_process->metricas_de_estado->execute = 0;
+    new_process->metricas_de_estado->blocked = 0;
+    new_process->metricas_de_estado->blocked_suspended = 0;
+    new_process->metricas_de_estado->ready_suspended = 0;
+    new_process->metricas_de_estado->exit = 0;
 
     new_process->metricas_de_tiempo->NEW = NULL;
     new_process->metricas_de_tiempo->READY = NULL;

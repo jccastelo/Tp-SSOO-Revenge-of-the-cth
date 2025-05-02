@@ -61,7 +61,7 @@ typedef struct {
     int tamanio_proceso;
     int pid;
     int pc;
-    t_mutex_queue* queue_ESTADO_Actual;
+    t_mutex_queue* queue_ESTADO_ACTUAL;
     t_metricas_de_estados *metricas_de_estado;
     t_metricas_de_tiempo *metricas_de_tiempo;
 }t_pcb;
@@ -84,11 +84,11 @@ typedef struct {
 
     t_mutex_queue* queue_NEW;
     t_mutex_queue* queue_BLOCKED;
-    t_mutex_queue queue_EXIT;
+    t_mutex_queue* queue_EXIT;
     void (*algoritmo_planificador)(t_pcb* process, t_queue* estado);
 } t_long_term;
 typedef struct {
-
+    t_mutex_queue *queue_EXECUTE;
     t_short_term *short_term;
     t_medium_term *medium_term; 
     t_long_term *long_term;
