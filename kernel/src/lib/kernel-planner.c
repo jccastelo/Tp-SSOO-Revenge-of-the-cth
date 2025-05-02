@@ -44,17 +44,23 @@ void planner_init(){
         abort();
     }
 
-    planner->short_term->queue_READY->queue_ESTADO = queue_create();
+    planner->short_term->queue_EXECUTE->queue_ESTADO = queue_create();
+
     planner->medium_term->queue_BLOCKED_SUSPENDED->queue_ESTADO = queue_create();
     planner->medium_term->queue_READY_SUSPENDED->queue_ESTADO = queue_create();
+
     planner->long_term->queue_NEW->queue_ESTADO = queue_create();
+    planner->long_term->queue_READY->queue_ESTADO = queue_create();
     planner->long_term->queue_BLOCKED->queue_ESTADO = queue_create();
 
-    pthread_mutex_init(planner->short_term->queue_READY->mutex, NULL);
+    pthread_mutex_init(planner->short_term->queue_EXECUTE->mutex, NULL);
+
     pthread_mutex_init(planner->medium_term->queue_BLOCKED_SUSPENDED->mutex, NULL);
     pthread_mutex_init(planner->medium_term->queue_READY_SUSPENDED->mutex, NULL);
-    pthread_mutex_init(planner->long_term->queue_BLOCKED->mutex, NULL);
+
     pthread_mutex_init(planner->long_term->queue_NEW->mutex, NULL);
+    pthread_mutex_init(planner->long_term->queue_READY->mutex, NULL);
+    pthread_mutex_init(planner->long_term->queue_BLOCKED->mutex, NULL);
 
     log_info(logger,"Planificador listo. Esperando para iniciar...");
 
@@ -135,15 +141,15 @@ void queue_process(t_pcb* process, int estado){
 void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_queue* estado), t_pcb* process, t_mutex_queue* sgteEstado){
     
     // Cerramos el mutex y sacamos el pcb de la cola del estado en el que estaba el proceso (que esta primero)
-    pthread_mutex_lock(process->queue_ESTADO->mutex);
-    queue_pop(process->queue_ESTADO->queue_ESTADO);
-    pthread_mutex_unlock(process->queue_ESTADO->mutex);
+    pthread_mutex_lock(process->queue_ESTADO_Actual->mutex);
+    queue_pop(process->queue_ESTADO_Actual->queue_ESTADO);
+    pthread_mutex_unlock(process->queue_ESTADO_Actual->mutex);
     // Cerramos el mutex y replanificamos la cola del estado al que pasamos agregando el pcb
     pthread_mutex_lock(sgteEstado->mutex);
     algoritmo_planificador(process, sgteEstado->queue_ESTADO);
     pthread_mutex_unlock(sgteEstado->mutex);
     // Cambiamos el estado del pcb
-    process->queue_ESTADO = sgteEstado;
+    process->queue_ESTADO_Actual = sgteEstado;
 }
 
 void actualizarTiempo(t_temporal **metrica_actual,t_temporal **metricas_de_tiempo_estado) 

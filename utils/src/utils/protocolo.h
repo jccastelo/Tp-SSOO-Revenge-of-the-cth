@@ -18,6 +18,7 @@ typedef enum {
 	INIT_PROC,
 	DUMP_MEMORY,
 	IO,
+	EXIT_Sys,
 } op_code;
 
 typedef struct

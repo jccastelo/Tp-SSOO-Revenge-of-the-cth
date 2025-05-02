@@ -24,7 +24,7 @@ void kernel_server_dispatch_handler(int client_socket, int operation, const char
     new_buffer->size = 0;
     new_buffer->stream = NULL;
 
-    new_buffer = recibir_buffer(& new_buffer->size,client_socket);
+    new_buffer->stream = recibir_buffer(&new_buffer->size,client_socket);
 
     switch(operation)
     {
