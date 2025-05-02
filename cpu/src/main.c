@@ -13,10 +13,10 @@ int main(int argc, char* argv[]) {
     sprintf(log_name, "cpu%s.log", id_cpu);
     logger = log_create(log_name, "CPU", true, LOG_LEVEL_INFO);
 
-    // Inicializamos la configuración del kernel y nos conectamos a él:
+    // Inicializamos la configuración
     cpu_config_init();
 
-    //Conectamos CPU a Kernel
+    //Conectamos CPU a Kernel y memoria
     cpu_connect();
     
     return 0;
