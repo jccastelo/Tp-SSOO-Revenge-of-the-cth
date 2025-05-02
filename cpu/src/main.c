@@ -18,6 +18,13 @@ int main(int argc, char* argv[]) {
 
     //Conectamos CPU a Kernel y memoria
     cpu_connect();
+
+    while (1) {
+        
+        recibir_contexto_de_kernel();
+
+        realizar_ciclo_de_instruccion();
+    }
     
     return 0;
 }
