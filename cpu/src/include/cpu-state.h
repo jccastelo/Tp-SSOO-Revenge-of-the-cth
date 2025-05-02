@@ -9,6 +9,7 @@
 
 // Definimos las variables globales:
 extern t_config_cpu *config_cpu;
+extern t_contexto* contexto;
 extern int socket_dispatch;
 extern int socket_interrupt;
 extern int socket_memoria;
