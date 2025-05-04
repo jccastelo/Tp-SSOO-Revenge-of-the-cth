@@ -1,4 +1,4 @@
-#include "include/memoria-server.h" 
+#include "../include/memoria-server.h" 
 
 void memoria_servers_init(void) {
     // Inicializamos variables:
