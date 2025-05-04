@@ -1,6 +1,7 @@
 #ifndef KERNEL_TYPES_H
 #define KERNEL_TYPES_H
 
+#include <commons/collections/list.h>
 #include <commons/collections/queue.h>
 #include <commons/temporal.h>
 #include <pthread.h>
@@ -57,7 +58,7 @@ typedef struct {
     t_temporal  *metrica_actual;
 }t_metricas_de_tiempo;
 typedef struct {
-    char *process_name;
+    char *archivo;
     int tamanio_proceso;
     int pid;
     int pc;

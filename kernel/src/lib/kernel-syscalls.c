@@ -8,6 +8,7 @@ void recibir_proceso(t_buffer *buffer ,int client_socket){
     cargar_proceso(process, buffer, client_socket);
 
     queue_process(process, NEW);
+
 }
 
 t_pcb *process_init(){
@@ -16,7 +17,7 @@ t_pcb *process_init(){
     new_process->metricas_de_estado = malloc(sizeof(t_metricas_de_estados));
     new_process->metricas_de_tiempo = malloc(sizeof(t_metricas_de_tiempo));
 
-    new_process->process_name = NULL;
+    new_process->archivo = NULL;
     new_process->tamanio_proceso = 0;
     new_process->pid = 0;
     new_process->pc = 0;
@@ -52,10 +53,10 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer, int client_socket){
     memcpy(&tamanio_nombre, buffer + desplazamiento, sizeof(int));
 
     // Copiamos el nombre del archivo
-    memcpy(process->process_name, buffer + desplazamiento, tamanio_nombre);
+    memcpy(process->archivo, buffer + desplazamiento, tamanio_nombre);
     desplazamiento+=tamanio_nombre;
     
-    // Copiamos el tamanio de arcivo
+    // Copiamos el tamanio de proceso
     memcpy(&process->tamanio_proceso, buffer+desplazamiento, sizeof(int));
     desplazamiento += sizeof(int);
 

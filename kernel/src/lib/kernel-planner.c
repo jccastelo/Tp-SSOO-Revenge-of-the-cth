@@ -100,10 +100,7 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->new += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->NEW));
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW);
-
-        solicitar_memoria(process);
-        
-        queue_process(process, READY);
+        memoria_init_proc(process);
         break;
 
     case READY:
