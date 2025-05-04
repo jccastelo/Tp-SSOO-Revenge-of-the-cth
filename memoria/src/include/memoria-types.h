@@ -9,6 +9,7 @@ typedef struct {
     int CANTIDAD_NIVELES;
     int RETARDO_MEMORIA;
     char *PATH_SWAPFILE;
+    char *PATH_INSTRUCCIONES;
     int RETARDO_SWAP;
     char* LOG_LEVEL;
     char *DUMP_PATH;
