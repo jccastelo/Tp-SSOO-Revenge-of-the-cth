@@ -17,4 +17,6 @@ extern t_long_term *long_term_planner;
 
 extern int socket_memoria;
 
+extern t_list *l_procesos;
+
 #endif // IO_STATE_H_

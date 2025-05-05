@@ -2,6 +2,8 @@
 
 void planner_init(){
 
+    l_procesos = list_create();
+
     t_planner *planner = malloc(sizeof(t_planner));
 
     planner->short_term = malloc(sizeof(t_short_term));
@@ -139,8 +141,8 @@ void queue_process(t_pcb* process, int estado){
     case EXIT:
         process->metricas_de_estado->exit += 1;
         temporal_stop(process->metricas_de_tiempo->metrica_actual);
-        cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->medium_term->queue_READY_SUSPENDED);
-        // carnuicero(); deberiamos crear una cola de procesos que hicieron exit y eliminar de a uno o hacer hilos con la funcion carnicero
+        cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_EXIT);
+        // carnicero(process); deberiamos crear una cola de procesos que hicieron exit y eliminar de a uno o hacer hilos con la funcion carnicero
         break;
     }
 }

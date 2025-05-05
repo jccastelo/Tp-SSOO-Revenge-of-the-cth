@@ -112,4 +112,5 @@ typedef enum {
     SJFcD,
 }t_planner_algorithm;
 
+
 # endif // KERNEL_TYPES_H

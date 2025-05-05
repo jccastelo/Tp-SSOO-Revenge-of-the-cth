@@ -44,10 +44,9 @@ t_pcb *process_init(){
 
 void cargar_proceso(t_pcb* process, t_buffer* buffer, int client_socket){
     
-    static int pid_unico = 0;
+    
 
 	int desplazamiento = 0;
-    
     // Copiamos el tamanio del nombre
     int tamanio_nombre;
     memcpy(&tamanio_nombre, buffer + desplazamiento, sizeof(int));
@@ -60,8 +59,7 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer, int client_socket){
     memcpy(&process->tamanio_proceso, buffer+desplazamiento, sizeof(int));
     desplazamiento += sizeof(int);
 
-    process->pid = pid_unico;
-    pid_unico += 1;
+    process->pid = list_add(l_procesos,process);
 
     if(desplazamiento < buffer->size)
     { 

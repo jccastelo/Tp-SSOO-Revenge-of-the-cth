@@ -1,0 +1,5 @@
+/Ahora se pide a la memoria para confirmacionde pasar proceso a ready
+
+/Agrego una list como variable global donde van a estar los procesos, su orden en la lista es su pid
+
+/Hago un pseudocodigo de la syscall de EXIT
