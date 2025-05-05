@@ -16,7 +16,7 @@ void set_socket_memoria(int socket) {
     generar_handshake(socket_memoria, "KERNEL a MEMORIA");
 }
 
-void memoria_init_proc(t_pcb* process) {
+char* memoria_init_proc(t_pcb* process) {
      t_paquete* paquete = crear_paquete(INIT_PROC);
      agregar_a_paquete(paquete, process->archivo, strlen(process->archivo) + 1);
      agregar_a_paquete(paquete, &process->tamanio_proceso, sizeof(int));
@@ -26,8 +26,12 @@ void memoria_init_proc(t_pcb* process) {
 
     pthread_create(&memoria_init_proc, NULL, (void*) kernel_wait_init_proc(process), NULL);
 
-    pthread_join(memoria_init_proc,NULL);
+    void* retorno;
+    pthread_join(memoria_init_proc, &retorno);
 
+    char* resultado = (char*)retorno;
+
+    return resultado;
 }
 
 void* kernel_wait_init_proc(t_pcb* process)

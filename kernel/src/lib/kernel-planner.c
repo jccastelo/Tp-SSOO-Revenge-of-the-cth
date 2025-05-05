@@ -102,7 +102,13 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->new += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->NEW));
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW);
-        memoria_init_proc(process);
+
+        if(queue_size(planner->long_term->queue_NEW)){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
+            
+            if(strcmp(memoria_init_proc(process), "OK")){ // SI hay lugar en memoria pasa a ready
+                queue_process(process, READY);
+            } // sino se queda esperando 
+        }
         break;
 
     case READY:

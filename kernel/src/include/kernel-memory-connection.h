@@ -15,7 +15,7 @@
 
 void kernel_memory_connection(void);
 void set_socket_memoria(int);
-void memoria_init_proc(t_pcb* process);
+char* memoria_init_proc(t_pcb* process);
 void* kernel_wait_init_proc(t_pcb* process);
 
 #endif // KERNEL_MEMORY_CONNECTION_H
