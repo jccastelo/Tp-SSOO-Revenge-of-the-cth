@@ -54,19 +54,8 @@ void kernel_server_dispatch_handler(int client_socket, int operation, const char
         break;
 
      case EXIT_Sys:
-        /*delate_process(new_buffer);
-
-                { int pid_delate = recv(paquete donde esta el pid);
-
-                    t_pcb *process_to_delate = list_get(t_list l_procesos, pid_delate);
-
-                    avisar_memoria();
-
-                    queue_process(process_to_delate,EXIT) }
-            
-            //Algo asi deberia pasar
-        */
-
+        delate_process(new_buffer,client_socket);
+         
         log_info(logger,"Se recibio la syscall EXIT_Sys desde el server %s",server_name);
         break;
 

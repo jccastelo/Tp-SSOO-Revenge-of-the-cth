@@ -17,4 +17,5 @@ void recibir_proceso(t_buffer *buffer ,int client_socket);
 t_pcb *process_init();
 void cargar_proceso(t_pcb* procces, t_buffer* buffer, int client_socket);
 
+void delate_process(t_buffer *buffer, int client_socket);
 #endif //KERNEL_SYSCALLS_H

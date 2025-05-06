@@ -20,6 +20,7 @@ char* memoria_init_proc(t_pcb* process) {
      t_paquete* paquete = crear_paquete(INIT_PROC);
      agregar_a_paquete(paquete, process->archivo, strlen(process->archivo) + 1);
      agregar_a_paquete(paquete, &process->tamanio_proceso, sizeof(int));
+     agregar_a_paquete(paquete, process->pid, sizeof(int));
      enviar_paquete(paquete, socket_memoria);
 
     pthread_t memoria_init_proc;
@@ -49,13 +50,43 @@ void* kernel_wait_init_proc(t_pcb* process)
             if(resultado == result_Ok)
             {
                 queue_process(process,READY);
+                
             }
         }
     }
     
     else if ( planner->long_term->algoritmo_planificador == queue_FIFO ) //PROCESO MAS CHICO PRIMERO
     {   
-        recv(socket, &resultado, sizeof(int32_t), MSG_WAITALL);
+        recv(socket_memoria, &resultado, sizeof(int32_t), MSG_WAITALL);
+        
     }
 
+}
+
+void memory_delete_process(t_pcb *process_to_delate)
+{
+    pthread_t memoria_delate_proc; //Creo hilo para eliminar el proceso
+
+    pthread_create(&memoria_delate_proc, NULL, (void*) kernel_wait_delate_proc(process_to_delate), NULL); //Le asigno la funcion de eliminacion
+
+    pthread_join(memoria_delate_proc, NULL); //Espero su respuesta sin colgar el programa completo
+}
+
+void *kernel_wait_delate_proc(t_pcb *process_to_delate)
+{
+    t_paquete* paquete = crear_paquete(EXIT); //Creo paquete con syscall de salida
+
+    agregar_a_paquete(paquete, &(process_to_delate->pid), sizeof(int)); //Pongo en el paquete el PID Del proceso a eliminar
+
+    enviar_paquete(paquete, socket_memoria); //Envio el paquete
+
+    int resultado;
+	int result_Ok = 0;
+
+    recv(socket_memoria, &resultado, sizeof(int), MSG_WAITALL); //ESpero una respuesta de OK
+            
+     if(resultado == result_Ok) //Uso queueProcess ante respuesta positiva
+     {
+        queue_process(process_to_delate,EXIT);
+     }
 }

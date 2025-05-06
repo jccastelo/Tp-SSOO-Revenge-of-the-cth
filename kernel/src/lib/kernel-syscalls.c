@@ -68,3 +68,20 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer, int client_socket){
     else{ log_info(logger,"Se inicializo "); }
 
 }
+
+void delate_process(t_buffer *buffer, int client_socket){
+
+    int pid_delate;
+    int tamanio_pid;
+    int desplazamiento = 0;
+    
+    memcpy(&tamanio_pid, buffer + desplazamiento, sizeof(int));
+
+    memcpy(&pid_delate, buffer + desplazamiento, tamanio_pid);       
+
+    t_pcb *process_to_delate = list_get(l_procesos, pid_delate);
+
+    memory_delete_process(process_to_delate);
+    
+}
+
