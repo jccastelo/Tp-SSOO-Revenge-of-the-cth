@@ -9,10 +9,10 @@ void planner_init(){
     planner->short_term = malloc(sizeof(t_short_term));
     planner->medium_term = malloc(sizeof(t_medium_term));
     planner->long_term = malloc(sizeof(t_long_term));
-    planner->queue_EXECUTE = malloc(sizeof(t_mutex_queue));
+    planner->queue_EXECUTE = malloc(sizeof(t_monitor));
     
     pthread_mutex_init(planner->queue_EXECUTE->mutex, NULL);
-    planner->queue_EXECUTE->queue_ESTADO = queue_create();
+    planner->queue_EXECUTE->queue_ESTADO = list_create();
 
     switch(get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY))
     {
@@ -50,14 +50,14 @@ void planner_init(){
         abort();
     }
 
-    planner->short_term->queue_READY->queue_ESTADO = queue_create();
+    planner->short_term->queue_READY->queue_ESTADO = list_create();
 
-    planner->medium_term->queue_BLOCKED_SUSPENDED->queue_ESTADO = queue_create();
-    planner->medium_term->queue_READY_SUSPENDED->queue_ESTADO = queue_create();
+    planner->medium_term->queue_BLOCKED_SUSPENDED->queue_ESTADO = list_create();
+    planner->medium_term->queue_READY_SUSPENDED->queue_ESTADO = list_create();
 
-    planner->long_term->queue_NEW->queue_ESTADO = queue_create();
-    planner->long_term->queue_EXIT->queue_ESTADO = queue_create();
-    planner->long_term->queue_BLOCKED->queue_ESTADO = queue_create();
+    planner->long_term->queue_NEW->queue_ESTADO = list_create();
+    planner->long_term->queue_EXIT->queue_ESTADO = list_create();
+    planner->long_term->queue_BLOCKED->queue_ESTADO = list_create();
 
     pthread_mutex_init(planner->short_term->queue_READY->mutex, NULL);
 
@@ -103,7 +103,7 @@ void queue_process(t_pcb* process, int estado){
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->NEW));
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW);
 
-        if(queue_size(planner->long_term->queue_NEW->queue_ESTADO)){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
+        if(list_size(planner->long_term->queue_NEW->queue_ESTADO)){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
             
             if(strcmp(memoria_init_proc(process), "OK")){ // SI hay lugar en memoria pasa a ready
                 queue_process(process, READY);
@@ -153,12 +153,12 @@ void queue_process(t_pcb* process, int estado){
     }
 }
 
-void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_queue* estado), t_pcb* process, t_mutex_queue* sgteEstado){
+void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estado), t_pcb* process, t_monitor* sgteEstado){
     
     if(process->queue_ESTADO_ACTUAL != NULL){
         // Cerramos el mutex y sacamos el pcb de la cola del estado en el que estaba el proceso (que esta primero)
         pthread_mutex_lock(process->queue_ESTADO_ACTUAL->mutex);
-        queue_pop(process->queue_ESTADO_ACTUAL->queue_ESTADO);
+        list_remove_element(process->queue_ESTADO_ACTUAL->queue_ESTADO, process);
         pthread_mutex_unlock(process->queue_ESTADO_ACTUAL->mutex);
     }
 
@@ -193,7 +193,7 @@ void actualizarTiempo(t_temporal **metrica_actual,t_temporal **metricas_de_tiemp
 }
 
 
-void queue_FIFO(t_pcb *process, t_queue *queue)
+void queue_FIFO(t_pcb *process, t_list *lista)
 {
-    queue_push(queue,process);
+    list_add(lista, process);
 }

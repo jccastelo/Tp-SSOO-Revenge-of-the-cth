@@ -32,9 +32,9 @@ typedef struct {
 // Colas de estados
 
 typedef struct {
-    t_queue* queue_ESTADO;
+    t_list* queue_ESTADO;
     pthread_mutex_t* mutex;
-}t_mutex_queue;
+}t_monitor;
 
 // Procesos
 
@@ -62,7 +62,7 @@ typedef struct {
     int tamanio_proceso;
     int pid;
     int pc;
-    t_mutex_queue* queue_ESTADO_ACTUAL;
+    t_monitor* queue_ESTADO_ACTUAL;
     t_metricas_de_estados *metricas_de_estado;
     t_metricas_de_tiempo *metricas_de_tiempo;
 }t_pcb;
@@ -71,25 +71,25 @@ typedef struct {
 // Planificador
 
 typedef struct {
-    t_mutex_queue* queue_READY;
-    void (*algoritmo_planificador)(t_pcb* process, t_queue* estado);
+    t_monitor* queue_READY;
+    void (*algoritmo_planificador)(t_pcb* process, t_list* estado);
 } t_short_term;
 
 typedef struct {
-    t_mutex_queue* queue_BLOCKED_SUSPENDED;
-    t_mutex_queue* queue_READY_SUSPENDED;
-    void (*algoritmo_planificador)(t_pcb* process, t_queue* estado);
+    t_monitor* queue_BLOCKED_SUSPENDED;
+    t_monitor* queue_READY_SUSPENDED;
+    void (*algoritmo_planificador)(t_pcb* process, t_list* estado);
 } t_medium_term;
 
 typedef struct {
 
-    t_mutex_queue* queue_NEW;
-    t_mutex_queue* queue_BLOCKED;
-    t_mutex_queue* queue_EXIT;
-    void (*algoritmo_planificador)(t_pcb* process, t_queue* estado);
+    t_monitor* queue_NEW;
+    t_monitor* queue_BLOCKED;
+    t_monitor* queue_EXIT;
+    void (*algoritmo_planificador)(t_pcb* process, t_list* estado);
 } t_long_term;
 typedef struct {
-    t_mutex_queue *queue_EXECUTE;
+    t_monitor *queue_EXECUTE;
     t_short_term *short_term;
     t_medium_term *medium_term; 
     t_long_term *long_term;
