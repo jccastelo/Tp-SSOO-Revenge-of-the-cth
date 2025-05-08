@@ -18,9 +18,9 @@ void set_socket_memoria(int socket) {
 
 char* memoria_init_proc(t_pcb* process) {
      t_paquete* paquete = crear_paquete(INIT_PROC);
-     agregar_a_paquete(paquete, process->archivo, strlen(process->archivo) + 1);
+     agregar_a_paquete(paquete, &process->archivo, strlen(process->archivo) + 1);
      agregar_a_paquete(paquete, &process->tamanio_proceso, sizeof(int));
-     agregar_a_paquete(paquete, process->pid, sizeof(int));
+     agregar_a_paquete(paquete, &process->pid, sizeof(int));
      enviar_paquete(paquete, socket_memoria);
 
     pthread_t memoria_init_proc;
