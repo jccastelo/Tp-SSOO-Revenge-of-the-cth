@@ -20,7 +20,7 @@ void set_socket_memoria(int);
 char* memoria_init_proc(t_pcb* process);
 void* kernel_wait_init_proc(t_pcb* process);
 
-void memory_delete_process(t_pcb *process_to_delate);
+int memory_delete_process(t_pcb *process_to_delate);
 void *kernel_wait_delate_proc(t_pcb *process_to_delate);
 
 #endif // KERNEL_MEMORY_CONNECTION_H

@@ -9,5 +9,6 @@ t_short_term *short_term_planner;
 t_long_term *long_term_planner;
 
 int socket_memoria;
+
 t_list *list_procesos;
-t_list *list_cpu;
+t_list *list_cpus;

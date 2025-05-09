@@ -18,28 +18,27 @@ void kernel_server_interrupt_handler(int client_socket, int operation, const cha
     return;
 }
 
-void kernel_server_dispatch_handler(int client_socket, int operation, const char *server_name) {
+void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *server_name) {
 
     t_buffer* new_buffer = malloc(sizeof(t_buffer));
     new_buffer->size = 0;
     new_buffer->stream = NULL;
 
-    new_buffer->stream = recibir_buffer(&new_buffer->size,client_socket);
+    new_buffer->stream = recibir_buffer(&new_buffer->size, cpu_socket);
 
     switch(operation)
     {
+    case HANDSHAKE:
+        recibir_handshake(cpu_socket);
+        break;
 
     case CPU_ID:
-        iniciar_cpu(new_buffer,client_socket);
+        iniciar_cpu(new_buffer,cpu_socket);
         log_info(logger,"Se recibio la ID de la CPU desde el server %s",server_name);
         break;
 
-    case HANDSHAKE:
-        recibir_handshake(client_socket);
-        break;
-
     case INIT_PROC:
-        recibir_proceso(new_buffer,client_socket);
+        recibir_proceso(new_buffer,cpu_socket);
         log_info(logger,"Se recibio la syscall INIC_PROC desde el server %s",server_name);
         break;
 
@@ -54,7 +53,8 @@ void kernel_server_dispatch_handler(int client_socket, int operation, const char
         break;
 
      case EXIT_Sys:
-        delate_process(new_buffer,client_socket);
+        delate_process(new_buffer,cpu_socket);
+        set_cpu(cpu_socket, DISPONIBLE);
          
         log_info(logger,"Se recibio la syscall EXIT_Sys desde el server %s",server_name);
         break;

@@ -1,16 +1,5 @@
 #include "../include/kernel-syscalls.h"
 
-
-void recibir_proceso(t_buffer *buffer ,int client_socket){
-
-    t_pcb *process =  process_init();
-
-    cargar_proceso(process, buffer, client_socket);
-
-    queue_process(process, NEW);
-
-}
-
 t_pcb *process_init(){
 
     t_pcb *new_process = malloc(sizeof(t_pcb));
@@ -42,6 +31,16 @@ t_pcb *process_init(){
     return new_process;
 }
 
+void recibir_proceso(t_buffer *buffer ,int client_socket){
+
+    t_pcb *process =  process_init();
+
+    cargar_proceso(process, buffer, client_socket);
+
+    queue_process(process, NEW);
+
+}
+
 void cargar_proceso(t_pcb* process, t_buffer* buffer, int client_socket){
     
     
@@ -53,6 +52,7 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer, int client_socket){
     desplazamiento += sizeof(int);
 
     // Copiamos el nombre del archivo
+    process->archivo = malloc(tamanio_nombre + 1);
     memcpy(process->archivo, buffer->stream+ + desplazamiento, tamanio_nombre);
     desplazamiento+=tamanio_nombre;
     
@@ -62,10 +62,8 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer, int client_socket){
 
     process->pid = list_add(list_procesos,process);
 
-    if(desplazamiento < buffer->size)
-    { 
-        log_info(logger,"Hay informacion sin deserializar en INIC_PROC"); 
-    }
+    if(desplazamiento < buffer->size) 
+    {log_info(logger,"Hay informacion sin deserializar en INIC_PROC"); }
     else{ log_info(logger,"Se inicializo "); }
 
 }
@@ -85,7 +83,6 @@ void delate_process(t_buffer *buffer, int client_socket){
 
     t_pcb *process_to_delate = list_get(list_procesos, pid_delate); //Obtengo el proceso a eliminar de la lista global
 
-    memory_delete_process(process_to_delate); //Eenvio a la conexion con memoria a aprobar la eliminacion del proceso
-    
+    queue_process(process_to_delate,EXIT); 
 }
 

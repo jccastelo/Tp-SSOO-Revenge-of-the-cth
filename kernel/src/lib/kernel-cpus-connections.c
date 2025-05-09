@@ -7,8 +7,6 @@ void iniciar_cpu(t_buffer *buffer,int socket_cliente)
     int tamanio_cpu_id; 
     int desplazamiento = 0;
 
-    //memcpy(&cpu_id, buffer->stream, sizeof(int)); SI SOLO VIENE UN CPU_ID SIN TAMANO
-
     memcpy(&tamanio_cpu_id, buffer->stream + desplazamiento, sizeof(int));
     desplazamiento += sizeof(int);
 
@@ -25,7 +23,26 @@ t_cpu *cpu_init(){
 
     new_cpu ->id= -1;
     new_cpu->estado= DISPONIBLE;
+    new_cpu->pid= -1;
     new_cpu->socket_cpu= -1;
 
     return new_cpu;
+}
+
+void set_cpu(int cpu_socket_buscado,int estado_nuevo)
+{
+    int socket_actual = -1;
+
+    for(int i = 0; i< list_size(list_cpus) ; i++)
+    {   
+        t_cpu *cpu =list_get(list_cpus,i);
+        socket_actual = cpu->socket_cpu;
+
+        if(socket_actual == cpu_socket_buscado)
+        {
+            cpu->estado = estado_nuevo;
+            return;
+        }
+    }
+    
 }

@@ -112,9 +112,12 @@ typedef enum {
     SJFcD,
 }t_planner_algorithm;
 
+
+//Cpu estructuras
 typedef struct{
     int id;
     int estado;
+    int pid;
     int socket_cpu;
 }t_cpu;
 
