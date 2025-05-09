@@ -19,5 +19,29 @@
  *                          La memoria para la cadena se asigna dinámicamente dentro de la función.
  */
 void rcv_setup_to_process(int client_socket, int *id_process, int *tam_process, char **file_procces);
+/**
+ * @brief Parsea un entero desde un buffer en una posición determinada.
+ *
+ * Esta función copia un valor entero (`int`) desde el buffer en la posición indicada
+ * por el desplazamiento, lo almacena en la variable de destino y actualiza el desplazamiento.
+ *
+ * @param buffer Puntero al buffer que contiene los datos.
+ * @param desplazamiento Puntero al desplazamiento actual dentro del buffer (en bytes). Se actualiza tras la lectura.
+ * @param destino Puntero a la variable donde se almacenará el valor entero parseado.
+ */
+void parsear_int(void* buffer, int* desplazamiento, int* destino);
+
+/**
+ * @brief Parsea una cadena de caracteres desde un buffer.
+ *
+ * Esta función lee un entero inicial que representa la longitud de la cadena,
+ * luego copia esa cantidad de caracteres desde el buffer, reserva memoria para el string
+ * e incluye el caracter nulo al final (`'\0'`). También actualiza el desplazamiento.
+ *
+ * @param buffer Puntero al buffer que contiene los datos.
+ * @param desplazamiento Puntero al desplazamiento actual dentro del buffer (en bytes). Se actualiza tras la lectura.
+ * @param destino Puntero donde se almacenará el puntero a la cadena parseada (se reserva memoria internamente).
+ */
+void parsear_string(void* buffer, int* desplazamiento, char** destino);
 
 #endif // MEMORIA_PROTOCOLS_H
