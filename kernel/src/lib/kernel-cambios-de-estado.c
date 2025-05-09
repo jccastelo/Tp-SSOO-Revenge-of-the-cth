@@ -22,13 +22,24 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->ready += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY));
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->short_term->queue_READY);
+        
+        if(buscar_cpu_disponible() != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
+        {
+            queue_process(process, EXECUTE);
+        }
+
         break;
 
     case EXECUTE:
         process->metricas_de_estado->execute += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->EXECUTE));
         cambiar_estado(queue_FIFO, process, planner->queue_EXECUTE);
-        // Aca entra el dispatcher => mandamos el proceso a cpu
+
+        t_cpu* cpu_a_ocupar = buscar_cpu_disponible();
+        if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
+        {
+            enviar_proceso_cpu(cpu_a_ocupar, process);
+        } else { log_error(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
         break;
 
     case BLOCKED:

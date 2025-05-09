@@ -44,5 +44,29 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo)
             return;
         }
     }
+}
+
+t_cpu* buscar_cpu_disponible(){
+
+    for(int i = 0; i< list_size(list_cpus) ; i++)
+    {   
+        t_cpu* cpu =list_get(list_cpus,i);
+
+        if(cpu->estado == DISPONIBLE)
+        {
+            return cpu;
+        }
+    }
+
+    return NULL;
+}
+
+void enviar_proceso_cpu(t_cpu* cpu_a_ocupar, t_pcb* process){
     
+    t_paquete* paquete;
+    crear_buffer(paquete);
+    agregar_a_paquete(paquete, process->pid, sizeof(int));
+    agregar_a_paquete(paquete, process->pc, sizeof(int));
+    enviar_paquete(paquete, cpu_a_ocupar->socket_cpu);
+    eliminar_paquete(paquete);
 }
