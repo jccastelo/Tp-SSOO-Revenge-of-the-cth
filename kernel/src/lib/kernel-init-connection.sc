@@ -1,4 +1,4 @@
-#include "include/kernel-connection.h" 
+#include "include/kernel-init-connection.h" 
 
 void kernel_servers_init(void) {
     // Inicializamos variables:

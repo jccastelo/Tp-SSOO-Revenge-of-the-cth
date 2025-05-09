@@ -1,5 +1,5 @@
-#ifndef KERNEL_CONNECTION_H
-#define KERNEL_CONNECTION_H
+#ifndef KERNEL_INIT_CONNECTION_H
+#define KERNEL_INIT_CONNECTION_H
 
 // Incluye las bibliotecas necesarias externas:
 #include <utils/logger.h>
@@ -52,4 +52,4 @@ void set_io_id (int id_server);
 */
 void set_interrupt_id(int id_server);
 
-#endif /* KERNEL_CONNECTION_H */
+#endif /* KERNEL_INIT_CONNECTION_H */

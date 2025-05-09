@@ -112,5 +112,15 @@ typedef enum {
     SJFcD,
 }t_planner_algorithm;
 
+typedef struct{
+    int id;
+    int estado;
+    int socket_cpu;
+}t_cpu;
+
+typedef enum{
+    DISPONIBLE,
+    EJECUTANDO,
+}cpu_estado;
 
 # endif // KERNEL_TYPES_H

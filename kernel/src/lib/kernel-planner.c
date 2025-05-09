@@ -2,7 +2,9 @@
 
 void planner_init(){
 
-    l_procesos = list_create();
+    list_procesos = list_create();
+
+    list_cpus = list_create();
 
     t_planner *planner = malloc(sizeof(t_planner));
 

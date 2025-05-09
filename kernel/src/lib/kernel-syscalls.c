@@ -49,17 +49,18 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer, int client_socket){
 	int desplazamiento = 0;
     // Copiamos el tamanio del nombre
     int tamanio_nombre;
-    memcpy(&tamanio_nombre, buffer + desplazamiento, sizeof(int));
+    memcpy(&tamanio_nombre, buffer->stream+ + desplazamiento, sizeof(int));
+    desplazamiento += sizeof(int);
 
     // Copiamos el nombre del archivo
-    memcpy(process->archivo, buffer + desplazamiento, tamanio_nombre);
+    memcpy(process->archivo, buffer->stream+ + desplazamiento, tamanio_nombre);
     desplazamiento+=tamanio_nombre;
     
     // Copiamos el tamanio de proceso
-    memcpy(&process->tamanio_proceso, buffer+desplazamiento, sizeof(int));
+    memcpy(&process->tamanio_proceso, buffer->stream+desplazamiento, sizeof(int));
     desplazamiento += sizeof(int);
 
-    process->pid = list_add(l_procesos,process);
+    process->pid = list_add(list_procesos,process);
 
     if(desplazamiento < buffer->size)
     { 
@@ -71,17 +72,20 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer, int client_socket){
 
 void delate_process(t_buffer *buffer, int client_socket){
 
-    int pid_delate;
-    int tamanio_pid;
+    int tamanio_pid; 
+    int pid_delate; //Solo necesito el pid del proceso
     int desplazamiento = 0;
-    
-    memcpy(&tamanio_pid, buffer + desplazamiento, sizeof(int));
 
-    memcpy(&pid_delate, buffer + desplazamiento, tamanio_pid);       
+    //memcpy(&pid_delate, buffer->stream, sizeof(int)); SI SOLO VIENE UN PID SIN TAMANO
 
-    t_pcb *process_to_delate = list_get(l_procesos, pid_delate);
+    memcpy(&tamanio_pid, buffer->stream + desplazamiento, sizeof(int));
+    desplazamiento += sizeof(int);
 
-    memory_delete_process(process_to_delate);
+    memcpy(&pid_delate, buffer->stream + desplazamiento, tamanio_pid);
+
+    t_pcb *process_to_delate = list_get(list_procesos, pid_delate); //Obtengo el proceso a eliminar de la lista global
+
+    memory_delete_process(process_to_delate); //Eenvio a la conexion con memoria a aprobar la eliminacion del proceso
     
 }
 

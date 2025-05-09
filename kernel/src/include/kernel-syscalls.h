@@ -11,7 +11,7 @@
 // Incluyo las bibliotecas internas necesarias:
 #include "kernel-planner.h"
 #include "kernel-state.h"
-#include "kernel-handlers.h"
+#include "kernel-escucha.h"
 
 void recibir_proceso(t_buffer *buffer ,int client_socket);
 t_pcb *process_init();

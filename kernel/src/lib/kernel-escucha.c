@@ -1,4 +1,4 @@
-#include "include/kernel-handlers.h"
+#include "include/kernel-escucha.h"
 
 void kernel_server_io_handler(int client_socket, int operation, const char *server_name) {
     if (operation == HANDSHAKE) {
@@ -30,7 +30,7 @@ void kernel_server_dispatch_handler(int client_socket, int operation, const char
     {
 
     case CPU_ID:
-
+        iniciar_cpu(new_buffer,client_socket);
         log_info(logger,"Se recibio la ID de la CPU desde el server %s",server_name);
         break;
 

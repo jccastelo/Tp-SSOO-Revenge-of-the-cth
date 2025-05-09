@@ -10,7 +10,7 @@
 
 // Incluyo las bibliotecas internas necesarias:
 #include "kernel-state.h"
-#include "kernel-handlers.h"
+#include "kernel-escucha.h"
 
 /**
  * @brief Inicia la escucha de los servidores principales del kernel.
