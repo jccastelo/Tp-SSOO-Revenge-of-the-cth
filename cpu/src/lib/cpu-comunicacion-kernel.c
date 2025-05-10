@@ -36,7 +36,7 @@ bool recibir_interrupciones() {
 void enviar_contexto_desalojo() {
     t_paquete* paquete = crear_paquete(CONTEXTO_DESALOJO);
     agregar_contexto_al_paquete(paquete);
-    enviar_paquete(paquete, socket_interrupt);
+    enviar_paquete(paquete, socket_dispatch);
 }
 
 
