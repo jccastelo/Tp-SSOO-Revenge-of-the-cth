@@ -41,7 +41,10 @@ t_instruccion* decode(char* instruccion) {
     return instr;
 }
 
-void excecute(t_instruccion* instruccion) { //TODO
+void excecute(t_instruccion* instruccion) {
+    char* parametros = concatenar_parametros(instruccion->argv, instruccion->argc);
+    log_info(logger, "## PID: %d - Ejecutando: %s - %s", contexto->pid, instruccion->argv[0], parametros);
+    free(parametros);
     switch (instruccion->tipo)
     {
     case NOOP:
@@ -91,6 +94,7 @@ bool es_syscall_que_frena(t_tipo_instruccion tipo) {
 bool check_interrupt() {
     bool finaliza = false;
     if (recibir_interrupciones()) {
+        log_info(logger, "## Llega interrupción al puerto Interrupt");
         enviar_contexto_desalojo();
         finaliza = true;
     }
