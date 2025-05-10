@@ -1,6 +1,5 @@
 #include "../include/cpu-comunicacion-memoria.h"
 
-// SE LA PIDO A MEMORIA
 void conseguir_siguiente_instruccion() {
     t_paquete* paquete = crear_paquete(GET_INSTRUCTION);
     agregar_a_paquete(paquete, &contexto->pc, sizeof(int));
@@ -9,7 +8,6 @@ void conseguir_siguiente_instruccion() {
 }
 
 
-// LO DEVUELVE MEMORIA
 char* devolver_instruccion_a_ejecutar() {
     int cod_op;
     int buffer_size;
