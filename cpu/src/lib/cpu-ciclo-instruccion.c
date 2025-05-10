@@ -84,7 +84,7 @@ void excecute(t_instruccion* instruccion) { //TODO
 }
 
 bool es_syscall_que_frena(t_tipo_instruccion tipo) {
-    return tipo == IO || tipo == INIT_PROC || tipo == DUMP_MEMORY || tipo == EXIT;
+    return tipo == IO || tipo == DUMP_MEMORY || tipo == EXIT;
 }
 
 
