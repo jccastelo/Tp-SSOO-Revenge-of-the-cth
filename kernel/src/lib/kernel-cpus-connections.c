@@ -63,7 +63,7 @@ t_cpu* buscar_cpu_disponible(){
 
 void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
     
-    t_paquete* paquete = crear_paquete(MENSAJE); // QUE VERGA LE PONGO
+    t_paquete* paquete = crear_paquete(CONTEXT_PROCESS); // QUE VERGA LE PONGO
     crear_buffer(paquete);
 
     agregar_a_paquete(paquete, &process->pid, sizeof(int));
@@ -72,6 +72,8 @@ void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
     enviar_paquete(paquete, cpu_socket);
 
     eliminar_paquete(paquete);
+
+    set_cpu(cpu_socket,EJECUTANDO);
 }
 
 t_pcb* recibir_proceso(t_buffer* buffer){

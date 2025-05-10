@@ -46,14 +46,13 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->blocked += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED));
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_BLOCKED);
-        
+        //Aca deberiamos hacer que la cola de readys se active para que uno pase a execute 
         break;
 
     case BLOCKED_SUSPENDED:
         process->metricas_de_estado->blocked_suspended += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED_SUSPENDED));
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
-        
         traer_proceso_a_MP();
         
         break;
@@ -62,7 +61,6 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->ready_suspended += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY_SUSPENDED));
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_READY_SUSPENDED);
-        //a
         break;
 
     case EXIT:

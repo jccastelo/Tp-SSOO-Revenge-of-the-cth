@@ -71,6 +71,7 @@ void *kernel_wait_delate_proc(t_pcb *process_to_delate)
     agregar_a_paquete(paquete, &(process_to_delate->pid), sizeof(int)); //Pongo en el paquete el PID Del proceso a eliminar
 
     enviar_paquete(paquete, socket_memoria); //Envio el paquete
+    
     eliminar_paquete(paquete);
 
     void* resultado;
