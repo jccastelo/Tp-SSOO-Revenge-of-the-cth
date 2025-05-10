@@ -13,9 +13,9 @@
 #include "kernel-state.h"
 #include "kernel-escucha.h"
 
-void recibir_proceso(t_buffer *buffer ,int client_socket);
+void recibir_y_crear_proceso(t_buffer *buffer);
 t_pcb *process_init();
-void cargar_proceso(t_pcb* procces, t_buffer* buffer, int client_socket);
+void cargar_proceso(t_pcb* procces, t_buffer* buffer);
 
-void delate_process(t_buffer *buffer, int client_socket);
+void delate_process(t_buffer *buffer);
 #endif //KERNEL_SYSCALLS_H

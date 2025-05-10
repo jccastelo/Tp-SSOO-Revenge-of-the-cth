@@ -31,17 +31,17 @@ t_pcb *process_init(){
     return new_process;
 }
 
-void recibir_proceso(t_buffer *buffer ,int client_socket){
+void recibir_y_crear_proceso(t_buffer *buffer){
 
     t_pcb *process =  process_init();
 
-    cargar_proceso(process, buffer, client_socket);
+    cargar_proceso(process, buffer);
 
     queue_process(process, NEW);
 
 }
 
-void cargar_proceso(t_pcb* process, t_buffer* buffer, int client_socket){
+void cargar_proceso(t_pcb* process, t_buffer* buffer){
     
     
 
@@ -68,7 +68,7 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer, int client_socket){
 
 }
 
-void delate_process(t_buffer *buffer, int client_socket){
+void delate_process(t_buffer *buffer){
 
     int tamanio_pid; 
     int pid_delate; //Solo necesito el pid del proceso

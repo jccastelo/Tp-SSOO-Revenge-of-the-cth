@@ -9,7 +9,8 @@
 t_cpu *cpu_init();
 void iniciar_cpu(t_buffer *buffer,int socket_cpu);
 void set_cpu(int cpu_socket_buscado,int estado_nuevo);
+t_pcb* recibir_proceso(t_buffer* buffer);
 t_cpu* buscar_cpu_disponible();
-void enviar_proceso_cpu(t_cpu* cpu_a_ocupar, t_pcb* process);
+void enviar_proceso_cpu(int cpu_socket, t_pcb* process);
 
 #endif //KERNEL_CPUS_CONNECTIONS_Hs

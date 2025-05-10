@@ -61,12 +61,35 @@ t_cpu* buscar_cpu_disponible(){
     return NULL;
 }
 
-void enviar_proceso_cpu(t_cpu* cpu_a_ocupar, t_pcb* process){
+void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
     
-    t_paquete* paquete;
+    t_paquete* paquete = crear_paquete(MENSAJE); // QUE VERGA LE PONGO
     crear_buffer(paquete);
-    agregar_a_paquete(paquete, process->pid, sizeof(int));
-    agregar_a_paquete(paquete, process->pc, sizeof(int));
-    enviar_paquete(paquete, cpu_a_ocupar->socket_cpu);
+
+    agregar_a_paquete(paquete, &process->pid, sizeof(int));
+    agregar_a_paquete(paquete, &process->pc, sizeof(int));
+
+    enviar_paquete(paquete, cpu_socket);
+
     eliminar_paquete(paquete);
+}
+
+t_pcb* recibir_proceso(t_buffer* buffer){
+    
+    int pid_recibido;
+    memcpy(&pid_recibido, buffer->stream, sizeof(int));
+    
+    free(buffer->stream);
+    free(buffer);
+
+    for(int i = 0; i < list_size(planner->queue_EXECUTE->queue_ESTADO); i++){
+        
+        t_pcb* process = list_get(planner->queue_EXECUTE->queue_ESTADO, i);
+        if(process->pid == pid_recibido)
+        {
+            return process;
+        }
+    }
+
+    return NULL;
 }

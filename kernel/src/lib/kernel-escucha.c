@@ -28,6 +28,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
 
     switch(operation)
     {
+    // Operaciones
     case HANDSHAKE:
         recibir_handshake(cpu_socket);
         break;
@@ -37,23 +38,34 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
         log_info(logger,"Se recibio la ID de la CPU desde el server %s",server_name);
         break;
 
+    // Syscalls
     case INIT_PROC:
-        recibir_proceso(new_buffer,cpu_socket);
+        recibir_y_crear_proceso(new_buffer);
         log_info(logger,"Se recibio la syscall INIC_PROC desde el server %s",server_name);
         break;
 
     case DUMP_MEMORY:
-    
+        t_pcb* process = recibir_proceso(new_buffer);
+        queue_process(process, BLOCKED);
+        // como se acaba de liberar una CPU, enviamos el primer proceso de READY a EXECUTE 
+        enviar_proceso_cpu(cpu_socket, list_get(planner->short_term->queue_READY->queue_ESTADO, 0)); 
+
         log_info(logger,"Se recibio la syscall INIC_PROC desde el server %s",server_name);
+        free(process);
         break;
 
     case IO:
+        process = recibir_proceso(new_buffer);
+        queue_process(process, BLOCKED);
+        // como se acaba de liberar una CPU, enviamos el primer proceso de READY a EXECUTE 
+        enviar_proceso_cpu(cpu_socket, list_get(planner->short_term->queue_READY->queue_ESTADO, 0)); 
 
         log_info(logger,"Se recibio la syscall IO desde el server %s",server_name);
+        free(process);
         break;
 
-     case EXIT_Sys:
-        delate_process(new_buffer,cpu_socket);
+    case EXIT_Sys:
+        delate_process(new_buffer);
         set_cpu(cpu_socket, DISPONIBLE);
          
         log_info(logger,"Se recibio la syscall EXIT_Sys desde el server %s",server_name);
