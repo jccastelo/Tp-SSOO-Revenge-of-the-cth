@@ -13,7 +13,7 @@ void planner_init(){
     planner->long_term = malloc(sizeof(t_long_term));
     planner->queue_EXECUTE = malloc(sizeof(t_monitor));
     
-    pthread_mutex_init(planner->queue_EXECUTE->mutex, NULL);
+    pthread_mutex_init(&(planner->queue_EXECUTE->mutex), NULL);
     planner->queue_EXECUTE->queue_ESTADO = list_create();
 
     switch(get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY))
@@ -52,23 +52,42 @@ void planner_init(){
         abort();
     }
 
+    //SHORT TERM
+    planner->short_term->queue_READY = malloc(sizeof(t_monitor));
+    pthread_mutex_init(&(planner->short_term->queue_READY->mutex), NULL);
     planner->short_term->queue_READY->queue_ESTADO = list_create();
 
+    //MEDIUM TERM
+    planner->medium_term->queue_BLOCKED_SUSPENDED = malloc(sizeof(t_monitor));
+    pthread_mutex_init(&(planner->medium_term->queue_BLOCKED_SUSPENDED->mutex), NULL);
     planner->medium_term->queue_BLOCKED_SUSPENDED->queue_ESTADO = list_create();
+
+    planner->medium_term->queue_READY_SUSPENDED = malloc(sizeof(t_monitor));
+    pthread_mutex_init(&(planner->medium_term->queue_READY_SUSPENDED->mutex), NULL);
     planner->medium_term->queue_READY_SUSPENDED->queue_ESTADO = list_create();
 
+    //LONG TERM
+    planner->long_term->queue_NEW = malloc(sizeof(t_monitor));
+    pthread_mutex_init(&(planner->long_term->queue_NEW->mutex), NULL);
     planner->long_term->queue_NEW->queue_ESTADO = list_create();
+
+    planner->long_term->queue_EXIT = malloc(sizeof(t_monitor));
+    pthread_mutex_init(&(planner->long_term->queue_EXIT->mutex), NULL);
     planner->long_term->queue_EXIT->queue_ESTADO = list_create();
+
+    planner->long_term->queue_BLOCKED = malloc(sizeof(t_monitor));
+    pthread_mutex_init(&(planner->long_term->queue_BLOCKED->mutex), NULL);
     planner->long_term->queue_BLOCKED->queue_ESTADO = list_create();
+    
 
-    pthread_mutex_init(planner->short_term->queue_READY->mutex, NULL);
+    
+   
 
-    pthread_mutex_init(planner->medium_term->queue_BLOCKED_SUSPENDED->mutex, NULL);
-    pthread_mutex_init(planner->medium_term->queue_READY_SUSPENDED->mutex, NULL);
+    
+   
+    
 
-    pthread_mutex_init(planner->long_term->queue_NEW->mutex, NULL);
-    pthread_mutex_init(planner->long_term->queue_BLOCKED->mutex, NULL);
-    pthread_mutex_init(planner->long_term->queue_EXIT->mutex, NULL);
+   
 
     log_info(logger,"Planificador listo. Esperando para iniciar...");
 
@@ -79,16 +98,16 @@ void planner_init(){
 
 int get_algoritm(char *algoritm_name)
 {
-    if(strcmp("FIFO",algoritm_name))
+    if(!strcmp("FIFO",algoritm_name))
     {return FIFO;}
 
-    else if(strcmp("PMCP",algoritm_name))
+    else if(!strcmp("PMCP",algoritm_name))
     {return PMCP;}
 
-    else if(strcmp("SJFsD",algoritm_name))
+    else if(!strcmp("SJFsD",algoritm_name))
     {return SJFsD;}
 
-    else if(strcmp("SJFcD",algoritm_name))
+    else if(!strcmp("SJFcD",algoritm_name))
     {return SJFcD;}
 
     else{log_info(logger,"BOOOM");

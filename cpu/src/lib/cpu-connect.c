@@ -4,12 +4,12 @@ void cpu_connect() {
     // Incializamos variables necesarias para la conexión:
     char *puerto_dispatch = string_itoa(config_cpu->PUERTO_KERNEL_DISPATCH);
     char *puerto_interrupt = string_itoa(config_cpu->PUERTO_KERNEL_INTERRUPT);
-    char *puerto_memoria = string_itoa(config_cpu->PUERTO_MEMORIA);
+    //char *puerto_memoria = string_itoa(config_cpu->PUERTO_MEMORIA);
 
     // Establecemos la conexión con el kernel dispatch y el kernel interrupt:
     setup_connection_with_server("Kernel DISPATCH", config_cpu->IP_KERNEL, puerto_dispatch, set_socket_kernel_dispatch);
     setup_connection_with_server("Kernel INTERRUPT", config_cpu->IP_KERNEL, puerto_interrupt, set_socket_kernel_interrupt);
-    setup_connection_with_server("Memoria", config_cpu->IP_MEMORIA, puerto_memoria, set_socket_memoria);
+    //setup_connection_with_server("Memoria", config_cpu->IP_MEMORIA, puerto_memoria, set_socket_memoria);
 }
 
 void set_socket_kernel_dispatch(int socket) {

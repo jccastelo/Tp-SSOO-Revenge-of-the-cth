@@ -26,11 +26,19 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
 
     new_buffer->stream = recibir_buffer(&new_buffer->size, cpu_socket);
 
+      if (operation == HANDSHAKE) {
+        log_info(logger,"LLego op handssake");
+        recibir_handshake(cpu_socket);
+    } else {
+        log_error(logger, "Operación no válida para el servidor IO: %d", operation);}
+
+
     switch(operation)
     {
     // Operaciones
     case HANDSHAKE:
         recibir_handshake(cpu_socket);
+        log_info(logger,"HUBO HANDSHAKE CON:  %s",server_name);
         break;
 
     case CPU_ID:

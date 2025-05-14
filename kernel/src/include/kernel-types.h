@@ -33,7 +33,7 @@ typedef struct {
 
 typedef struct {
     t_list* queue_ESTADO;
-    pthread_mutex_t* mutex;
+    pthread_mutex_t mutex;
 }t_monitor;
 
 // Procesos
