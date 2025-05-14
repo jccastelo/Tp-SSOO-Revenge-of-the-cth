@@ -19,6 +19,7 @@ int main() {
     //PLANIFICADOR LARGO, MEDIANO, CORTO PLAZO
     planner_init();
     
+    //RAMA TEEEEEEEEEEEEEEEEEEEEEEEEEEEEST
 
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
     // Ya que detachamos los hilos, no podemos esperar a que terminen.]
