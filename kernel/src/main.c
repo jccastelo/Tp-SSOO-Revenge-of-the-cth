@@ -14,14 +14,13 @@ int main() {
     //Nos conectamos a la memoria como clientes
     kernel_memory_connection();
 
-    
-
     //PLANIFICADOR LARGO, MEDIANO, CORTO PLAZO
     planner_init();
     
 
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
     // Ya que detachamos los hilos, no podemos esperar a que terminen.]
+    //HOLAAAAAAAAAA
     while(1) {
         
     }

@@ -46,6 +46,7 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer){
     
 
 	int desplazamiento = 0;
+    
     // Copiamos el tamanio del nombre
     int tamanio_nombre;
     memcpy(&tamanio_nombre, buffer->stream+ + desplazamiento, sizeof(int));

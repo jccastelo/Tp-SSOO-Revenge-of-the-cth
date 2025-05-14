@@ -68,7 +68,7 @@ void queue_process(t_pcb* process, int estado){
         temporal_stop(process->metricas_de_tiempo->metrica_actual);
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_EXIT);
         
-        if(memory_delete_process(process) == 0)
+        if(memory_delete_process(process) == 0 )
         {
             carnicero(process);
         }
