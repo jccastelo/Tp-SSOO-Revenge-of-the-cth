@@ -6,7 +6,7 @@ void planner_init(){
 
     list_cpus = list_create();
 
-    t_planner *planner = malloc(sizeof(t_planner));
+    planner = malloc(sizeof(t_planner));
 
     planner->short_term = malloc(sizeof(t_short_term));
     planner->medium_term = malloc(sizeof(t_medium_term));
@@ -144,4 +144,36 @@ void traer_proceso_a_MP(){
 void queue_FIFO(t_pcb *process, t_list *lista)
 {
     list_add(lista, process);
+}
+
+void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc){
+
+    //INICIO BUFFER
+    t_buffer* new_buffer = malloc(sizeof(t_buffer));
+    new_buffer->size = 0;
+    new_buffer->stream = NULL;
+
+    // Inicializamos los datos del buffer
+    int tamanio_nombre_archivo= strlen(archivo_pseudocodigo);
+    int total_size = sizeof(int) + tamanio_nombre_archivo + sizeof(int); // tamaño + mensaje + Tamanio_prco
+
+    new_buffer->stream = malloc(total_size);
+    new_buffer->size = total_size;
+
+    int desplazamiento = 0;
+
+    // Copiar el tamaño del archivo_pseudocodigo
+    memcpy(new_buffer->stream + desplazamiento, &tamanio_nombre_archivo, sizeof(int));
+    desplazamiento += sizeof(int);
+
+    // Copiar el mensaje
+    memcpy(new_buffer->stream + desplazamiento, archivo_pseudocodigo, tamanio_nombre_archivo);
+    desplazamiento += tamanio_nombre_archivo;
+
+    // Copiar el Tamanio_proc
+    memcpy(new_buffer->stream + desplazamiento, &Tamanio_proc, sizeof(int));
+    desplazamiento += sizeof(int);
+
+    //Llamada de la syscall INIC_PROC
+    recibir_y_crear_proceso(new_buffer);
 }

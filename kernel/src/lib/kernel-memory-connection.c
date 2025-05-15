@@ -39,7 +39,8 @@ char* memoria_init_proc(t_pcb* process) {
 
     char* resultado = (char*)retorno;
 
-    return resultado;
+    //return resultado;
+    return "OK";
 }
 
 void* kernel_wait_init_proc(t_pcb* process)

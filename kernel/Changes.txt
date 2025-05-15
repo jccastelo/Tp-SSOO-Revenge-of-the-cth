@@ -1,3 +1,7 @@
 /CORREGIR PLANNER INIT
     /CAMBIAR EL TIPO DE DATO DE MUTEX DE LAS COLAS
     /CORREGIR LOS MUTEX
+
+/CAmbio de desserializar el apquete
+
+/CAMbio en inicializacion del planner, no era global
