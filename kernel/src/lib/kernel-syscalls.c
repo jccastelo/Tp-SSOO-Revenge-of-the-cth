@@ -46,15 +46,15 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer){
     
 
 	int desplazamiento = 0;
-    
     // Copiamos el tamanio del nombre
-    int tamanio_nombre;
-    memcpy(&tamanio_nombre, buffer->stream+ + desplazamiento, sizeof(int));
+    int tamanio_nombre=0;
+    memcpy(&tamanio_nombre, buffer->stream+ desplazamiento, sizeof(int));
     desplazamiento += sizeof(int);
 
     // Copiamos el nombre del archivo
     process->archivo = malloc(tamanio_nombre + 1);
-    memcpy(process->archivo, buffer->stream+ + desplazamiento, tamanio_nombre);
+    memcpy(process->archivo, buffer->stream+  desplazamiento, tamanio_nombre);
+    process->archivo[tamanio_nombre] = '\0'; 
     desplazamiento+=tamanio_nombre;
     
     // Copiamos el tamanio de proceso
@@ -86,4 +86,3 @@ void delate_process(t_buffer *buffer){
 
     queue_process(process_to_delate,EXIT); 
 }
-

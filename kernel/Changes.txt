@@ -3,3 +3,11 @@
 /Agrego una list como variable global donde van a estar los procesos, su orden en la lista es su pid
 
 /Hago un pseudocodigo de la syscall de EXIT
+
+/CORREGIR PLANNER INIT
+    /CAMBIAR EL TIPO DE DATO DE MUTEX DE LAS COLAS
+    /CORREGIR LOS MUTEX
+
+/CAmbio de desserializar el apquete
+
+/CAMbio en inicializacion del planner, no era global

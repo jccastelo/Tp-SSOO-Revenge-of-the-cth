@@ -34,13 +34,11 @@ void* kernel_server_dispatcher_listening(void* _) {
     server_with_thread(
         server_socket, 
         "Kernel DISPATCH", 
-        conection_strategy_persistence, 
+        conection_strategy_once,
         kernel_server_dispatch_handler);
 
-     while(1) {
-        
-        
-     }
+     //while(1) {}      
+     
 
       return NULL;
 

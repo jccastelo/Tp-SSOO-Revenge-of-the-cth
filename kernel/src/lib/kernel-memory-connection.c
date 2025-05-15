@@ -29,7 +29,6 @@ char* memoria_init_proc(t_pcb* process) {
     agregar_a_paquete(paquete, &process->pid, sizeof(int));
     enviar_paquete(paquete, socket_memoria);
     eliminar_paquete(paquete);
-    
     pthread_t memoria_recive_proc;
 
     pthread_create(&memoria_recive_proc, NULL, (void*) kernel_wait_init_proc(process), NULL);
@@ -41,6 +40,7 @@ char* memoria_init_proc(t_pcb* process) {
     char* resultado = (char*)retorno;
 
     return resultado;
+   
 }
 
 void* kernel_wait_init_proc(t_pcb* process)

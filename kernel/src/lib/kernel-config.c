@@ -57,6 +57,11 @@ void configurar_valores_de_servidores(t_config_kernel* config_io, t_config* conf
 // To Do: Implementar una función que valide los valores de configuración de los algoritmos de planificación
 void configurar_valores_de_planificacion(t_config_kernel* config_io, t_config* config) {
     config_kernel->ALGORITMO_CORTO_PLAZO = strdup(config_get_string_value(config, "ALGORITMO_CORTO_PLAZO"));
+
+    if (config_kernel->ALGORITMO_CORTO_PLAZO == NULL) {
+    // Manejo de error si no se pudo asignar la cadena
+    log_info(logger, "Error al asignar ALGORITMO_CORTO_PLAZO desde el archivo de configuración");}
+
     config_kernel->ALGORITMO_INGRESO_A_READY = strdup(config_get_string_value(config, "ALGORITMO_INGRESO_A_READY"));
     config_kernel->ALFA = config_get_double_value(config, "ALFA");
     config_kernel->TIEMPO_SUSPENSION = config_get_int_value(config, "TIEMPO_SUSPENSION");
