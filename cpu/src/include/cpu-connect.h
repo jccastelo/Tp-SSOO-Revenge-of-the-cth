@@ -19,7 +19,7 @@
  * 
  * Generalmente, esta función se invoca durante la fase de inicialización del módulo de CPU.
  */
-void cpu_connect();
+void cpu_connect(int codigo);
 
 /**
  * @brief Asigna el socket utilizado para la comunicación con el servidor de dispatch del kernel.
@@ -53,5 +53,5 @@ void set_socket_kernel_interrupt(int socket);
  * @param socket Descriptor del socket que conecta la CPU con el módulo de memoria.
  */
 void set_socket_memoria(int socket);
-
+void identificar_cpu_A_kernel(int socket);
 #endif // CPU_CONNECT_H_

@@ -8,7 +8,9 @@ int main(int argc, char* argv[]) {
     cpu_config_init();
 
     //Conectamos CPU a Kernel
-    cpu_connect();
+    cpu_connect(0);
+
+    cpu_connect(1);
     
     return 0;
 }

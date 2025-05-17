@@ -88,7 +88,7 @@ void generar_handshake(int socket, char *server_name) {
 	op_code cod_op = HANDSHAKE; 
 	send(socket, &cod_op, sizeof(op_code), 0);
     send(socket, &handshake, sizeof(int32_t), 0);
-	
+
 	recv(socket, &result, sizeof(int32_t), MSG_WAITALL);
 
     if(result == 0) 

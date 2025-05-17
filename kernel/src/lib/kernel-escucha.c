@@ -46,8 +46,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
         log_info(logger,"LLego op handssake");
         recibir_handshake(cpu_socket);
         log_info(logger,"Coonexion disptach lista");
-    } else {
-        log_error(logger, "Operación no válida para el servidor DISPATCH: %d", operation);}
+      }
 
 
     switch(operation)
@@ -59,6 +58,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
         break;
 
     case CPU_ID:
+        log_info(logger, "Llego cpu para identificarse" );
         iniciar_cpu(new_buffer,cpu_socket);
         log_info(logger,"Se recibio la ID de la CPU desde el server %s",server_name);
         break;

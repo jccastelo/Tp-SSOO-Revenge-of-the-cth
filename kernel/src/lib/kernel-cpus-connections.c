@@ -14,6 +14,7 @@ void iniciar_cpu(t_buffer *buffer,int socket_cliente)
 
     cpu->socket_cpu = socket_cliente;
     
+    log_info(logger, "Llego cpu. ID: %d ",cpu->id);
     list_add(list_cpus,cpu);
 
 }
