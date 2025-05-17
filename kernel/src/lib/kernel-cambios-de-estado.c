@@ -11,8 +11,8 @@ void queue_process(t_pcb* process, int estado){
 
         if(list_size(planner->long_term->queue_NEW->queue_ESTADO) == 1 ){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
             
-            //queue_process(process,EXIT);//test
-            //return; //test
+            queue_process(process,EXIT);//test
+            return; //test
             if(strcmp(memoria_init_proc(process), "OK")){
                 queue_process(process, READY);
             } 
@@ -69,9 +69,10 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->exit += 1;
         temporal_stop(process->metricas_de_tiempo->metrica_actual);
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_EXIT);
-        //carnicero(process); //test
 
-        //return 0;//test
+        carnicero(process); //test
+        return ;//test
+
         if(memory_delete_process(process) == 0)
         {
             carnicero(process);

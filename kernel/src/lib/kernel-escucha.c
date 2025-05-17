@@ -9,11 +9,24 @@ void kernel_server_io_handler(int client_socket, int operation, const char *serv
     return;
 }
 
-void kernel_server_interrupt_handler(int client_socket, int operation, const char *server_name) {
-    if (operation == HANDSHAKE) {
-        recibir_handshake(client_socket);
-    } else 
-        log_error(logger, "Operación no válida para el servidor Interrupt: %d", operation);
+void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *server_name) {
+   
+    t_buffer* new_buffer = malloc(sizeof(t_buffer));
+    new_buffer->size = 0;
+    new_buffer->stream = NULL;
+
+    if((operation != HANDSHAKE))
+        {
+            new_buffer->stream = recibir_buffer(&new_buffer->size, cpu_socket);
+        }
+
+      if (operation == HANDSHAKE) {
+        log_info(logger,"LLego op handssake");
+        recibir_handshake(cpu_socket);
+        log_info(logger,"Coonexion interrupt lista");
+    } else {
+        log_error(logger, "Operación no válida para el servidor INTERRUPT: %d", operation);}
+
     
     return;
 }
@@ -24,13 +37,17 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
     new_buffer->size = 0;
     new_buffer->stream = NULL;
 
-    new_buffer->stream = recibir_buffer(&new_buffer->size, cpu_socket);
+    if((operation != HANDSHAKE))
+        {
+            new_buffer->stream = recibir_buffer(&new_buffer->size, cpu_socket);
+        }
 
       if (operation == HANDSHAKE) {
         log_info(logger,"LLego op handssake");
         recibir_handshake(cpu_socket);
+        log_info(logger,"Coonexion disptach lista");
     } else {
-        log_error(logger, "Operación no válida para el servidor IO: %d", operation);}
+        log_error(logger, "Operación no válida para el servidor DISPATCH: %d", operation);}
 
 
     switch(operation)
