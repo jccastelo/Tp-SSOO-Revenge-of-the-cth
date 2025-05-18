@@ -15,9 +15,6 @@ void queue_process(t_pcb* process, int estado){
             
             if(strcmp(memoria_init_proc(process), "OK")==0){
 
-                queue_process(process,EXIT);//test
-                return; //test
-
                 queue_process(process, READY);
             } 
         }
@@ -25,6 +22,7 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case READY:
+        log_info(logger, "Proceso en READY");
         process->metricas_de_estado->ready += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY));
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->short_term->queue_READY);
@@ -32,7 +30,11 @@ void queue_process(t_pcb* process, int estado){
         if(buscar_cpu_disponible() != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
         {
             queue_process(process, EXECUTE);
-        }
+            log_info(logger, "Proceso en EJECUTANDO EN cpu...");
+            sleep(4);//test
+            queue_process(process,EXIT);//test
+                return; //test
+        }else { log_error(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
 
         break;
 
@@ -70,21 +72,20 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case EXIT:
+        log_info(logger, "Proceso en EXIT");
         process->metricas_de_estado->exit += 1;
         temporal_stop(process->metricas_de_tiempo->metrica_actual);
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_EXIT);
 
-        carnicero(process); //test
-        return ;//test
 
-        if(memory_delete_process(process) == 0)
+        if(memory_delete_process(process) == 51)
         {
             carnicero(process);
         }
         else{log_info(logger, "Error al pasar proceso a exit");}
         
         traer_proceso_a_MP();
-
+        log_info(logger , "NO mas porcesos por traer a mp desde exit");
         break;
     }
 }

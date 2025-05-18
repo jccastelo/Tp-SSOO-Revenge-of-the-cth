@@ -55,6 +55,7 @@ t_cpu* buscar_cpu_disponible(){
 
         if(cpu->estado == DISPONIBLE)
         {
+            log_info(logger,"CPu asignada a proceso");
             return cpu;
         }
     }

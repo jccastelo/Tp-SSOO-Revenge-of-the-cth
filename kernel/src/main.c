@@ -38,9 +38,28 @@ int main(int argc, char *argv[]) {
     //Nos conectamos a la memoria como clientes
     kernel_memory_connection();
 
+    log_info(logger, "Esperando conexion de alguna CPU para iniciar primer proceso...");
+    while(list_size(list_cpus) == 0){}
+    log_info(logger, "Primera Cpu conectada");
+
     //INICIO PRIMER PROCESO
     init_fist_process(archivo_pseudocodigo,Tamanio_proc);
 
+    char *archivo_pseudocodigo2 = "ARCHI22222";
+    int Tamanio_proc2 = 102;
+    init_fist_process(archivo_pseudocodigo2,Tamanio_proc2 );
+
+    char *archivo_pseudocodigo3 = "ARCHI3";
+    int Tamanio_proc3 = 103;    
+    init_fist_process(archivo_pseudocodigo3,Tamanio_proc3);
+
+    char *archivo_pseudocodigo4 = "ARCHI4";
+    int Tamanio_proc4 = 104;
+    init_fist_process(archivo_pseudocodigo4,Tamanio_proc4);
+
+    char *archivo_pseudocodigo5 = "ARCHI5";
+    int Tamanio_proc5 = 105;
+    init_fist_process(archivo_pseudocodigo5,Tamanio_proc5);
 
 
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.

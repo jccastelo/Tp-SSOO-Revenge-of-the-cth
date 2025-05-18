@@ -43,8 +43,8 @@ char* memoria_init_proc(t_pcb* process) {
 
     if (bytes_recibidos <= 0) {
     perror("recv");
-    log_error(logger, "No se pudo recibir respuesta de memoria");
-}
+    log_error(logger, "No se pudo recibir respuesta de memoria para iniciar proceso");
+    }
 
     if(resultado99 == 99)//test
     {log_info(logger,"MEmoria confirma espacio para iniciar proceso %d :", process->pid);
@@ -59,6 +59,61 @@ char* memoria_init_proc(t_pcb* process) {
 
     return resultado;
    
+}
+
+
+int memory_delete_process(t_pcb *process_to_delate)
+{
+    /*
+    pthread_t memoria_delate_proc; //Creo hilo para eliminar el proceso
+
+    pthread_create(&memoria_delate_proc, NULL,  kernel_wait_delate_proc(process_to_delate), NULL); //Le asigno la funcion de eliminacion
+
+    void* retorno; // se supone que es entero
+    pthread_join(memoria_delate_proc, &retorno);
+    */
+    t_paquete* paquete = crear_paquete(EXIT_Sys); //Creo paquete con syscall de salida
+
+    agregar_a_paquete(paquete, &(process_to_delate->pid), sizeof(int)); //Pongo en el paquete el PID Del proceso a eliminar
+
+    enviar_paquete(paquete, socket_memoria); //Envio el paquete
+    
+    eliminar_paquete(paquete);
+
+    int resultado51;
+    //void* resultado;
+    log_info(logger, "Proceso en COnsultando salida");
+    int bytes_recibidos=recv(socket_memoria, &resultado51, sizeof(int), MSG_WAITALL); //ESpero una respuesta de OK
+
+     if (bytes_recibidos <= 0) {
+    perror("recv");
+    log_error(logger, "No se pudo recibir respuesta de memoria par eliminar proceso");
+    }
+
+    if(resultado51 == 51)//test
+    {log_info(logger,"MEmoria confirma Eliminar proceso %d :", process_to_delate->pid);}
+
+
+    //int retorno_int = *(int*)resultado;
+
+    return resultado51;
+}
+
+void *kernel_wait_delate_proc(t_pcb *process_to_delate)
+{
+    t_paquete* paquete = crear_paquete(EXIT_Sys); //Creo paquete con syscall de salida
+
+    agregar_a_paquete(paquete, &(process_to_delate->pid), sizeof(int)); //Pongo en el paquete el PID Del proceso a eliminar
+
+    enviar_paquete(paquete, socket_memoria); //Envio el paquete
+    
+    eliminar_paquete(paquete);
+
+    void* resultado;
+
+    recv(socket_memoria, &resultado, sizeof(int), MSG_WAITALL); //ESpero una respuesta de OK
+            
+    return resultado;
 }
 
 void* kernel_wait_init_proc(void *args)
@@ -88,35 +143,5 @@ void* kernel_wait_init_proc(void *args)
     strcpy(resultado, "OK");
     }//test
     
-    return resultado;
-}
-
-int memory_delete_process(t_pcb *process_to_delate)
-{
-    pthread_t memoria_delate_proc; //Creo hilo para eliminar el proceso
-
-    pthread_create(&memoria_delate_proc, NULL, (void*) kernel_wait_delate_proc(process_to_delate), NULL); //Le asigno la funcion de eliminacion
-
-    void* retorno; // se supone que es entero
-    pthread_join(memoria_delate_proc, &retorno); 
-    int retorno_int = *(int*)retorno;
-
-    return retorno_int;
-}
-
-void *kernel_wait_delate_proc(t_pcb *process_to_delate)
-{
-    t_paquete* paquete = crear_paquete(EXIT_Sys); //Creo paquete con syscall de salida
-
-    agregar_a_paquete(paquete, &(process_to_delate->pid), sizeof(int)); //Pongo en el paquete el PID Del proceso a eliminar
-
-    enviar_paquete(paquete, socket_memoria); //Envio el paquete
-    
-    eliminar_paquete(paquete);
-
-    void* resultado;
-
-    recv(socket_memoria, &resultado, sizeof(int), MSG_WAITALL); //ESpero una respuesta de OK
-            
     return resultado;
 }

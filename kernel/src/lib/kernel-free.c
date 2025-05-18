@@ -11,7 +11,6 @@ void carnicero(t_pcb* process){
     log_metricas(process);
 
     free(process->archivo);    
-    free(process->queue_ESTADO_ACTUAL);
     free(process->metricas_de_estado);
 
     free(process->metricas_de_tiempo->NEW);
@@ -37,7 +36,8 @@ char buffer[1024];
         "EXECUTE: Ocurrencias %d  Tiempo: %" PRId64 "\n"
         "BLOCKED: Ocurrencias %d  Tiempo: %" PRId64 "\n"
         "READY SUSPENDED: Ocurrencias %d  Tiempo: %" PRId64 "\n"
-        "BLOCKED SUSPENDED: Ocurrencias %d  Tiempo: %" PRId64,
+        "BLOCKED SUSPENDED: Ocurrencias %d  Tiempo: %" PRId64 "\n"
+        "------------------------------------------- \n",
         process->pid,
         process->metricas_de_estado->new,
         process->metricas_de_tiempo->NEW ? temporal_gettime(process->metricas_de_tiempo->NEW) : 0,
