@@ -8,5 +8,5 @@
 #include "cpu-state.h"
 #include "cpu-config.h"
 #include "cpu-connect.h"
-
+void mostrar_menu();
 #endif //CPU_H

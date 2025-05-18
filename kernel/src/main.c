@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
     //PLANIFICADOR LARGO, MEDIANO, CORTO PLAZO
     
     
-    //RAMA TEEEEEEEEEEEEEEEEEEEEEEEEEEEEST
+
 
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
     // Ya que detachamos los hilos, no podemos esperar a que terminen.]

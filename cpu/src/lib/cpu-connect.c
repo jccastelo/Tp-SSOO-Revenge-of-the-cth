@@ -7,10 +7,10 @@ void cpu_connect(int cod_mensaje_tipo) {
     //char *puerto_memoria = string_itoa(config_cpu->PUERTO_MEMORIA); //test
 
     // Establecemos la conexión con el kernel dispatch y el kernel interrupt:
-    if(cod_mensaje_tipo == 0)
-    {setup_connection_with_server("Kernel DISPATCH", config_cpu->IP_KERNEL, puerto_dispatch, set_socket_kernel_dispatch);}
-    else if(cod_mensaje_tipo == 1)
-    {setup_connection_with_server("Kernel DISPATCH", config_cpu->IP_KERNEL, puerto_dispatch, identificar_cpu_A_kernel);}
+    
+    setup_connection_with_server("Kernel DISPATCH", config_cpu->IP_KERNEL, puerto_dispatch, set_socket_kernel_dispatch);
+    
+   
     setup_connection_with_server("Kernel INTERRUPT", config_cpu->IP_KERNEL, puerto_interrupt, set_socket_kernel_interrupt);
     //setup_connection_with_server("Memoria", config_cpu->IP_MEMORIA, puerto_memoria, set_socket_memoria); //tedst
 }
