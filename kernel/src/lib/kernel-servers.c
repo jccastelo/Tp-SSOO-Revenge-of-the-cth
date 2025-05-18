@@ -34,7 +34,7 @@ void* kernel_server_dispatcher_listening(void* _) {
     server_with_thread(
         server_socket, 
         "Kernel DISPATCH", 
-        conection_strategy_once,
+        conection_strategy_persistence,
         kernel_server_dispatch_handler);
 
      //while(1) {}      
@@ -50,7 +50,7 @@ void* kernel_server_interrupt_listening(void* _) {
     server_with_thread(
         server_socket, 
         "Kernel INTERRUPT", 
-        conection_strategy_once, //estrategia persistance?
+        conection_strategy_persistence, //estrategia persistance?
         kernel_server_interrupt_handler);
 
     return NULL;

@@ -34,12 +34,12 @@ int main(int argc, char *argv[]) {
 
     // Comenzamos a escuchar las conexiones de los clientes:
     kernel_servers_listening();
-
+    log_info(logger,"ESta escuchadno");
     //INICIO PRIMER PROCESO
     init_fist_process(archivo_pseudocodigo,Tamanio_proc);
 
     //Nos conectamos a la memoria como clientes
-    //kernel_memory_connection();
+    kernel_memory_connection();
 
     
 
