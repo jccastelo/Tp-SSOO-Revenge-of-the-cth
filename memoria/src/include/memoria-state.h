@@ -10,5 +10,4 @@
 // Definimos las variables globales:
 extern t_config_memoria *config_memoria;
 extern t_memoria_servers *memoria_servers;
-
 #endif // CPU_STATE_H_

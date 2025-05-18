@@ -17,38 +17,77 @@ void set_socket_memoria(int socket) {
 }
 
 
-
 char* memoria_init_proc(t_pcb* process) {
 
+    //void* retorno;
+/*
+    pthread_t memoria_recive_proc;
+
+    pthread_create(&memoria_recive_proc, NULL, kernel_wait_init_proc, (void*) process);
+
+    pthread_join(memoria_recive_proc, &retorno);
+*/  
+    void *resultado = malloc(3); ;
+    int resultado99 ; //test
     int tamanio_nombre_archivo = strlen(process->archivo) + 1;
 
     t_paquete* paquete = crear_paquete(INIT_PROC);
     agregar_a_paquete(paquete, &tamanio_nombre_archivo, sizeof(int));
-    agregar_a_paquete(paquete, &process->archivo, strlen(process->archivo) + 1);
+    agregar_a_paquete(paquete, process->archivo, strlen(process->archivo) + 1);
     agregar_a_paquete(paquete, &process->tamanio_proceso, sizeof(int));
     agregar_a_paquete(paquete, &process->pid, sizeof(int));
     enviar_paquete(paquete, socket_memoria);
+    int bytes_recibidos= recv(socket_memoria, &resultado99, sizeof(int), MSG_WAITALL);
     eliminar_paquete(paquete);
-    pthread_t memoria_recive_proc;
 
-    pthread_create(&memoria_recive_proc, NULL, (void*) kernel_wait_init_proc(process), NULL);
 
-    void* retorno;
+    if (bytes_recibidos <= 0) {
+    perror("recv");
+    log_error(logger, "No se pudo recibir respuesta de memoria");
+}
+
+    if(resultado99 == 99)//test
+    {log_info(logger,"MEmoria confirma espacio para iniciar proceso %d :", process->pid);
     
-    pthread_join(memoria_recive_proc, &retorno);
+    
+    strcpy(resultado, "OK");
+    }//test
+    
 
-    char* resultado = (char*)retorno;
+    
+    //char* resultado = (char*)retorno;
 
     return resultado;
    
 }
 
-void* kernel_wait_init_proc(t_pcb* process)
+void* kernel_wait_init_proc(void *args)
 {   
-    void *resultado;
+    t_pcb* process = (t_pcb*) args;
+    void *resultado = malloc(3); ;
+    int resultado99 ; //test
+    int tamanio_nombre_archivo = strlen(process->archivo) + 1;
 
-    recv(socket_memoria, &resultado, sizeof(int), MSG_WAITALL);
-        
+    t_paquete* paquete = crear_paquete(INIT_PROC);
+    agregar_a_paquete(paquete, &tamanio_nombre_archivo, sizeof(int));
+    agregar_a_paquete(paquete, process->archivo, strlen(process->archivo) + 1);
+    agregar_a_paquete(paquete, &process->tamanio_proceso, sizeof(int));
+    agregar_a_paquete(paquete, &process->pid, sizeof(int));
+    enviar_paquete(paquete, socket_memoria);
+    recv(socket_memoria, &resultado99, sizeof(int), MSG_WAITALL);
+    eliminar_paquete(paquete);
+
+    
+    
+
+
+    if(resultado99 == 99)//test
+    {log_info(logger,"MEmoria confirma espacio para iniciar proceso %d :", process->pid);
+    
+    
+    strcpy(resultado, "OK");
+    }//test
+    
     return resultado;
 }
 

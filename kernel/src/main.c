@@ -20,7 +20,6 @@ int main(int argc, char *argv[]) {
     logger = log_create("kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
 
     // Inicializamos la configuración del kernel y los servidores:
-    
     kernel_config_init();
 
     planner_init();
@@ -35,17 +34,13 @@ int main(int argc, char *argv[]) {
     // Comenzamos a escuchar las conexiones de los clientes:
     kernel_servers_listening();
     log_info(logger,"ESta escuchadno");
-    //INICIO PRIMER PROCESO
-    init_fist_process(archivo_pseudocodigo,Tamanio_proc);
 
     //Nos conectamos a la memoria como clientes
     kernel_memory_connection();
 
-    
+    //INICIO PRIMER PROCESO
+    init_fist_process(archivo_pseudocodigo,Tamanio_proc);
 
-    //PLANIFICADOR LARGO, MEDIANO, CORTO PLAZO
-    
-    
 
 
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.

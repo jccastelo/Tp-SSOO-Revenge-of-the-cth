@@ -7,6 +7,6 @@ void memoria_servers_listening() {
     server_with_thread(
         server_socket, 
         "Memoria ESCUCHA", 
-        conection_strategy_once, 
+        conection_strategy_persistence, 
         memoria_server_escucha_handler);
 }
