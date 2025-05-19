@@ -15,7 +15,7 @@ void iniciar_cpu(t_buffer *buffer,int socket_cliente)
     cpu->socket_cpu = socket_cliente;
     
     log_info(logger, "Llego cpu. ID: %d ",cpu->id);
-    list_add(list_cpus,cpu);
+    list_add(list_cpus->queue_ESTADO,cpu);
 
 }
 
@@ -34,9 +34,9 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo)
 {
     int socket_actual = -1;
 
-    for(int i = 0; i< list_size(list_cpus) ; i++)
+    for(int i = 0; i< list_size(list_cpus->queue_ESTADO) ; i++)
     {   
-        t_cpu *cpu =list_get(list_cpus,i);
+        t_cpu *cpu =list_get(list_cpus->queue_ESTADO,i);
         socket_actual = cpu->socket_cpu;
 
         if(socket_actual == cpu_socket_buscado)
@@ -49,9 +49,9 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo)
 
 t_cpu* buscar_cpu_disponible(){
 
-    for(int i = 0; i< list_size(list_cpus) ; i++)
+    for(int i = 0; i< list_size(list_cpus->queue_ESTADO) ; i++)
     {   
-        t_cpu* cpu =list_get(list_cpus,i);
+        t_cpu* cpu =list_get(list_cpus->queue_ESTADO,i);
 
         if(cpu->estado == DISPONIBLE)
         {

@@ -61,7 +61,9 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer){
     memcpy(&process->tamanio_proceso, buffer->stream+desplazamiento, sizeof(int));
     desplazamiento += sizeof(int);
 
-    process->pid = list_add(list_procesos,process);
+    pthread_mutex_lock(&list_procesos->mutex);
+    process->pid = list_add(list_procesos->queue_ESTADO,process);
+    pthread_mutex_unlock(&list_procesos->mutex);
 
     if(desplazamiento < buffer->size) 
     {log_info(logger,"Hay informacion sin deserializar en INIC_PROC"); }
@@ -83,7 +85,7 @@ void delate_process(t_buffer *buffer){
 
     memcpy(&pid_delate, buffer->stream + desplazamiento, tamanio_pid);
 
-    t_pcb *process_to_delate = list_get(list_procesos, pid_delate); //Obtengo el proceso a eliminar de la lista global
+    t_pcb *process_to_delate = list_get(list_procesos->queue_ESTADO, pid_delate); //Obtengo el proceso a eliminar de la lista global
 
     queue_process(process_to_delate,EXIT); 
 }

@@ -11,6 +11,7 @@
 #include "kernel-servers.h"
 #include "kernel-memory-connection.h"
 #include "kernel-planner.h"
+#include "kernel-free.h"
 
 
 #endif // KERNEL_Hs

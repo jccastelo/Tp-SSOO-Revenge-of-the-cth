@@ -12,12 +12,11 @@ int main(int argc, char *argv[]) {
     int Tamanio_proc = atoi(argv[2]);
     */
 
-    char *archivo_pseudocodigo = "ARCHIVOPSEUDO";
-    int Tamanio_proc = 7;
-
-
     // Inicializamos un logger
     logger = log_create("kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
+
+    char *archivo_pseudocodigo = "ARCHIVOPSEUDO";
+    int Tamanio_proc = 7;
 
     // Inicializamos la configuración del kernel y los servidores:
     kernel_config_init();
@@ -39,7 +38,7 @@ int main(int argc, char *argv[]) {
     kernel_memory_connection();
 
     log_info(logger, "Esperando conexion de alguna CPU para iniciar primer proceso...");
-    while(list_size(list_cpus) == 0){}
+    while(list_size(list_cpus->queue_ESTADO) == 0){}
     log_info(logger, "Primera Cpu conectada");
 
     //INICIO PRIMER PROCESO
@@ -64,9 +63,10 @@ int main(int argc, char *argv[]) {
 
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
     // Ya que detachamos los hilos, no podemos esperar a que terminen.]
-    while(1) {
-        
-    }
+    while(list_size(list_cpus->queue_ESTADO) > 0) {}
  
+    terminar_kernel();
     return 0;
+
+
 }

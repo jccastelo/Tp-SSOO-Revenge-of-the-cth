@@ -16,7 +16,7 @@ extern t_planner *planner;
 
 extern int socket_memoria;
 
-extern t_list *list_procesos;
-extern t_list *list_cpus;
+extern t_monitor *list_procesos;
+extern t_monitor *list_cpus;
 
 #endif // IO_STATE_H_

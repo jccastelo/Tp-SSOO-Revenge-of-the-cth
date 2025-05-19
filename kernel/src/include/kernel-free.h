@@ -8,4 +8,5 @@
 
 void carnicero(t_pcb* process);
 void log_metricas(t_pcb* process);
+void terminar_kernel();
 #endif //KERNEL_FREE_H

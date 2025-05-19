@@ -2,9 +2,14 @@
 
 void planner_init(){
 
-    list_procesos = list_create();
+    list_procesos = malloc(sizeof(t_monitor));
+    pthread_mutex_init(&(list_procesos->mutex), NULL);
+    list_procesos->queue_ESTADO = list_create();
 
-    list_cpus = list_create();
+
+    list_cpus = malloc(sizeof(t_monitor));
+    pthread_mutex_init(&(list_cpus->mutex), NULL);
+    list_cpus->queue_ESTADO = list_create();
 
     planner = malloc(sizeof(t_planner));
 

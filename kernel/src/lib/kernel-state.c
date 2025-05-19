@@ -9,5 +9,5 @@ t_planner *planner;
 
 int socket_memoria;
 
-t_list *list_procesos;
-t_list *list_cpus;
+t_monitor *list_procesos;
+t_monitor *list_cpus;
