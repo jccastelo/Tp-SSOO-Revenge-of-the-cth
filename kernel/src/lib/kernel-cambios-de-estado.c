@@ -31,8 +31,6 @@ void queue_process(t_pcb* process, int estado){
         {
             queue_process(process, EXECUTE);
             log_info(logger, "Proceso en EJECUTANDO EN cpu...");
-            sleep(4);//test
-            queue_process(process,EXIT);//test
                 return; //test
         }else { log_error(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
 
@@ -54,7 +52,13 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->blocked += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED));
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_BLOCKED);
-        //Aca deberiamos hacer que la cola de readys se active para que uno pase a execute 
+        
+        if(list_size(planner->short_term->queue_READY->queue_ESTADO) > 0)
+        {
+            t_pcb *sgte_proceso = list_get(planner->short_term->queue_READY->queue_ESTADO,0);
+            queue_process(sgte_proceso, EXECUTE);
+        }
+
         break;
 
     case BLOCKED_SUSPENDED:
@@ -62,7 +66,6 @@ void queue_process(t_pcb* process, int estado){
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED_SUSPENDED));
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
         traer_proceso_a_MP();
-        
         break;
 
     case READY_SUSPENDED:
