@@ -22,5 +22,5 @@ void* kernel_wait_init_proc(void *args);
 
 int memory_delete_process(t_pcb *process_to_delate);
 void *kernel_wait_delate_proc(t_pcb *process_to_delate);
-
+int avisar_dump_memory(int pid);
 #endif // KERNEL_MEMORY_CONNECTION_H

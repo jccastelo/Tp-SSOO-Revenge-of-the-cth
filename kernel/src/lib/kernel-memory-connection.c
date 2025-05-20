@@ -61,6 +61,36 @@ char* memoria_init_proc(t_pcb* process) {
    
 }
 
+int avisar_dump_memory(int pid){
+    // este tendria que ir en un hilo
+
+     t_paquete* paquete = crear_paquete(DUMP_MEMORY); //Creo paquete con syscall Dump
+
+    agregar_a_paquete(paquete, &pid, sizeof(int)); //Pongo en el paquete el PID Del proceso a eliminar
+
+    enviar_paquete(paquete, socket_memoria); //Envio el paquete
+    
+    eliminar_paquete(paquete);
+
+    int resultado61;
+
+    log_info(logger, "Proceso en COnsultando DUMP");
+    int bytes_recibidos = recv(socket_memoria, &resultado61, sizeof(int), MSG_WAITALL); //ESpero una respuesta de OK
+
+     if (bytes_recibidos <= 0) {
+    perror("recv");
+    log_error(logger, "No se pudo recibir respuesta de memoria parA DUMP MEMORY proceso");
+    }
+
+    if(resultado61 == 61)//test
+    {log_info(logger,"MEmoria confirma DUMP MEMORY %d :", pid);}
+
+
+    //int retorno_int = *(int*)resultado;
+
+    return resultado61;
+
+}
 
 int memory_delete_process(t_pcb *process_to_delate)
 {
@@ -83,7 +113,7 @@ int memory_delete_process(t_pcb *process_to_delate)
     int resultado51;
     //void* resultado;
     log_info(logger, "Proceso en COnsultando salida");
-    int bytes_recibidos=recv(socket_memoria, &resultado51, sizeof(int), MSG_WAITALL); //ESpero una respuesta de OK
+    int bytes_recibidos = recv(socket_memoria, &resultado51, sizeof(int), MSG_WAITALL); //ESpero una respuesta de OK
 
      if (bytes_recibidos <= 0) {
     perror("recv");
@@ -99,6 +129,7 @@ int memory_delete_process(t_pcb *process_to_delate)
     return resultado51;
 }
 
+/*
 void *kernel_wait_delate_proc(t_pcb *process_to_delate)
 {
     t_paquete* paquete = crear_paquete(EXIT_Sys); //Creo paquete con syscall de salida
@@ -145,3 +176,4 @@ void* kernel_wait_init_proc(void *args)
     
     return resultado;
 }
+*/

@@ -65,6 +65,7 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->blocked_suspended += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED_SUSPENDED));
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
+
         traer_proceso_a_MP();
         break;
 
@@ -79,7 +80,6 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->exit += 1;
         temporal_stop(process->metricas_de_tiempo->metrica_actual);
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_EXIT);
-
 
         if(memory_delete_process(process) == 51)
         {
