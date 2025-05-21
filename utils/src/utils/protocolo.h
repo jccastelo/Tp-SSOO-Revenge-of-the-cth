@@ -19,6 +19,8 @@ typedef enum {
 	DUMP_MEMORY,
 	IO,
 	EXIT_Sys,
+	DESBLOQUEO_IO,
+	FIN_CONEXION_DE_IO,
 } op_code;
 
 typedef struct

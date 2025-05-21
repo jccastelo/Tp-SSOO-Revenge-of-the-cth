@@ -5,9 +5,8 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
     if (operation == HANDSHAKE) {
         log_info(logger,"LLego op handssake");
         recibir_handshake(io_socket);
-        //SI NO exite esa io, se crea nueva
-        //SI ya existe se agrega una instanci
-        log_info(logger,"Coonexion interrupt lista");
+        recibir_io(io_socket);
+        log_info(logger,"Coonexion IO lista");
     }
 
     switch(operation){

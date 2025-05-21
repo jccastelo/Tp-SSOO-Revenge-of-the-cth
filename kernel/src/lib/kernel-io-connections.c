@@ -1,5 +1,6 @@
 #include "../include/kernel-io-connections.h"
 
+//CPu a Kernel
 void gestionar_io(t_buffer *buffer)
 {
     int desplazamiento = 0;
@@ -103,19 +104,23 @@ t_IO_instancia *buscar_instancia_libre(t_IO *ioBuscada)
 
 t_IO *buscar_io(char *ioNombreBuscado)
 {
+    t_IO *encontrado = NULL;
+
     for (int i = 0; i < list_size(list_ios->queue_ESTADO); i++)
     {
-        t_IO *io = list_get(list_ios->queue_ESTADO, i);
+         encontrado  = list_get(list_ios->queue_ESTADO, i);
 
-        if (strcmp(io->nombre, ioNombreBuscado) == 0)
+        if (strcmp(encontrado->nombre, ioNombreBuscado) == 0)
         {
-            return io;
+            return encontrado;
         }
     }
 
     return NULL;
 }
 
+
+//IO a Kernel
 int recibir_pid(int io_socket)
 {
     int pid;
@@ -177,4 +182,63 @@ void eliminar_instancia(int io_socket)
             }
         }
     }
+}
+
+void recibir_io(int socket)
+{
+    int tamanio_nombre;
+    recv(socket, &tamanio_nombre, sizeof(int), MSG_WAITALL);
+
+    char *nombreIO = malloc(tamanio_nombre + 1);
+
+    recv(socket, nombreIO, tamanio_nombre, MSG_WAITALL);
+    nombreIO[tamanio_nombre] = '\0';
+
+
+    t_IO *ioBuscada = buscar_io(nombreIO);
+
+    if (ioBuscada != NULL)
+    {
+        //Creo instancia y agrego a estructura ya existente
+
+        t_IO_instancia *nueva_instancia_io= malloc(sizeof(t_IO_instancia));
+        nueva_instancia_io->socket = socket;
+        nueva_instancia_io->proceso = -1;
+
+        pthread_mutex_lock(&ioBuscada->instancias_IO->mutex);
+        list_add(ioBuscada->instancias_IO->queue_ESTADO,nueva_instancia_io);
+        pthread_mutex_unlock(&ioBuscada->instancias_IO->mutex);
+
+        log_info(logger, "Llego una nueva INSTANCIA de IO de nombre %s Y SOCKET: %d ", ioBuscada->nombre,nueva_instancia_io->socket );
+    }
+    else
+    {
+        //Creo estructura de  0, inicializando todo
+        t_IO *ioNueva = malloc(sizeof(t_IO));
+        ioNueva->nombre = nombreIO;
+
+        ioNueva->instancias_IO = malloc(sizeof(t_monitor));
+        pthread_mutex_init(&(ioNueva->instancias_IO->mutex), NULL);
+        ioNueva->instancias_IO->queue_ESTADO =list_create();
+
+        ioNueva->procesos_esperando= malloc(sizeof(t_monitor));
+        pthread_mutex_init(&(ioNueva->procesos_esperando->mutex), NULL);
+        ioNueva->procesos_esperando->queue_ESTADO =list_create();
+
+        //Creo la primera instancia para meter en la estructura nueva
+        t_IO_instancia *nueva_instancia_io= malloc(sizeof(t_IO_instancia));
+        nueva_instancia_io->socket = socket;
+        nueva_instancia_io->proceso = -1;
+
+        pthread_mutex_lock(&ioNueva->instancias_IO->mutex);
+        list_add(ioNueva->instancias_IO->queue_ESTADO,nueva_instancia_io);
+        pthread_mutex_unlock(&ioNueva->instancias_IO->mutex);
+
+        pthread_mutex_lock(&list_ios->mutex);
+        list_add(list_ios->queue_ESTADO,ioNueva);
+        pthread_mutex_unlock(&list_ios->mutex);
+
+        log_info(logger, "Llego una Nueva IO de nombre %s Y SOCKET: %d ", ioNueva->nombre,nueva_instancia_io->socket );
+    }
+
 }

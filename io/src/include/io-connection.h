@@ -8,7 +8,7 @@
 
 // Incluye las bibliotecas internas necesarias:
 #include "io-state.h"
-
+void identificarse_como_io();
 /**
  * @brief Establece una conexión con un servidor y ejecuta una función callback con el socket del cliente.
  * 

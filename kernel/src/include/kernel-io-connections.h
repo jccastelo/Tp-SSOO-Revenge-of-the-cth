@@ -13,4 +13,5 @@ int recibir_pid(int io_socket);
 void enviar_proceso_io(int io_socket);
 void eliminar_instancia(int io_socket);
 t_buffer *crear_buffer_io(int milisegundos,int  pid_a_io);
+void recibir_io(int socket);
 #endif //KERNEL_IO_CONNECTIONS
