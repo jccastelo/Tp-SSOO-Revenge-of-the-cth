@@ -28,9 +28,9 @@ void queue_process(t_pcb* process, int estado){
         
         if(buscar_cpu_disponible() != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
         {
-            queue_process(process, EXECUTE);
             log_info(logger, "Proceso en EJECUTANDO EN cpu...");
-                return; //test
+            queue_process(process, EXECUTE);
+            
         }else { log_error(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
 
         break;
@@ -44,6 +44,16 @@ void queue_process(t_pcb* process, int estado){
         if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
         {
             enviar_proceso_cpu(cpu_a_ocupar->socket_cpu, process);
+
+            //TEST
+            t_pcb *p = list_get(list_procesos->queue_ESTADO,process->pid);
+
+            sleep(5);
+            set_cpu(cpu_a_ocupar->socket_cpu,DISPONIBLE);
+            queue_process(p,EXIT);
+            
+
+
         } else { log_error(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
         break;
 

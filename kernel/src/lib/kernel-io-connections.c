@@ -1,65 +1,113 @@
-#include  "../include/kernel-io-connections.h"
+#include "../include/kernel-io-connections.h"
 
-void gestionar_io(t_buffer *buffer,int socket)
+void gestionar_io(t_buffer *buffer)
 {
     int desplazamiento = 0;
     char *ioNombre;
     int milisegundos;
 
     // Copiamos el tamanio del nombre
-    int tamanio_nombre=0;
-    memcpy(&tamanio_nombre, buffer->stream+ desplazamiento, sizeof(int));
+    int tamanio_nombre = 0;
+    memcpy(&tamanio_nombre, buffer->stream + desplazamiento, sizeof(int));
     desplazamiento += sizeof(int);
 
     // Copiamos el nombre de la IO
-    ioNombre= malloc(tamanio_nombre + 1);
-    memcpy(ioNombre, buffer->stream+  desplazamiento, tamanio_nombre);
-    ioNombre[tamanio_nombre] = '\0'; 
-    desplazamiento+=tamanio_nombre;
-    
+    ioNombre = malloc(tamanio_nombre + 1);
+    memcpy(ioNombre, buffer->stream + desplazamiento, tamanio_nombre);
+    ioNombre[tamanio_nombre] = '\0';
+    desplazamiento += tamanio_nombre;
+
     // Copiamos el TIEMPO DE IO
-    memcpy(&milisegundos, buffer->stream+desplazamiento, sizeof(int));
+    memcpy(&milisegundos, buffer->stream + desplazamiento, sizeof(int));
     desplazamiento += sizeof(int);
 
-    int tamanio_pid; 
-    int pid_a_io; //Solo necesito el pid del proces
+    
+    int pid_a_io; // Solo necesito el pid del proces
 
-    memcpy(&tamanio_pid, buffer->stream + desplazamiento, sizeof(int));
-    desplazamiento += sizeof(int);
+    memcpy(&pid_a_io, buffer->stream + desplazamiento, sizeof(int));
 
-    memcpy(&pid_a_io, buffer->stream + desplazamiento, tamanio_pid);
+    t_pcb* process = list_get(list_procesos->queue_ESTADO,pid_a_io);
+    queue_process(process, BLOCKED);
 
-    t_IO *ioBuscada = existe_io(ioNombre);
 
-    if(ioBuscada != NULL)
+    t_IO *ioBuscada = buscar_io(ioNombre);
+    
+    if (ioBuscada != NULL)
     {
-        if(list_size(ioBuscada->procesos_esperando->queue_ESTADO) == 0)
+        t_buffer *buffer_io = crear_buffer_io(milisegundos, pid_a_io);
+        t_IO_instancia *instancia_io_libre = buscar_instancia_libre(ioBuscada);
+
+        if ((list_size(ioBuscada->procesos_esperando->queue_ESTADO) == 0)&&(instancia_io_libre != NULL))
         {
-        
+            pthread_mutex_lock(&ioBuscada->procesos_esperando->mutex);
+            list_add(ioBuscada->procesos_esperando->queue_ESTADO, buffer_io);
+            pthread_mutex_unlock(&ioBuscada->procesos_esperando->mutex);
+            
+            int socket_io_libre = instancia_io_libre->socket;
+            enviar_proceso_io(socket_io_libre);
         }
-        else{
-            pthread_mutex_lock(&ioBuscada->procesos_esperando->queue_ESTADO);
-            list_add(ioBuscada->procesos_esperando->queue_ESTADO,pid_a_io);
-            pthread_mutex_unlock(&ioBuscada->procesos_esperando->queue_ESTADO);
+        else
+        {
+            pthread_mutex_lock(&ioBuscada->procesos_esperando->mutex);
+            list_add(ioBuscada->procesos_esperando->queue_ESTADO, buffer_io);
+            pthread_mutex_unlock(&ioBuscada->procesos_esperando->mutex);
         }
     }
     else
     {
-        t_pcb *process_to_delate = list_get(list_procesos->queue_ESTADO, pid_a_io); //Obtengo el proceso a eliminar de la lista global
+        t_pcb *process_to_delate = list_get(list_procesos->queue_ESTADO, pid_a_io); // Obtengo el proceso a eliminar de la lista global
 
-        queue_process(process_to_delate,EXIT);
-        
+        queue_process(process_to_delate, EXIT);
     }
-
 }
 
-t_IO *existe_io(char *ioNombreBuscado)
+t_buffer *crear_buffer_io(int milisegundos,int  pid_a_io)
 {
-    for(int i = 0; i< list_size(list_ios->queue_ESTADO) ; i++)
-    {   
-        t_IO* io = list_get(list_ios->queue_ESTADO,i);
+    //INICIO BUFFER
+    t_buffer* new_buffer = malloc(sizeof(t_buffer));
+    new_buffer->size = 0;
+    new_buffer->stream = NULL;
 
-        if(strcmp(io->nombre,ioNombreBuscado)==0)
+    int total_size = sizeof(int) + sizeof(int);
+
+    new_buffer->stream = malloc(total_size);
+    new_buffer->size = total_size;
+
+    int desplazamiento = 0;
+
+    // Copio el pid del proceso
+    memcpy(new_buffer->stream + desplazamiento, &pid_a_io ,sizeof(int));
+    desplazamiento += sizeof(int);
+
+    // Copiar los milisegundos
+    memcpy(new_buffer->stream + desplazamiento, &milisegundos ,sizeof(int));
+    desplazamiento += sizeof(int);
+
+    return new_buffer;
+}
+
+t_IO_instancia *buscar_instancia_libre(t_IO *ioBuscada)
+{
+    for (int j = 0; j < list_size(ioBuscada->instancias_IO->queue_ESTADO); j++)
+        {
+            t_IO_instancia *io_instancia = list_get(ioBuscada->instancias_IO->queue_ESTADO, j);
+
+            if (io_instancia->proceso < 0 )
+            {
+                return io_instancia;
+            }
+        }
+
+    return NULL;
+}
+
+t_IO *buscar_io(char *ioNombreBuscado)
+{
+    for (int i = 0; i < list_size(list_ios->queue_ESTADO); i++)
+    {
+        t_IO *io = list_get(list_ios->queue_ESTADO, i);
+
+        if (strcmp(io->nombre, ioNombreBuscado) == 0)
         {
             return io;
         }
@@ -68,56 +116,65 @@ t_IO *existe_io(char *ioNombreBuscado)
     return NULL;
 }
 
-int recibir_pid(int io_socket){
+int recibir_pid(int io_socket)
+{
     int pid;
     recv(io_socket, &pid, sizeof(int), MSG_WAITALL);
     return pid;
 }
 
-void enviar_proceso_io(int io_socket){
-    
-    for(int i = 0; i < list_size(list_ios->queue_ESTADO); i++){
-        t_IO* ios = list_get(list_ios->queue_ESTADO, i);
-        
-        for(int j = 0; j < list_size(ios->instancias_IO); j++){
-            t_IO_instancia* io = list_get(ios->instancias_IO, j);
+void enviar_proceso_io(int io_socket)
+{
 
-            if(io->socket == io_socket){
+    for (int i = 0; i < list_size(list_ios->queue_ESTADO); i++)
+    {
+        t_IO *ios = list_get(list_ios->queue_ESTADO, i);
+
+        for (int j = 0; j < list_size(ios->instancias_IO->queue_ESTADO); j++)
+        {
+            t_IO_instancia *io = list_get(ios->instancias_IO->queue_ESTADO, j);
+
+            if (io->socket == io_socket)
+            {
                 pthread_mutex_lock(&ios->procesos_esperando->mutex);
-                int pid = list_remove(ios->procesos_esperando, 0);
+                int pid = list_remove(ios->procesos_esperando->queue_ESTADO, 0);
                 pthread_mutex_unlock(&ios->procesos_esperando->mutex);
-                
-                send(io_socket, &pid, sizeof(int), NULL);
+
+                send(io_socket, &pid, sizeof(int), 0);
                 return;
             }
         }
     }
 }
 
-void eliminar_instancia(int io_socket){
-    
-    for(int i = 0; i < list_size(list_ios->queue_ESTADO); i++){
-        t_IO* ios = list_get(list_ios->queue_ESTADO, i);
-        
-        for(int j = 0; j < list_size(ios->instancias_IO); j++){
-            t_IO_instancia* io = list_get(ios->instancias_IO, j);
+void eliminar_instancia(int io_socket)
+{
 
-            if(io->socket == io_socket){
-                
+    for (int i = 0; i < list_size(list_ios->queue_ESTADO); i++)
+    {
+        t_IO *ios = list_get(list_ios->queue_ESTADO, i);
+
+        for (int j = 0; j < list_size(ios->instancias_IO->queue_ESTADO); j++)
+        {
+            t_IO_instancia *io = list_get(ios->instancias_IO->queue_ESTADO, j);
+
+            if (io->socket == io_socket)
+            {
+
                 pthread_mutex_lock(&ios->procesos_esperando->mutex);
-                int pid = list_remove(ios->procesos_esperando, 0);
+                int pid = list_remove(ios->procesos_esperando->queue_ESTADO, 0);
                 pthread_mutex_unlock(&ios->procesos_esperando->mutex);
-                
-                carnicero_de_instancias(io);
 
-                if(list_size(ios->instancias_IO) == 0){
+                carnicero_de_instancias_io(io);
+
+                if (list_size(ios->instancias_IO->queue_ESTADO) == 0)
+                {
 
                     carnicero_de_io(ios);
-                } 
+                }
 
                 return;
             }
         }
-    }    
+    }
 }
-

@@ -86,14 +86,7 @@ t_pcb* recibir_proceso(t_buffer* buffer){
     free(buffer->stream);
     free(buffer);
 
-    for(int i = 0; i < list_size(planner->queue_EXECUTE->queue_ESTADO); i++){
-        
-        t_pcb* process = list_get(planner->queue_EXECUTE->queue_ESTADO, i);
-        if(process->pid == pid_recibido)
-        {
-            return process;
-        }
-    }
+    t_pcb *process_buscado=list_get(list_procesos->queue_ESTADO,pid_recibido);
 
-    return NULL;
+    return process_buscado;
 }

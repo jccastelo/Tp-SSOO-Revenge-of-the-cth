@@ -13,21 +13,24 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
     switch(operation){
         case DESBLOQUEO_IO:
             // REcibo el pid (no hace falta paquete)
-            int pid = recibir_pid(io_socket);
+            int pid_desbloqueo = recibir_pid(io_socket);
             // Reviso la cola de bloqueados de esa IO, si hay alguno lo mando
             enviar_proceso_io(io_socket);
             // Con el pid busco el proceso y lo mando a READY
-            t_pcb *process = list_get(list_procesos, pid);
-            queue_process(process, EXIT);
+            t_pcb *process = list_get(list_procesos->queue_ESTADO, pid_desbloqueo);
+            queue_process(process, READY);
         break;
-        case FIN_IO:
+        case FIN_CONEXION_DE_IO:
             // Recibo el pid (no hace falta paquete), puede no haber 
-            int pid = recibir_pid(io_socket);
+            int pid_fin = recibir_pid(io_socket);
             // Borramos la instancia y si era la ultima instancia borramos la estructura general
             eliminar_instancia(io_socket);
             // Si habia pid lo mandamos a exit
-            if(pid >= 0){
-                t_pcb *process = list_get(list_procesos, pid);
+
+            //CREO QUE TMB VAN A EXIT TODOS LOS PROCESOS QUE ESTABAN ESPERANDO ESTA IO (en su cola)
+
+            if(pid_fin >= 0){
+                t_pcb *process = list_get(list_procesos->queue_ESTADO, pid_fin);
                 queue_process(process, EXIT);
             }
         break;
@@ -118,11 +121,9 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
     case IO:
         log_info(logger,"Se recibio la syscall IO desde el server %s",server_name);
 
-
-        queue_process(process, BLOCKED);
-
         set_cpu(cpu_socket, DISPONIBLE);
 
+        //SE REALIZA EL BLOC ACA, PORQUE EL PID ESTA EN EL BUFFER
         gestionar_io(new_buffer);
         break;
 

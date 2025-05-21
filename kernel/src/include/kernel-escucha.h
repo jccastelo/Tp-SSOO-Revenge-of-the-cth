@@ -9,6 +9,7 @@
 #include "kernel-escucha.h"
 #include "kernel-cpus-connections.h"
 #include "kernel-syscalls.h"
+#include "kernel-io-connections.h"
 
 
 /**

@@ -136,7 +136,12 @@ typedef struct{
 
 typedef struct{
     int socket;
-    t_pcb* proceso;
+    int proceso;
 }t_IO_instancia;
+
+typedef enum{
+    DESBLOQUEO_IO,
+    FIN_CONEXION_DE_IO,
+}io_operaciones;
 
 # endif // KERNEL_TYPES_H
