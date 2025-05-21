@@ -113,7 +113,7 @@ typedef enum {
 }t_planner_algorithm;
 
 
-//Cpu estructuras
+// CPU Estructuras
 typedef struct{
     int id;
     int estado;
@@ -125,5 +125,18 @@ typedef enum{
     DISPONIBLE,
     EJECUTANDO,
 }cpu_estado;
+
+// I/O Estructuras
+
+typedef struct{
+    char *nombre;
+    t_monitor *instancias_IO;
+    t_monitor *procesos_esperando; 
+}t_IO;
+
+typedef struct{
+    int socket;
+    t_pcb* proceso;
+}t_IO_instancia;
 
 # endif // KERNEL_TYPES_H

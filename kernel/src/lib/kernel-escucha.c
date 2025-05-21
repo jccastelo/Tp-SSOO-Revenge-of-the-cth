@@ -1,12 +1,37 @@
 #include "include/kernel-escucha.h"
 
-void kernel_server_io_handler(int client_socket, int operation, const char *server_name) {
+void kernel_server_io_handler(int io_socket, int operation, const char *server_name) {
+
     if (operation == HANDSHAKE) {
-        recibir_handshake(client_socket);
-    } else 
-        log_error(logger, "Operación no válida para el servidor IO: %d", operation);
-    
-    return;
+        log_info(logger,"LLego op handssake");
+        recibir_handshake(io_socket);
+        //SI NO exite esa io, se crea nueva
+        //SI ya existe se agrega una instanci
+        log_info(logger,"Coonexion interrupt lista");
+    }
+
+    switch(operation){
+        case DESBLOQUEO_IO:
+            // REcibo el pid (no hace falta paquete)
+            int pid = recibir_pid(io_socket);
+            // Reviso la cola de bloqueados de esa IO, si hay alguno lo mando
+            enviar_proceso_io(io_socket);
+            // Con el pid busco el proceso y lo mando a READY
+            t_pcb *process = list_get(list_procesos, pid);
+            queue_process(process, EXIT);
+        break;
+        case FIN_IO:
+            // Recibo el pid (no hace falta paquete), puede no haber 
+            int pid = recibir_pid(io_socket);
+            // Borramos la instancia y si era la ultima instancia borramos la estructura general
+            eliminar_instancia(io_socket);
+            // Si habia pid lo mandamos a exit
+            if(pid >= 0){
+                t_pcb *process = list_get(list_procesos, pid);
+                queue_process(process, EXIT);
+            }
+        break;
+    }
 }
 
 void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *server_name) {
@@ -93,19 +118,12 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
     case IO:
         log_info(logger,"Se recibio la syscall IO desde el server %s",server_name);
 
-        process = recibir_proceso(new_buffer);
+
         queue_process(process, BLOCKED);
 
         set_cpu(cpu_socket, DISPONIBLE);
-        // como se acaba de liberar una CPU, enviamos el primer proceso de READY a EXECUTE 
-        //enviar_proceso_cpu(cpu_socket, list_get(planner->short_term->queue_READY->queue_ESTADO, 0));
-         
-         //ENTIENDO la logica, pero creo que la funcion de enviar a cpu solo deberia llamarse en un unico lugar,
-        // que es la queue de execute. SI QUE DEBERIA "ACTIVARSE UNA SECUENCIA PARA QUE SUCEDA"
 
-
-        
-        //free(process); ???
+        gestionar_io(new_buffer);
         break;
 
     case EXIT_Sys:

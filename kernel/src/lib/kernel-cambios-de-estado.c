@@ -12,8 +12,7 @@ void queue_process(t_pcb* process, int estado){
 
         if(list_size(planner->long_term->queue_NEW->queue_ESTADO) == 1 ){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
             
-            
-            if(strcmp(memoria_init_proc(process), "OK")==0){
+            if(strcmp(memoria_init_proc(process), "OK") == 0){
 
                 queue_process(process, READY);
             } 

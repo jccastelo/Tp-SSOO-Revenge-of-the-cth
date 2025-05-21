@@ -7,7 +7,7 @@ void carnicero(t_pcb* process){
     list_remove_element(process->queue_ESTADO_ACTUAL->queue_ESTADO, process);
     pthread_mutex_unlock(&process->queue_ESTADO_ACTUAL->mutex);
     
-    //SI hago un remove, los procesos se moverian de posicion
+    //SI hago un remove, los procesos se moverian de posicion, por lo tanto reemplazamos el proceso por un pid negativo para marcar esa posicion como vacia y poder seguir buscando los procesos por pid
     int PROCESOS_ELIMINADO =-99;
     pthread_mutex_lock(&list_procesos->mutex);
     list_replace(list_procesos->queue_ESTADO,process->pid, &PROCESOS_ELIMINADO);
@@ -62,9 +62,13 @@ char buffer[1024];
     log_info(logger, "%s", buffer);
 }
 
+void carnicero_de_instancias_io(t_IO_instancia* instancia_io){}
+
+void carnicero_de_io(t_IO* io){}
+
 void terminar_kernel(){
     //liberar planner
-    //liberar listas cpus y procesos
+    //liberar listas cpus, procesos e io
     //liberar conexiones
     //liberar lo que haya quedado
 }   
