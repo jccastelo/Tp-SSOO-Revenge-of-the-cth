@@ -62,9 +62,15 @@ char buffer[1024];
     log_info(logger, "%s", buffer);
 }
 
-void carnicero_de_instancias_io(t_IO_instancia* instancia_io){}
+void carnicero_de_instancias_io(t_IO_instancia* instancia_io){
+    free(instancia_io);
+}
 
-void carnicero_de_io(t_IO* io){}
+void carnicero_de_io(t_IO* io){
+    free(io->instancias_IO);
+    free(io->procesos_esperando);
+    free(io);
+}
 
 void terminar_kernel(){
     //liberar planner
