@@ -16,7 +16,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             // Reviso la cola de bloqueados de esa IO, si hay alguno lo mando
             enviar_proceso_io(io_socket);
             // Con el pid busco el proceso y lo mando a READY
-            t_pcb *process = list_get(list_procesos->queue_ESTADO, pid_desbloqueo);
+            t_pcb *process = list_get(list_procesos->cola, pid_desbloqueo);
             queue_process(process, READY);
         break;
         case FIN_CONEXION_DE_IO:
@@ -28,7 +28,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
 
             // LA CONSIGNA NO ESPECIFICA QUE HACER CON LOS PROCESOS EN ESPERA CUANDO SE VAN TODAS LAS INSTANCIAS DE UNA IO
             if(pid_fin >= 0){
-                t_pcb *process = list_get(list_procesos->queue_ESTADO, pid_fin);
+                t_pcb *process = list_get(list_procesos->cola, pid_fin);
                 queue_process(process, EXIT);
             }
         break;

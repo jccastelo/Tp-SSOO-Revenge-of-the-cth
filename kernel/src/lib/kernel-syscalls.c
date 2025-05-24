@@ -62,7 +62,7 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer){
     desplazamiento += sizeof(int);
 
     pthread_mutex_lock(&list_procesos->mutex);
-    process->pid = list_add(list_procesos->queue_ESTADO,process);
+    process->pid = list_add(list_procesos->cola,process);
     pthread_mutex_unlock(&list_procesos->mutex);
 
     if(desplazamiento < buffer->size) 
@@ -85,7 +85,7 @@ void delate_process(t_buffer *buffer){
 
     memcpy(&pid_delate, buffer->stream + desplazamiento, tamanio_pid);
 
-    t_pcb *process_to_delate = list_get(list_procesos->queue_ESTADO, pid_delate); //Obtengo el proceso a eliminar de la lista global
+    t_pcb *process_to_delate = list_get(list_procesos->cola, pid_delate); //Obtengo el proceso a eliminar de la lista global
 
     queue_process(process_to_delate,EXIT); 
 }

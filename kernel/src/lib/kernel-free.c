@@ -4,13 +4,13 @@
 void carnicero(t_pcb* process){
 
     pthread_mutex_lock(&process->queue_ESTADO_ACTUAL->mutex);
-    list_remove_element(process->queue_ESTADO_ACTUAL->queue_ESTADO, process);
+    list_remove_element(process->queue_ESTADO_ACTUAL->cola, process);
     pthread_mutex_unlock(&process->queue_ESTADO_ACTUAL->mutex);
     
     //SI hago un remove, los procesos se moverian de posicion, por lo tanto reemplazamos el proceso por un pid negativo para marcar esa posicion como vacia y poder seguir buscando los procesos por pid
     int PROCESOS_ELIMINADO =-99;
     pthread_mutex_lock(&list_procesos->mutex);
-    list_replace(list_procesos->queue_ESTADO,process->pid, &PROCESOS_ELIMINADO);
+    list_replace(list_procesos->cola,process->pid, &PROCESOS_ELIMINADO);
     pthread_mutex_unlock(&list_procesos->mutex);
 
     // aca van los logs

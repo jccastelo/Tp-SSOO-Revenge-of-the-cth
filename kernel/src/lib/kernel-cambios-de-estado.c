@@ -10,7 +10,7 @@ void queue_process(t_pcb* process, int estado){
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->NEW));
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW); 
 
-        if(list_size(planner->long_term->queue_NEW->queue_ESTADO) == 1 ){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
+        if(list_size(planner->long_term->queue_NEW->cola) == 1 ){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
             
             if(strcmp(memoria_init_proc(process), "OK") == 0){
 
@@ -46,7 +46,7 @@ void queue_process(t_pcb* process, int estado){
             enviar_proceso_cpu(cpu_a_ocupar->socket_cpu, process);
 
             //TEST
-            t_pcb *p = list_get(list_procesos->queue_ESTADO,process->pid);
+            t_pcb *p = list_get(list_procesos->cola,process->pid);
 
             sleep(5);
             set_cpu(cpu_a_ocupar->socket_cpu,DISPONIBLE);
@@ -62,9 +62,9 @@ void queue_process(t_pcb* process, int estado){
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED));
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_BLOCKED);
         
-        if(list_size(planner->short_term->queue_READY->queue_ESTADO) > 0)
+        if(list_size(planner->short_term->queue_READY->cola) > 0)
         {
-            t_pcb *sgte_proceso = list_get(planner->short_term->queue_READY->queue_ESTADO,0);
+            t_pcb *sgte_proceso = list_get(planner->short_term->queue_READY->cola,0);
             queue_process(sgte_proceso, EXECUTE);
         }
 
@@ -112,13 +112,13 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
     if(process->queue_ESTADO_ACTUAL != NULL){
         // Cerramos el mutex y sacamos el pcb de la cola del estado en el que estaba el proceso (que esta primero)
         pthread_mutex_lock(&process->queue_ESTADO_ACTUAL->mutex);
-        list_remove_element(process->queue_ESTADO_ACTUAL->queue_ESTADO, process);
+        list_remove_element(process->queue_ESTADO_ACTUAL->cola, process);
         pthread_mutex_unlock(&process->queue_ESTADO_ACTUAL->mutex);
     }
 
     // Cerramos el mutex y replanificamos la cola del estado al que pasamos agregando el pcb
     pthread_mutex_lock(&sgteEstado->mutex);
-    algoritmo_planificador(process, sgteEstado->queue_ESTADO);
+    algoritmo_planificador(process, sgteEstado->cola);
     pthread_mutex_unlock(&sgteEstado->mutex);
 
     // Cambiamos el estado del pcb

@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
     kernel_memory_connection();
 
     log_info(logger, "Esperando conexion de alguna CPU para iniciar primer proceso...");
-    while(list_size(list_cpus->queue_ESTADO) == 0){}
+    while(list_size(list_cpus->cola) == 0){}
     log_info(logger, "Primera Cpu conectada");
 
     //INICIO PRIMER PROCESO
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
     // Ya que detachamos los hilos, no podemos esperar a que terminen.]
-    while(list_size(list_cpus->queue_ESTADO) > 0) {}
+    while(list_size(list_cpus->cola) > 0) {}
  
     terminar_kernel();
     return 0;

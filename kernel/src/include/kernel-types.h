@@ -32,7 +32,7 @@ typedef struct {
 // Colas de estados
 
 typedef struct {
-    t_list* queue_ESTADO;
+    t_list* cola;
     pthread_mutex_t mutex;
 }t_monitor;
 

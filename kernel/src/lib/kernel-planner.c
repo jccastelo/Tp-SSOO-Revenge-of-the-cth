@@ -4,16 +4,16 @@ void planner_init(){
 
     list_procesos = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(list_procesos->mutex), NULL);
-    list_procesos->queue_ESTADO = list_create();
+    list_procesos->cola = list_create();
 
     list_cpus = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(list_cpus->mutex), NULL);
-    list_cpus->queue_ESTADO = list_create();
+    list_cpus->cola = list_create();
 
     //Lista IOS
     list_ios = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(list_ios->mutex), NULL);
-    list_ios->queue_ESTADO =list_create();
+    list_ios->cola =list_create();
 
 
     //Planner
@@ -25,7 +25,7 @@ void planner_init(){
     planner->queue_EXECUTE = malloc(sizeof(t_monitor));
     
     pthread_mutex_init(&(planner->queue_EXECUTE->mutex), NULL);
-    planner->queue_EXECUTE->queue_ESTADO = list_create();
+    planner->queue_EXECUTE->cola = list_create();
 
     switch(get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY))
     {
@@ -66,29 +66,29 @@ void planner_init(){
     //SHORT TERM
     planner->short_term->queue_READY = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(planner->short_term->queue_READY->mutex), NULL);
-    planner->short_term->queue_READY->queue_ESTADO = list_create();
+    planner->short_term->queue_READY->cola = list_create();
 
     //MEDIUM TERM
     planner->medium_term->queue_BLOCKED_SUSPENDED = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(planner->medium_term->queue_BLOCKED_SUSPENDED->mutex), NULL);
-    planner->medium_term->queue_BLOCKED_SUSPENDED->queue_ESTADO = list_create();
+    planner->medium_term->queue_BLOCKED_SUSPENDED->cola = list_create();
 
     planner->medium_term->queue_READY_SUSPENDED = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(planner->medium_term->queue_READY_SUSPENDED->mutex), NULL);
-    planner->medium_term->queue_READY_SUSPENDED->queue_ESTADO = list_create();
+    planner->medium_term->queue_READY_SUSPENDED->cola = list_create();
 
     //LONG TERM
     planner->long_term->queue_NEW = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(planner->long_term->queue_NEW->mutex), NULL);
-    planner->long_term->queue_NEW->queue_ESTADO = list_create();
+    planner->long_term->queue_NEW->cola = list_create();
 
     planner->long_term->queue_EXIT = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(planner->long_term->queue_EXIT->mutex), NULL);
-    planner->long_term->queue_EXIT->queue_ESTADO = list_create();
+    planner->long_term->queue_EXIT->cola = list_create();
 
     planner->long_term->queue_BLOCKED = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(planner->long_term->queue_BLOCKED->mutex), NULL);
-    planner->long_term->queue_BLOCKED->queue_ESTADO = list_create();
+    planner->long_term->queue_BLOCKED->cola = list_create();
     
 
     
@@ -130,24 +130,24 @@ void traer_proceso_a_MP(){
             
     char* respuestaMemoria;
 
-    while(list_size(planner->medium_term->queue_READY_SUSPENDED->queue_ESTADO) > 0){
+    while(list_size(planner->medium_term->queue_READY_SUSPENDED->cola) > 0){
 
-        respuestaMemoria = memoria_init_proc(list_get(planner->medium_term->queue_READY_SUSPENDED->queue_ESTADO,0));
+        respuestaMemoria = memoria_init_proc(list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0));
         // SE USA LA MISMA FUNCION PARA INCIAR PROCESOS EN MP QUE PARA TRAERLOS DE SWAP???
         
         if(strcmp(respuestaMemoria, "OK"))
         {
-            queue_process(list_get(planner->medium_term->queue_READY_SUSPENDED->queue_ESTADO,0), READY);
+            queue_process(list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0), READY);
         } else { break; }
     }
 
-    while(list_size(planner->long_term->queue_NEW->queue_ESTADO) > 0){ 
+    while(list_size(planner->long_term->queue_NEW->cola) > 0){ 
 
-        respuestaMemoria = memoria_init_proc(list_get(planner->long_term->queue_NEW->queue_ESTADO,0));
+        respuestaMemoria = memoria_init_proc(list_get(planner->long_term->queue_NEW->cola,0));
 
         if(!strcmp(respuestaMemoria, "OK"))
         {
-            queue_process(list_get(planner->long_term->queue_NEW->queue_ESTADO,0), READY);
+            queue_process(list_get(planner->long_term->queue_NEW->cola,0), READY);
         } else { break; }
     }
 }
