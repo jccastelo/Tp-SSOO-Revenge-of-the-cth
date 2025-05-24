@@ -38,7 +38,7 @@ void gestionar_io(t_buffer *buffer)
         t_buffer *buffer_io = crear_buffer_io(milisegundos, pid_a_io);
         t_IO_instancia *instancia_io_libre = buscar_instancia_libre(ioBuscada);
 
-        if ((list_size(ioBuscada->procesos_esperando->queue_ESTADO) == 0)&&(instancia_io_libre != NULL))
+        if (list_size(ioBuscada->procesos_esperando->queue_ESTADO) == 0 && instancia_io_libre != NULL)
         {
             pthread_mutex_lock(&ioBuscada->procesos_esperando->mutex);
             list_add(ioBuscada->procesos_esperando->queue_ESTADO, buffer_io);
@@ -141,16 +141,22 @@ void enviar_proceso_io(int io_socket)
 
             if (io->socket == io_socket)
             {
+                if(!list_is_empty(ios->procesos_esperando)){
+
                 pthread_mutex_lock(&ios->procesos_esperando->mutex);
                 int pid = list_remove(ios->procesos_esperando->queue_ESTADO, 0);
                 pthread_mutex_unlock(&ios->procesos_esperando->mutex);
 
                 send(io_socket, &pid, sizeof(int), 0);
+                }
+
                 return;
             }
         }
     }
 }
+
+// Carniero en busqueda de su fiambre
 
 void eliminar_instancia(int io_socket)
 {

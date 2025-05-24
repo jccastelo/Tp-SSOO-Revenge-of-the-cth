@@ -26,8 +26,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             eliminar_instancia(io_socket);
             // Si habia pid lo mandamos a exit
 
-            //CREO QUE TMB VAN A EXIT TODOS LOS PROCESOS QUE ESTABAN ESPERANDO ESTA IO (en su cola)
-
+            // LA CONSIGNA NO ESPECIFICA QUE HACER CON LOS PROCESOS EN ESPERA CUANDO SE VAN TODAS LAS INSTANCIAS DE UNA IO
             if(pid_fin >= 0){
                 t_pcb *process = list_get(list_procesos->queue_ESTADO, pid_fin);
                 queue_process(process, EXIT);
@@ -114,7 +113,6 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             queue_process(process, EXIT);
         }
     
-        //free(process);???
         break;
 
     case IO:
