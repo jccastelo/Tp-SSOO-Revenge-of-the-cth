@@ -1,11 +1,16 @@
-#ifndef KERNEL_HANDLERS_H
-#define KERNEL_HANDLERS_H
+#ifndef KERNEL_ESCUCHA_H
+#define KERNEL_ESCUCHA_H
 
 // Incluyo las bibliotecas externas necesarias:
 #include <utils/logger.h>
 #include <utils/protocolo.h>
 
 // Incluyo las bibliotecas internas necesarias:
+#include "kernel-escucha.h"
+#include "kernel-cpus-connections.h"
+#include "kernel-syscalls.h"
+#include "kernel-io-connections.h"
+
 
 /**
  * @brief Maneja una operación de entrada/salida solicitada al servidor de I/O del kernel.
@@ -74,4 +79,4 @@ void kernel_server_dispatch_handler(int client_socket, int operation, const char
  */
 void kernel_server_interrupt_handler(int client_socket, int operation, const char *server_name);
 
-#endif // KERNEL_HANDLERS_H
+#endif // KERNEL_ESCUCHA_H

@@ -15,5 +15,27 @@ typedef struct {
     char *LOG_LEVEL;
 } t_config_cpu;
 
+typedef struct {
+    int pid;
+    int pc;
+} t_contexto;
+
+typedef enum {
+    INSTR_NOOP,
+    INSTR_WRITE,
+    INSTR_READ,
+    INSTR_GOTO,
+    INSTR_IO,
+    INSTR_INIT_PROC,
+    INSTR_DUMP_MEMORY,
+    INSTR_EXIT
+} t_tipo_instruccion;
+
+typedef struct {
+    t_tipo_instruccion tipo;
+    char** argv;
+    int argc;
+} t_instruccion;
+
 
 #endif // CPU_TYPES_H_ 

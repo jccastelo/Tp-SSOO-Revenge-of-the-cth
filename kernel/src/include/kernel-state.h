@@ -11,4 +11,12 @@
 extern t_config_kernel *config_kernel;
 extern t_kernel_servers *kernel_servers;
 
+extern t_planner *planner;
+
+extern int socket_memoria;
+
+extern t_monitor *list_procesos;
+extern t_monitor *list_cpus;
+extern t_monitor *list_ios;
+
 #endif // IO_STATE_H_

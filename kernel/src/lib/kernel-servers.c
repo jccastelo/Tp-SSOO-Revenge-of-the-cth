@@ -11,7 +11,6 @@ void kernel_servers_listening() {
     pthread_create(&kernel_server_dispatcher, NULL, (void*) kernel_server_dispatcher_listening, NULL);
     pthread_create(&kernel_server_interrupt, NULL, (void*) kernel_server_interrupt_listening, NULL);
 
-    // Esperamos a que los hilos terminen:
     pthread_detach(kernel_server_io);
     pthread_detach(kernel_server_dispatcher);
     pthread_detach(kernel_server_interrupt);
@@ -23,7 +22,7 @@ void* kernel_server_io_listening(void* _) {
     server_with_thread(
         server_socket, 
         "Kernel IO", 
-        conection_strategy_once, // TADE; ESTO TENDRIA QUE ESTAR EN PERSISTANCE
+        conection_strategy_once,
         kernel_server_io_handler);
 
     return NULL;
@@ -35,11 +34,15 @@ void* kernel_server_dispatcher_listening(void* _) {
     server_with_thread(
         server_socket, 
         "Kernel DISPATCH", 
-        conection_strategy_once, // TADE; ESTO TENDRIA QUE ESTAR EN PERSISTANCE bueno no grites loko
+        conection_strategy_persistence,
         kernel_server_dispatch_handler);
 
-    return NULL;
-}
+     //while(1) {}      
+     
+
+      return NULL;
+
+    }
 
 void* kernel_server_interrupt_listening(void* _) {
     int server_socket = kernel_servers->id_server_interrupt;
@@ -47,7 +50,7 @@ void* kernel_server_interrupt_listening(void* _) {
     server_with_thread(
         server_socket, 
         "Kernel INTERRUPT", 
-        conection_strategy_once, //estrategia persistance?
+        conection_strategy_persistence, //estrategia persistance?
         kernel_server_interrupt_handler);
 
     return NULL;

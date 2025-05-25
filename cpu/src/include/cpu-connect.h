@@ -54,4 +54,6 @@ void set_socket_kernel_interrupt(int socket);
  */
 void set_socket_memoria(int socket);
 
+void enviar_id_cpu(int socket);
+
 #endif // CPU_CONNECT_H_

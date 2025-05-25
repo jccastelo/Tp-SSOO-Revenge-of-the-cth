@@ -35,4 +35,20 @@ void setup_server(char *server_name, char *ip, char *puerto, void (*callback)(in
  */
 void setup_connection_with_server(char *server_name, char *ip, char *puerto, void (*callback)(int socket_client));
 
+/**
+ * @brief Valida el estado de conexión con un cliente.
+ * 
+ * Esta función verifica si un cliente sigue conectado al servidor sin bloquear la ejecución.
+ * Utiliza `recv` con las banderas `MSG_PEEK` y `MSG_DONTWAIT` para inspeccionar la conexión
+ * de manera no bloqueante. 
+ * 
+ * Si detecta que el cliente se ha desconectado, registra un error en el log
+ * y actualiza la variable `execute_server` para detener la ejecución del servidor.
+ * 
+ * @param execute_server Puntero a una variable de control que indica si el servidor debe seguir ejecutándose.
+ * @param client_socket Socket del cliente cuya conexión se desea validar.
+ */
+ void connection_validate(int *execute_server, int client_socket);
+
+
 # endif /* CONNECTION_H_ */

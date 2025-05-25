@@ -20,6 +20,21 @@ void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio) {
 	paquete->buffer->size += tamanio;
 }
 
+void agregar_a_paquete_string(t_paquete* paquete, char* cadena, int tamanio) {
+    int cadena_length = strlen(cadena);
+    size_t size = sizeof(int);  // Tamaño en bytes de un entero
+    
+    // Expandir el tamaño del buffer del paquete para acomodar la longitud de la cadena
+    paquete->buffer->stream = realloc(paquete->buffer->stream, paquete->buffer->size + size);
+    memcpy(paquete->buffer->stream + paquete->buffer->size, &cadena_length, size);
+    paquete->buffer->size += size;
+
+    // Expandir el tamaño del buffer para acomodar la cadena
+    paquete->buffer->stream = realloc(paquete->buffer->stream, paquete->buffer->size + tamanio);
+    memcpy(paquete->buffer->stream + paquete->buffer->size, cadena, tamanio);
+    paquete->buffer->size += tamanio;
+}
+
 void enviar_paquete(t_paquete* paquete, int socket_cliente) {
 	int bytes = paquete->buffer->size + 2 *sizeof(int);
 	void* a_enviar = serializar_paquete(paquete, bytes);
@@ -87,8 +102,8 @@ void generar_handshake(int socket, char *server_name) {
 
 	op_code cod_op = HANDSHAKE; 
 	send(socket, &cod_op, sizeof(op_code), 0);
-    
     send(socket, &handshake, sizeof(int32_t), 0);
+
 	recv(socket, &result, sizeof(int32_t), MSG_WAITALL);
 
     if(result == 0) 
@@ -97,4 +112,27 @@ void generar_handshake(int socket, char *server_name) {
         log_error(logger, "Error en el handshake con %s", server_name);
         exit(EXIT_FAILURE);
     }
+}
+
+void parsear_int(void* buffer ,int* desplazamiento,int* ubicacion ){
+    memcpy(ubicacion, buffer + *desplazamiento, sizeof(int));
+    *desplazamiento += sizeof(int);
+}
+
+void parsear_string(void *buffer, int *desplazamiento, char **destino) {
+    int longitud;
+
+    memcpy(&longitud, buffer + *desplazamiento, sizeof(int));
+    *desplazamiento += sizeof(int);
+
+    *destino = malloc(longitud + 1);
+    if (*destino == NULL) {
+        perror("Error al asignar memoria para la cadena");
+        exit(1);
+    }
+
+    memcpy(*destino, buffer + *desplazamiento, longitud);
+    (*destino)[longitud] = '\0';
+
+    *desplazamiento += longitud;
 }

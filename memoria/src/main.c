@@ -4,13 +4,12 @@ int main(int argc, char* argv[]) {
     // Inicializamos un logger:
     logger = log_create("memoria.log", "MEMORIA", true, LOG_LEVEL_INFO);
 
-    // Inicializamos la configuración del kernel y los servidores:
+    // Inicializamos la configuración del memoria, y las variables globales:
     memoria_config_init();
+    memoria_state_init();
 
-    //Inicializamos el server
+    // Inicializamos el server y comenzamos a escuchar:
     memoria_servers_init();
-
-    // Comenzamos a escuchar las conexiones de los clientes:
     memoria_servers_listening();
 
     return 0;

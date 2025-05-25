@@ -9,6 +9,7 @@ typedef struct {
     int CANTIDAD_NIVELES;
     int RETARDO_MEMORIA;
     char *PATH_SWAPFILE;
+    char *PATH_INSTRUCCIONES;
     int RETARDO_SWAP;
     char* LOG_LEVEL;
     char *DUMP_PATH;
@@ -18,5 +19,4 @@ typedef struct {
     int id_server_escucha_memoria;
 } t_memoria_servers;
 
-
-#endif //MEMORIA_TYPES_H_
+#endif // MEMORIA_TYPES_H_

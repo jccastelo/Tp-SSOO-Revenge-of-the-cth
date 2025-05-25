@@ -1,4 +1,4 @@
-#include "include/kernel-connection.h" 
+#include "include/kernel-init-connection.h" 
 
 void kernel_servers_init(void) {
     // Inicializamos variables:
@@ -24,4 +24,3 @@ void set_interrupt_id (int id_server) {
     kernel_servers->id_server_interrupt = id_server;
     log_info(logger, "ID del servidor INTERRUPT: %d", kernel_servers->id_server_interrupt);
 }
-
