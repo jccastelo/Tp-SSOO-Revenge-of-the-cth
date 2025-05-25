@@ -10,8 +10,6 @@
 #include "cpu-comunicacion-memoria.h"
 #include "cpu-comunicacion-kernel.h"
 
-#include "../include/cpu-ciclo-instruccion.h"
-
 /**
  * @brief Realiza el ciclo de instrucción de un proceso.
  * 

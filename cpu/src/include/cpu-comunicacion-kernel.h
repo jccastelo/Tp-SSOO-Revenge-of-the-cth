@@ -8,8 +8,6 @@
 #include "cpu-types.h"
 #include "cpu-state.h"
 
-#include "../include/cpu-comunicacion-kernel.h"
-
 /* -------------------- Recepción de contexto -------------------- */
 
 /**

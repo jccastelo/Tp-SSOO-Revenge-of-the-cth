@@ -19,7 +19,7 @@
  * 
  * Generalmente, esta función se invoca durante la fase de inicialización del módulo de CPU.
  */
-void cpu_connect(int codigo);
+void cpu_connect();
 
 /**
  * @brief Asigna el socket utilizado para la comunicación con el servidor de dispatch del kernel.

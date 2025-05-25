@@ -2,12 +2,12 @@
 
 int main(int argc, char *argv[]) {
 
-    if (argc != 1) {
+    if (argc != 2) {
         fprintf(stderr, "Error: se debe inicia una instancia de IO con su nombre");
         return 1;
     }
 
-    char *nombre = strdup(argv[0]);
+    char *nombre = strdup(argv[1]);
 
     // Inicializamos un logger
     logger = log_create("io.log", "IO", true, LOG_LEVEL_INFO);
@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
     ciclo_de_io();
 
-    atexit(fin_de_io());
+    atexit(cierre_de_io());
 
     return 0;
 }

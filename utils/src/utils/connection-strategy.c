@@ -1,6 +1,5 @@
 #include "connection-strategy.h"
 
-
 void conection_strategy_persistence(void * args) {
     // Inicializamos las variables necesarias para el manejo de la conexión:
     client_args_t* args_t = (client_args_t*) args;
@@ -16,7 +15,6 @@ void conection_strategy_persistence(void * args) {
         int operation = recibir_operacion(client_socket);
         
         // Loggeamos la operación recibida:
-        log_info(logger, "Valor de execute_server: %d", execute_server);
         log_info(logger, "Operacion recibida: %d", operation);
         
         // Si la operación es -1, significa que hubo un error al recibir la operación:

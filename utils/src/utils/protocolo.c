@@ -21,7 +21,7 @@ void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio) {
 }
 
 void agregar_a_paquete_string(t_paquete* paquete, char* cadena, int tamanio) {
-    int cadena_length = string_length(cadena);
+    int cadena_length = strlen(cadena);
     size_t size = sizeof(int);  // Tamaño en bytes de un entero
     
     // Expandir el tamaño del buffer del paquete para acomodar la longitud de la cadena

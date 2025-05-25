@@ -5,6 +5,9 @@
 #include <utils/logger.h>
 #include <utils/protocolo.h>
 
+// Incluyo las bibliotecas internas necesarias:
+#include "memoria-requests.h"
+
 /**
  * @brief Maneja las conexiones entrantes al servidor de Memoria.
  * 

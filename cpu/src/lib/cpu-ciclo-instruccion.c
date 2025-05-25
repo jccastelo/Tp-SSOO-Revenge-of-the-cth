@@ -47,47 +47,47 @@ void excecute(t_instruccion* instruccion) {
     free(parametros);
     switch (instruccion->tipo)
     {
-    case NOOP:
+    case INSTR_NOOP:
         usleep(500000);
         break;
-    case WRITE: 
+    case INSTR_WRITE: 
         int direccion_wr = atoi(instruccion->argv[1]);
         char* mensaje = instruccion->argv[2];
         //TODO con traduccion lógica a física
         break;
-    case READ:
+    case INSTR_READ:
         int direccion_rd = atoi(instruccion->argv[1]);
         int tamanio_rd = atoi(instruccion->argv[2]);
         //TODO con traduccion lógica a física
         break;
-    case GOTO:
+    case INSTR_GOTO:
         contexto->pc = atoi(instruccion->argv[1]);
         break;
-    case IO:
+    case INSTR_IO:
         char* dispositivo = instruccion->argv[1];
         int tiempo = atoi(instruccion->argv[2]);
         syscall_io(dispositivo, tiempo);
         break;
-    case INIT_PROC:
+    case INSTR_INIT_PROC:
         char* archivo_instrucciones = instruccion->argv[1];
         int tamanio_proc = atoi(instruccion->argv[2]);
         syscall_init_proc(archivo_instrucciones, tamanio_proc);
         break;
-    case DUMP_MEMORY:
+    case INSTR_DUMP_MEMORY:
         syscall_dump_memory();
         break;
-    case EXIT:
+    case INSTR_EXIT:
         syscall_exit();
         break;
     default:
         break;
     }
-    if (instruccion->tipo != GOTO)
+    if (instruccion->tipo != INSTR_GOTO)
         contexto->pc++;
 }
 
 bool es_syscall_que_frena(t_tipo_instruccion tipo) {
-    return tipo == IO || tipo == DUMP_MEMORY || tipo == EXIT;
+    return tipo == INSTR_IO || tipo == INSTR_DUMP_MEMORY || tipo == INSTR_EXIT;
 }
 
 
@@ -102,13 +102,13 @@ bool check_interrupt() {
 }
 
 t_tipo_instruccion mapeo_string_tipo(char* tipo_instruccion) {
-    if (string_equals_ignore_case(tipo_instruccion, "NOOP")) return NOOP;
-    else if (string_equals_ignore_case(tipo_instruccion, "WRITE")) return WRITE;
-    else if (string_equals_ignore_case(tipo_instruccion, "READ")) return READ;
-    else if (string_equals_ignore_case(tipo_instruccion, "GOTO")) return GOTO;
-    else if (string_equals_ignore_case(tipo_instruccion, "IO")) return IO;
-    else if (string_equals_ignore_case(tipo_instruccion, "INIT_PROC")) return INIT_PROC;
-    else if (string_equals_ignore_case(tipo_instruccion, "DUMP_MEMORY")) return DUMP_MEMORY;
-    else if (string_equals_ignore_case(tipo_instruccion, "EXIT")) return EXIT;
+    if (string_equals_ignore_case(tipo_instruccion, "NOOP")) return INSTR_NOOP;
+    else if (string_equals_ignore_case(tipo_instruccion, "WRITE")) return INSTR_WRITE;
+    else if (string_equals_ignore_case(tipo_instruccion, "READ")) return INSTR_READ;
+    else if (string_equals_ignore_case(tipo_instruccion, "GOTO")) return INSTR_GOTO;
+    else if (string_equals_ignore_case(tipo_instruccion, "IO")) return INSTR_IO;
+    else if (string_equals_ignore_case(tipo_instruccion, "INIT_PROC")) return INSTR_INIT_PROC;
+    else if (string_equals_ignore_case(tipo_instruccion, "DUMP_MEMORY")) return INSTR_DUMP_MEMORY;
+    else if (string_equals_ignore_case(tipo_instruccion, "EXIT")) return INSTR_EXIT;
     else return -1;
 }

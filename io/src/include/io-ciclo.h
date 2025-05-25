@@ -11,5 +11,6 @@
 #include "io-types.h"
 
 void ciclo_de_io();
-
+t_proceso* recibir_proceso();
+void notificar_liberacion(t_proceso* proceso);
 #endif /* IO_CICLO_H_ */

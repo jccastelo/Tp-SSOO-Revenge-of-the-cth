@@ -21,14 +21,14 @@ typedef struct {
 } t_contexto;
 
 typedef enum {
-    NOOP,
-    WRITE,
-    READ,
-    GOTO,
-    IO,
-    INIT_PROC,
-    DUMP_MEMORY,
-    EXIT
+    INSTR_NOOP,
+    INSTR_WRITE,
+    INSTR_READ,
+    INSTR_GOTO,
+    INSTR_IO,
+    INSTR_INIT_PROC,
+    INSTR_DUMP_MEMORY,
+    INSTR_EXIT
 } t_tipo_instruccion;
 
 typedef struct {

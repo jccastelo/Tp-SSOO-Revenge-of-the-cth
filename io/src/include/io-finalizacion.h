@@ -7,8 +7,9 @@
 #include <commons/string.h>
 
 // Incluye las bibliotecas internas necesarias:
+#include "io-types.h"
 #include "io-state.h"
 
-void* fin_de_io();
 
+void* cierre_de_io();
 #endif /* IO_FINALIZACION_H_ */

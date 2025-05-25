@@ -54,6 +54,7 @@ void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *
         log_error(logger, "Operación no válida para el servidor INTERRUPT: %d", operation);}
 
     
+    free(new_buffer);
     return;
 }
 
@@ -74,7 +75,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
         log_info(logger,"Coonexion disptach lista");
       }
 
-
+    log_info(logger, "%d", operation);
     switch(operation)
     {
     // Operaciones
@@ -124,7 +125,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
         gestionar_io(new_buffer);
         break;
 
-    case EXIT_Sys:
+    case EXIT_SYS:
         delate_process(new_buffer);
         set_cpu(cpu_socket, DISPONIBLE);
          

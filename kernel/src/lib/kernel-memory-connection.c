@@ -32,21 +32,27 @@ char* memoria_init_proc(t_pcb* process) {
     int tamanio_nombre_archivo = strlen(process->archivo) + 1;
 
     t_paquete* paquete = crear_paquete(INIT_PROC);
+
+
+    agregar_a_paquete(paquete, &process->pid, sizeof(int));
+    agregar_a_paquete(paquete, &process->tamanio_proceso, sizeof(int));
     agregar_a_paquete(paquete, &tamanio_nombre_archivo, sizeof(int));
     agregar_a_paquete(paquete, process->archivo, strlen(process->archivo) + 1);
-    agregar_a_paquete(paquete, &process->tamanio_proceso, sizeof(int));
-    agregar_a_paquete(paquete, &process->pid, sizeof(int));
+    
+    
+
     enviar_paquete(paquete, socket_memoria);
-    int bytes_recibidos= recv(socket_memoria, &resultado99, sizeof(int), MSG_WAITALL);
-    eliminar_paquete(paquete);
+    int respuesta = recv(socket_memoria, &resultado99, sizeof(int), MSG_WAITALL);
+    // int bytes_recibidos= recv(socket_memoria, &resultado99, sizeof(int), MSG_WAITALL);
+    // eliminar_paquete(paquete);
+    log_info(logger, "Respuesta de memoria: %d", respuesta);
 
+    // if (bytes_recibidos <= 0) {
+    // perror("recv");
+    // log_error(logger, "No se pudo recibir respuesta de memoria para iniciar proceso");
+    // }
 
-    if (bytes_recibidos <= 0) {
-    perror("recv");
-    log_error(logger, "No se pudo recibir respuesta de memoria para iniciar proceso");
-    }
-
-    if(resultado99 == 99)//test
+    if(resultado99 == 1)//test
     {log_info(logger,"MEmoria confirma espacio para iniciar proceso %d :", process->pid);
     
     
@@ -102,7 +108,7 @@ int memory_delete_process(t_pcb *process_to_delate)
     void* retorno; // se supone que es entero
     pthread_join(memoria_delate_proc, &retorno);
     */
-    t_paquete* paquete = crear_paquete(EXIT_Sys); //Creo paquete con syscall de salida
+    t_paquete* paquete = crear_paquete(EXIT_SYS); //Creo paquete con syscall de salida
 
     agregar_a_paquete(paquete, &(process_to_delate->pid), sizeof(int)); //Pongo en el paquete el PID Del proceso a eliminar
 

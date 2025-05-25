@@ -4,13 +4,7 @@ void iniciar_cpu(t_buffer *buffer,int socket_cliente)
 {
     t_cpu *cpu = cpu_init();
 
-    int tamanio_cpu_id; 
-    int desplazamiento = 0;
-
-    memcpy(&tamanio_cpu_id, buffer->stream + desplazamiento, sizeof(int));
-    desplazamiento += sizeof(int);
-
-    memcpy(&cpu->id, buffer->stream + desplazamiento, tamanio_cpu_id);
+    memcpy(&cpu->id, buffer->stream, sizeof(int));
 
     cpu->socket_cpu = socket_cliente;
     

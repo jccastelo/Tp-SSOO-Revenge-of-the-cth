@@ -32,7 +32,7 @@ void connection_validate(int *execute_server, int client_socket) {
     int buffer;
     int sigue_conectado = recv(client_socket, &buffer, sizeof(int), MSG_PEEK | MSG_DONTWAIT);
 
-    log_info(logger, "Valor de sigue_conectado: %d", sigue_conectado);
+    // log_info(logger, "Valor de sigue_conectado: %d", sigue_conectado);
     
     if(!sigue_conectado) {
         log_error(logger, "El cliente se ha desconectado");

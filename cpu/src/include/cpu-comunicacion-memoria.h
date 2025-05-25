@@ -8,8 +8,6 @@
 #include "cpu-types.h"
 #include "cpu-state.h"
 
-#include "../include/cpu-comunicacion-memoria.h"
-
 /**
  * @brief Solicita a Memoria la instrucción correspondiente al Program Counter actual.
  *

@@ -14,9 +14,11 @@ void ciclo_de_io(){
 t_proceso* recibir_proceso(){
 
     t_buffer* buffer = malloc(sizeof(t_buffer));
+    buffer->size = 0;
+    buffer->stream = NULL;
 
     // Leer el tamaño del buffer
-    recv(socket_kernel, buffer->size, sizeof(int), 0);
+    recv(socket_kernel, &buffer->size, sizeof(int), 0);
 
     // Reservar memoria para el stream y recibirlo
     buffer->stream = malloc(buffer->size);
@@ -36,7 +38,7 @@ t_proceso* recibir_proceso(){
 void notificar_liberacion(t_proceso* proceso){
 
     t_paquete* paquete = crear_paquete(DESBLOQUEO_IO);
-    agregar_a_paquete(paquete, proceso->pid, sizeof(int));
+    agregar_a_paquete(paquete, &proceso->pid, sizeof(int));
     enviar_paquete(paquete, socket_kernel);
     eliminar_paquete(paquete);
 }

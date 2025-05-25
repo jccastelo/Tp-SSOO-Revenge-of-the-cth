@@ -31,7 +31,7 @@ void rcv_setup_to_process(int client_socket, int *id_process, int *tam_process, 
  * @param id_process Identificador del proceso solicitado (se actualiza con el valor recibido).
  * @param program_counter Contador de programa solicitado (se actualiza con el valor recibido).
  */
-void rcv_instruction_consumer(int client_socket, int id_process, int program_counter);
+void rcv_instruction_consumer(int client_socket, int *id_process, int *program_counter);
 
 /**
  * @brief Envía una instrucción al consumidor (CPU) a través del socket.

@@ -9,6 +9,7 @@
 #include <netdb.h>
 #include <utils/logger.h>
 #include <string.h>
+#include <commons/string.h>
 
 typedef enum {
     MENSAJE, 
@@ -18,9 +19,13 @@ typedef enum {
 	INIT_PROC,
 	DUMP_MEMORY,
 	IO,
-	EXIT_Sys,
+	EXIT_SYS,
 	DESBLOQUEO_IO,
 	FIN_CONEXION_DE_IO,
+	INTERRUPT,
+	CONTEXTO_DESALOJO,
+	GET_INSTRUCTION,
+	RETURN_INSTRUCCION
 } op_code;
 
 typedef struct

@@ -4,6 +4,7 @@ void init_process (int client_socket) {
     // Inicializamos las variables necesarias para el proceso:
     int id_process;
     int tam_process;
+    int resquest = 1;
     char *file_procces;
     
     // Llamamos a la función que recibe y configura los valores para el proceso:
@@ -13,6 +14,9 @@ void init_process (int client_socket) {
 
     // Cargar las instrucciones en la estructura administrativa: instrucciones por proceso
     loading_process_instructions(id_process, file_procces);
+
+    // Enviamos respuesta afimartiva que se mando se creo el proceso:
+    send(client_socket, &resquest, sizeof(resquest), 0);
 }
 
 void send_process_instruction(int cliente_socket) {
@@ -22,7 +26,7 @@ void send_process_instruction(int cliente_socket) {
     char *instruction;
 
     // Llamamos a la función que recibe y configura los valores necesarios para el proceso. Luego, enviamos la instrucción correspondiente:
-    rcv_instruction_consumer(client_socket, &id_process, &program_counter);
-    get_instruction(client_socket, id_process, program_counter, &instruction);
-    send_instruction_consumer(cliente_socket, instruction);
+    rcv_instruction_consumer(cliente_socket, &id_process, &program_counter);
+    get_instruction(cliente_socket, id_process, program_counter, &instruction);
+    send_instruction_consumer(cliente_socket, id_process, program_counter, instruction);
 }

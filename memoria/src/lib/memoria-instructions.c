@@ -3,6 +3,7 @@
 void loading_process_instructions(int id_process, char *file_procces) {
     // Completa la ruta del archivo pseudocódigo asociándola al directorio correspondiente
     associate_instructions_folder_path(&file_procces);
+    log_info(logger, "%s", file_procces);
 
     // Abre el archivo en modo lectura ("r")
     FILE *pseudocode_file = fopen(file_procces, "r");
@@ -63,7 +64,7 @@ void get_instruction(int client_socket, int id_process, int program_counter, cha
 
     // Verificamos que el proceso tenga instrucciones cargadas.
     if (!process_instructions) {
-        log_error("El proceso no tiene instrucciones cargadas en memoria.");
+        log_error(logger, "El proceso no tiene instrucciones cargadas en memoria.");
         free(key_id_process); 
         return;
     }
@@ -71,6 +72,6 @@ void get_instruction(int client_socket, int id_process, int program_counter, cha
     *instruction = list_get(process_instructions, program_counter);
 
     // Logueamos la instrucción obtenida, y liberamos la cadena creada si es necesaria. 
-    log_info("Obtener instrucción: ## PID: %d - Obtener instrucción: %d - Instrucción: %s", id_process, program_counter, *instruction);
+    log_info(logger, "Obtener instrucción: ## PID: %d - Obtener instrucción: %d - Instrucción: %s", id_process, program_counter, *instruction);
     free(key_id_process); 
 }

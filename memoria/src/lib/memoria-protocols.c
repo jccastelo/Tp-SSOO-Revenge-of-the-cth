@@ -14,7 +14,7 @@ void rcv_setup_to_process(int client_socket, int *id_process, int *tam_process, 
     parsear_string(buffer, &desplazamiento, file_procces);
 }
 
-void rcv_instruction_consumer(int client_socket, int id_process, int program_counter) {
+void rcv_instruction_consumer(int client_socket, int *id_process, int *program_counter) {
     // Inicializamos las variables necessarias:
     int size;
     int desplazamiento = 0;
@@ -33,7 +33,7 @@ void send_instruction_consumer(int cliente_socket, int id_process, int program_c
         return;
     }
  
-    t_paquete *instruction_package = crear_paquete();
+    t_paquete *instruction_package = crear_paquete(GET_INSTRUCTION);
     agregar_a_paquete_string(instruction_package, instruction, strlen(instruction) + 1);
     enviar_paquete(instruction_package, cliente_socket);
     eliminar_paquete(instruction_package);
