@@ -10,6 +10,7 @@ t_config_memoria* inicializar_config_memoria() {
     config_memoria->CANTIDAD_NIVELES = 0;
     config_memoria->RETARDO_MEMORIA = 0;
     config_memoria->PATH_SWAPFILE = NULL; // Fixed initialization
+    config_memoria->PATH_INSTRUCCIONES = NULL;
     config_memoria->RETARDO_SWAP = 0;
     config_memoria->LOG_LEVEL = NULL;
     config_memoria->DUMP_PATH = NULL; // Fixed initialization
@@ -54,6 +55,7 @@ void configurar_valores_de_tamanios(t_config_memoria* config_io , t_config* conf
 
 void configurar_valores_de_paths(t_config_memoria* config_io, t_config* config) {
     config_memoria-> PATH_SWAPFILE = strdup(config_get_string_value(config,"PATH_SWAPFILE"));
+    config_memoria->PATH_INSTRUCCIONES = strdup(config_get_string_value(config, "PATH_INSTRUCCIONES"));
     config_memoria-> DUMP_PATH = strdup(config_get_string_value(config,"DUMP_PATH"));
 }
 
