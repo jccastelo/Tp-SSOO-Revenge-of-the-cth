@@ -143,12 +143,13 @@ void enviar_proceso_io(int io_socket)
             {
                 if(!list_is_empty(ios->procesos_esperando->cola)){
 
-                pthread_mutex_lock(&ios->procesos_esperando->mutex);
-                int *pid = (int*)list_remove(ios->procesos_esperando->cola, 0);
-                pthread_mutex_unlock(&ios->procesos_esperando->mutex);
+                    pthread_mutex_lock(&ios->procesos_esperando->mutex);
+                    t_buffer* pid_y_milisegundos = (t_buffer*)list_remove(ios->procesos_esperando->cola, 0);
+                    pthread_mutex_unlock(&ios->procesos_esperando->mutex);
 
-                send(io_socket, pid, sizeof(int), 0);
-                free(pid);
+                    send(io_socket, &pid_y_milisegundos->size, sizeof(int), 0);
+                    send(io_socket, pid_y_milisegundos->stream, pid_y_milisegundos->size, 0);
+                    free(pid_y_milisegundos);
                 }
 
                 return;
