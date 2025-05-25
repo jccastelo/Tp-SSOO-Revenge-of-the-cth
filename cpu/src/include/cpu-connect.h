@@ -53,5 +53,7 @@ void set_socket_kernel_interrupt(int socket);
  * @param socket Descriptor del socket que conecta la CPU con el módulo de memoria.
  */
 void set_socket_memoria(int socket);
-void identificar_cpu_A_kernel(int socket);
+
+void enviar_id_cpu(int socket);
+
 #endif // CPU_CONNECT_H_

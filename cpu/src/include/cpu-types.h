@@ -16,10 +16,26 @@ typedef struct {
 } t_config_cpu;
 
 typedef struct {
-    int socket_dispatch;
-    int socket_interrupt;
-    int socket_memoria;
-} t_cpu_servers;
+    int pid;
+    int pc;
+} t_contexto;
+
+typedef enum {
+    NOOP,
+    WRITE,
+    READ,
+    GOTO,
+    IO,
+    INIT_PROC,
+    DUMP_MEMORY,
+    EXIT
+} t_tipo_instruccion;
+
+typedef struct {
+    t_tipo_instruccion tipo;
+    char** argv;
+    int argc;
+} t_instruccion;
 
 
 #endif // CPU_TYPES_H_ 

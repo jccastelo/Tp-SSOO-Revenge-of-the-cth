@@ -20,7 +20,8 @@ void set_socket_kernel_dispatch(int socket) {
     cpu_servers->socket_dispatch = socket;
 
     // Enviamos el handshake al kernel:
-    generar_handshake(cpu_servers->socket_dispatch, "Kernel DISPATCH");
+    generar_handshake(socket_dispatch, "Kernel DISPATCH");
+    enviar_id_cpu(socket_dispatch); // Post handshake, envía a KERNEL su ID
 }
 
 void set_socket_kernel_interrupt(int socket) {
@@ -28,7 +29,8 @@ void set_socket_kernel_interrupt(int socket) {
     cpu_servers->socket_interrupt = socket;
     
     // Enviamos el handshake al kernel interrupt:
-    generar_handshake(cpu_servers->socket_interrupt, "Kernel INTERRUPT");
+    generar_handshake(socket_interrupt, "Kernel INTERRUPT");
+    enviar_id_cpu(socket_interrupt);
 }
 
 void set_socket_memoria(int socket) {
@@ -37,4 +39,10 @@ void set_socket_memoria(int socket) {
 
     // Enviamos el handshake a memoria:
     generar_handshake(cpu_servers->socket_memoria, "Memoria");
+}
+
+void enviar_id_cpu(int socket) {
+    t_paquete* paquete = crear_paquete(CPU_ID);
+    agregar_a_paquete(paquete, &id_cpu, sizeof(int));
+    enviar_paquete(paquete, socket);
 }

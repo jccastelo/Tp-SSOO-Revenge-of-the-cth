@@ -8,5 +8,6 @@
 #include "cpu-state.h"
 #include "cpu-config.h"
 #include "cpu-connect.h"
-void mostrar_menu();
+#include "cpu-ciclo-instruccion.h"
+
 #endif //CPU_H
