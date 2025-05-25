@@ -16,7 +16,9 @@ int main(int argc, char *argv[]) {
     io_config_init();
     io_connect(nombre);
 
-    free(nombre);
+    ciclo_de_io();
+
+    atexit(fin_de_io());
 
     return 0;
 }
