@@ -7,4 +7,9 @@ typedef struct {
     char *LOG_LEVEL;
 } t_config_io;
 
+typedef struct {
+    int pid;
+    int milisegundos;
+} t_proceso;
+
 # endif // IO_TYPES_H

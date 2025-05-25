@@ -19,7 +19,7 @@ void identificarse_como_io();
  * 
  * Es útil para inicializar conexiones con componentes del sistema como parte de la etapa de configuración.
  */
-void io_connect();
+void io_connect(char* nombre);
 
 /**
  * @brief Asigna el socket conectado del kernel para su uso posterior en el sistema.
@@ -30,5 +30,7 @@ void io_connect();
  * @param socket Descriptor del socket conectado al kernel.
  */
 void set_socket_kernel(int socket);
+
+void enviar_nombre_kernel(char* nombre);
 
 #endif /* IO_CONNECTION_H_ */
