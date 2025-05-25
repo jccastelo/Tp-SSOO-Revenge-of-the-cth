@@ -27,7 +27,6 @@ void set_socket_kernel_interrupt(int socket) {
 
     // Enviamos el handshake al kernel interrupt:
     generar_handshake(socket_interrupt, "Kernel INTERRUPT");
-    enviar_id_cpu(socket_interrupt);
 }
 
 void set_socket_memoria(int socket) {
