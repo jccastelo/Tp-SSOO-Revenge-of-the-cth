@@ -17,5 +17,16 @@
  *                      permitiendo la transmisión de datos necesarios para la inicialización.
  */
 void init_process(int client_socket);
+/**
+ * @brief Envía una instrucción de un proceso a solicitud del cliente (CPU).
+ * 
+ * Esta función coordina la recepción de los parámetros necesarios (ID del proceso y program counter)
+ * y la posterior obtención y envío de la instrucción correspondiente desde la memoria. 
+ * Se utiliza como parte del protocolo de comunicación entre el módulo de memoria y otros componentes, 
+ * permitiendo que el cliente obtenga la instrucción que necesita ejecutar.
+ * 
+ * @param cliente_socket El socket a través del cual se recibe la solicitud y se envía la instrucción.
+ */
+void send_process_instruction(int cliente_socket);
 
 #endif // MEMORIA_REQUESTS_H
