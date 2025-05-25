@@ -60,6 +60,8 @@ void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *
 
 void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *server_name) {
 
+    log_info(logger, "LLEGO OPERACION A KERNEL DISPATCH %d", operation);
+
     t_buffer* new_buffer = malloc(sizeof(t_buffer));
     new_buffer->size = 0;
     new_buffer->stream = NULL;
@@ -72,17 +74,14 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
       if (operation == HANDSHAKE) {
         log_info(logger,"LLego op handssake");
         recibir_handshake(cpu_socket);
-        log_info(logger,"Coonexion disptach lista");
+        log_info(logger,"Coonexion disptach lista ");
+        return;
       }
 
-    log_info(logger, "%d", operation);
+    
     switch(operation)
     {
     // Operaciones
-    case HANDSHAKE:
-        recibir_handshake(cpu_socket);
-        log_info(logger,"HUBO HANDSHAKE CON:  %s",server_name);
-        break;
 
     case CPU_ID:
         log_info(logger, "Llego cpu para identificarse" );
