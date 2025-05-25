@@ -52,4 +52,24 @@ t_list *read_pseudocode_file(FILE *pseudocode_file);
  */
 void load_process_instructions_in_instrucciones_por_procesos(int id_process, t_list *process_instructions);
 
+/**
+ * @brief Obtiene una instrucción específica de un proceso y la devuelve por referencia.
+ *
+ * Esta función recupera la instrucción correspondiente al contador de programa (`program_counter`)
+ * del proceso identificado por `id_process`, a partir de una estructura global que almacena
+ * las instrucciones de cada proceso.
+ *
+ * @param client_socket Socket del cliente (no utilizado en esta función, pero puede estar reservado para futuras extensiones).
+ * @param id_process Identificador del proceso del cual se desea obtener la instrucción.
+ * @param program_counter Índice que indica la posición de la instrucción dentro de la lista de instrucciones del proceso.
+ * @param instruction Puntero doble donde se almacenará la instrucción obtenida.
+ *
+ * @note Si el proceso no tiene instrucciones cargadas en memoria (es decir, no existe una entrada para su ID),
+ *       la función registrará un error y no modificará el contenido de `instruction`.
+ *
+ * @warning La función asume que `instrucciones_por_procesos` es un diccionario previamente inicializado y
+ *          que contiene listas (`t_list*`) de instrucciones asociadas a cada proceso.
+ */
+void get_instruction(int client_socket, int id_process, int program_counter, char **instruction);
+
 #endif // MEMORIA_INSTRUCTIONS_H

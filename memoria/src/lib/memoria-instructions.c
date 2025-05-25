@@ -33,7 +33,7 @@ t_list *read_pseudocode_file(FILE *pseudocode_file) {
     t_list *process_instructions = list_create();
 
     // Leemos el archivo y cada instrucción es un elemento de la lista (process_instructions) 
-    while((read = getline(&instruction, &len_buffer, pseudocode_file)) != -1) {
+    while ((read = getline(&instruction, &len_buffer, pseudocode_file)) != -1) {
         int len_instruction = string_length(instruction);
 
         // Si la instrucción termina con un salto de línea ('\n'), lo reemplazamos por '\0'.
@@ -52,4 +52,25 @@ t_list *read_pseudocode_file(FILE *pseudocode_file) {
 void load_process_instructions_in_instrucciones_por_procesos(int id_process, t_list *process_instructions) {
     char *key_procces = string_itoa(id_process);
     dictionary_put(instrucciones_por_procesos, key_procces, process_instructions);
+}
+
+void get_instruction(int client_socket, int id_process, int program_counter, char **instruction) {
+    // Convertimos el valor entero id_process en una cadena para usarla como clave.
+    char *key_id_process = string_itoa(id_process); 
+
+    // Obtenemos la lista de instrucciones del proceso del diccionario
+    t_list *process_instructions = dictionary_get(instrucciones_por_procesos, key_id_process);
+
+    // Verificamos que el proceso tenga instrucciones cargadas.
+    if (!process_instructions) {
+        log_error("El proceso no tiene instrucciones cargadas en memoria.");
+        free(key_id_process); 
+        return;
+    }
+
+    *instruction = list_get(process_instructions, program_counter);
+
+    // Logueamos la instrucción obtenida, y liberamos la cadena creada si es necesaria. 
+    log_info("Obtener instrucción: ## PID: %d - Obtener instrucción: %d - Instrucción: %s", id_process, program_counter, *instruction);
+    free(key_id_process); 
 }
