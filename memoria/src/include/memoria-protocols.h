@@ -19,29 +19,32 @@
  *                          La memoria para la cadena se asigna dinámicamente dentro de la función.
  */
 void rcv_setup_to_process(int client_socket, int *id_process, int *tam_process, char **file_procces);
-/**
- * @brief Parsea un entero desde un buffer en una posición determinada.
- *
- * Esta función copia un valor entero (`int`) desde el buffer en la posición indicada
- * por el desplazamiento, lo almacena en la variable de destino y actualiza el desplazamiento.
- *
- * @param buffer Puntero al buffer que contiene los datos.
- * @param desplazamiento Puntero al desplazamiento actual dentro del buffer (en bytes). Se actualiza tras la lectura.
- * @param destino Puntero a la variable donde se almacenará el valor entero parseado.
- */
-void parsear_int(void* buffer, int* desplazamiento, int* destino);
 
 /**
- * @brief Parsea una cadena de caracteres desde un buffer.
+ * @brief Recibe un paquete con la instrucción solicitada por un consumidor (CPU).
  *
- * Esta función lee un entero inicial que representa la longitud de la cadena,
- * luego copia esa cantidad de caracteres desde el buffer, reserva memoria para el string
- * e incluye el caracter nulo al final (`'\0'`). También actualiza el desplazamiento.
+ * Esta función recibe un buffer desde el socket del cliente y extrae los valores enteros
+ * correspondientes al ID del proceso y al contador de programa (program counter),
+ * actualizando el desplazamiento en el buffer para la correcta lectura.
  *
- * @param buffer Puntero al buffer que contiene los datos.
- * @param desplazamiento Puntero al desplazamiento actual dentro del buffer (en bytes). Se actualiza tras la lectura.
- * @param destino Puntero donde se almacenará el puntero a la cadena parseada (se reserva memoria internamente).
+ * @param client_socket Descriptor del socket desde donde se recibe la información.
+ * @param id_process Identificador del proceso solicitado (se actualiza con el valor recibido).
+ * @param program_counter Contador de programa solicitado (se actualiza con el valor recibido).
  */
-void parsear_string(void* buffer, int* desplazamiento, char** destino);
+void rcv_instruction_consumer(int client_socket, int id_process, int program_counter);
+
+/**
+ * @brief Envía una instrucción al consumidor (CPU) a través del socket.
+ *
+ * Esta función arma un paquete que contiene la instrucción solicitada, primero verificando
+ * que la instrucción no sea NULL para evitar errores. Luego, agrega la instrucción al paquete,
+ * la envía por el socket correspondiente y libera la memoria utilizada por el paquete.
+ *
+ * @param cliente_socket Descriptor del socket donde se enviará la instrucción.
+ * @param id_process Identificador del proceso al que pertenece la instrucción.
+ * @param program_counter Contador de programa correspondiente a la instrucción.
+ * @param instruction Cadena de caracteres que representa la instrucción a enviar.
+ */
+void send_instruction_consumer(int cliente_socket, int id_process, int program_counter, char *instruction);
 
 #endif // MEMORIA_PROTOCOLS_H

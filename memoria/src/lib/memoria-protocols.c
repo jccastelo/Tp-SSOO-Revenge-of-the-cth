@@ -1,7 +1,3 @@
-#include <check.h>
-#include <math.h>
-
-
 #include "../include/memoria-protocols.h"
 
 void rcv_setup_to_process(int client_socket, int *id_process, int *tam_process, char **file_procces) {
@@ -18,25 +14,27 @@ void rcv_setup_to_process(int client_socket, int *id_process, int *tam_process, 
     parsear_string(buffer, &desplazamiento, file_procces);
 }
 
+void rcv_instruction_consumer(int client_socket, int id_process, int program_counter) {
+    // Inicializamos las variables necessarias:
+    int size;
+    int desplazamiento = 0;
+    void *buffer = recibir_buffer(&size, client_socket);
 
-void parsear_int(void* buffer ,int* desplazamiento,int* ubicacion ){
-    memcpy(ubicacion, buffer + *desplazamiento, sizeof(int));
-    *desplazamiento += sizeof(int);
+    // Parseamos los primeros valores enteros del buffer, actualizando el desplazamiento en cada paso:
+    parsear_int(buffer, &desplazamiento, id_process);
+    parsear_int(buffer, &desplazamiento, program_counter);
 }
-void parsear_string(void *buffer, int *desplazamiento, char **destino) {
-    int longitud;
 
-    memcpy(&longitud, buffer + *desplazamiento, sizeof(int));
-    *desplazamiento += sizeof(int);
-
-    *destino = malloc(longitud + 1);
-    if (*destino == NULL) {
-        perror("Error al asignar memoria para la cadena");
-        exit(1);
+void send_instruction_consumer(int cliente_socket, int id_process, int program_counter, char *instruction) {
+    // Verificamos que haya instruccion para enviar al cliente.
+    // Si no hay instruccion valida, registramos un error y salimos. 
+    if (!instruction) {
+        log_error(logger, "No se puede enviar la instrucción solicitada por CPU. Program Counter: %d | ID de Proceso: %d", program_counter, id_process);
+        return;
     }
-
-    memcpy(*destino, buffer + *desplazamiento, longitud);
-    (*destino)[longitud] = '\0';
-
-    *desplazamiento += longitud;
-}
+ 
+    t_paquete *instruction_package = crear_paquete();
+    agregar_a_paquete_string(instruction_package, instruction, strlen(instruction) + 1);
+    enviar_paquete(instruction_package, cliente_socket);
+    eliminar_paquete(instruction_package);
+} 
