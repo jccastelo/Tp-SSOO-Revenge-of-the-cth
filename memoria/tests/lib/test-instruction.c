@@ -1,6 +1,8 @@
-// Incluyo las bibliotecas externas necesarias:
+// Incluimos las biblotecas externas:
 #include <check.h>
 #include <math.h>
+
+// Incluimos las biblotecas internas:
 #include "../src/include/memoria-instructions.h"
 #include "../src/include/memoria-state.h"
 
