@@ -1,7 +1,12 @@
 #ifndef CONNECTION_H_
 #define CONNECTION_H_
 
-// Incluye las bibliotecas internas externas:
+// Incluye las bibliotecas externas:
+#include <errno.h>
+#include <string.h>
+#include <unistd.h>
+
+// Incluye las bibliotecas externas:
 #include "logger.h"
 #include "socket.h"
 

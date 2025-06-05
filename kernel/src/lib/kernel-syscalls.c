@@ -38,7 +38,6 @@ void recibir_y_crear_proceso(t_buffer *buffer){
     cargar_proceso(process, buffer);
 
     queue_process(process, NEW);
-
 }
 
 void cargar_proceso(t_pcb* process, t_buffer* buffer){

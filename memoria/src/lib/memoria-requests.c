@@ -9,6 +9,7 @@ void init_process (int client_socket) {
     
     // Llamamos a la función que recibe y configura los valores para el proceso:
     rcv_setup_to_process(client_socket, &id_process, &tam_process, &file_procces);
+    log_info(logger, "PID: %d - Proceso a punto de crearse - Tamanio: %d - Archivo: %s", id_process, tam_process, file_procces);
 
     // To Do: Deberiamos de validar, si memoria tiene espacio para el proceso
 

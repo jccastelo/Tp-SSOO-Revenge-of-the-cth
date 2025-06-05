@@ -15,15 +15,13 @@ int main(int argc, char *argv[]) {
     // Inicializamos un logger
     logger = log_create("kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
 
-
     // Inicializamos la configuración del kernel y los servidores:
     kernel_config_init();
-
     planner_init();
 
     if (planner == NULL || planner->long_term == NULL) {
-    log_error(logger,"Planner no inicializado");
-    return -1;
+        log_error(logger,"Planner no inicializado");
+        return -1;
     }
 
     kernel_servers_init();
@@ -33,21 +31,21 @@ int main(int argc, char *argv[]) {
     log_info(logger,"ESta escuchadno");
 
     // //Nos conectamos a la memoria como clientes
-    // kernel_memory_connection();
+    kernel_memory_connection();
 
     log_info(logger, "Esperando conexion de alguna CPU para iniciar primer proceso...");
-    while(list_size(list_cpus->cola) == 0){}
-    // log_info(logger, "Primera Cpu conectada");
+    while(list_size(list_cpus->cola) == 0) {}
+    log_info(logger, "Primera Cpu conectada");
 
-    //INICIO PRIMER PROCESO
-    // init_fist_process(archivo_pseudocodigo,Tamanio_proc);
+    // INICIO PRIMER PROCESO
+    init_fist_process(archivo_pseudocodigo,Tamanio_proc);
 
 
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
-    // Ya que detachamos los hilos, no podemos esperar a que terminen.]
+    // Ya que detachamos los hilos, no podemos esperar a que terminen.
     while(list_size(list_cpus->cola) > 0) {}
-    // while(1) {}
  
-    terminar_kernel();
+    // terminar_kernel();
+
     return 0;
 }

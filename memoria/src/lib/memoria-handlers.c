@@ -1,7 +1,6 @@
 #include "../include/memoria-handlers.h"
 
 void memoria_server_escucha_handler(int client_socket, int operation, const char *server_name) {
-    log_info(logger, "%d", operation);
     switch (operation) {
         case HANDSHAKE:
             log_info(logger, "Se ha recibido un handshake.");

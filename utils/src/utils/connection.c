@@ -28,14 +28,24 @@ void setup_connection_with_server(char *server_name, char *ip, char *puerto, voi
 }
 
 void connection_validate(int *execute_server, int client_socket) {
-    // Inicializamos la variable para controlar el bucle de atención al cliente:
-    int buffer;
-    int sigue_conectado = recv(client_socket, &buffer, sizeof(int), MSG_PEEK | MSG_DONTWAIT);
+    char buffer;
+    int resultado = recv(client_socket, &buffer, sizeof(buffer), MSG_PEEK | MSG_DONTWAIT);
 
-    // log_info(logger, "Valor de sigue_conectado: %d", sigue_conectado);
-    
-    if(!sigue_conectado) {
-        log_error(logger, "El cliente se ha desconectado");
-        *execute_server = 0;
+    if (resultado > 0) {
+        log_info(logger, "Cliente sigue conectado");
+        return;
     }
+
+    if (resultado == 0) {
+        log_error(logger, "Cliente desconectado (cerró la conexión)");
+    } else {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            log_info(logger, "Cliente aún conectado (sin datos disponibles por ahora)");
+            return;
+        }
+        
+        log_error(logger, "Error al verificar la conexión: %s", strerror(errno));
+    }
+
+    *execute_server = 0;
 }

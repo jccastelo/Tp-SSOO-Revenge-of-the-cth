@@ -9,16 +9,15 @@ void cpu_connect() {
     // Establecemos la conexión con el kernel dispatch y el kernel interrupt:
     setup_connection_with_server("Kernel DISPATCH", config_cpu->IP_KERNEL, puerto_dispatch, set_socket_kernel_dispatch);
     setup_connection_with_server("Kernel INTERRUPT", config_cpu->IP_KERNEL, puerto_interrupt, set_socket_kernel_interrupt);
-    // setup_connection_with_server("Memoria", config_cpu->IP_MEMORIA, puerto_memoria, set_socket_memoria);
+    setup_connection_with_server("Memoria", config_cpu->IP_MEMORIA, puerto_memoria, set_socket_memoria);
 }
 
 void set_socket_kernel_dispatch(int socket) {
     // Guardamos el socket del kernel dispatch en la variable global:
-    int socket_dispatch = socket;
+    socket_dispatch = socket;
 
     // Enviamos el handshake al kernel:
     generar_handshake(socket_dispatch, "Kernel DISPATCH");
-    sleep(4);
     enviar_id_cpu(socket_dispatch); // Post handshake, envía a KERNEL su ID
 }
 
@@ -40,6 +39,7 @@ void set_socket_memoria(int socket) {
 
 void enviar_id_cpu(int socket) {
     t_paquete* paquete = crear_paquete(CPU_ID);
-    agregar_a_paquete(paquete, &id_cpu, sizeof(int));
+    int cpu_id = atoi(id_cpu);
+    agregar_a_paquete(paquete, &cpu_id, sizeof(int));
     enviar_paquete(paquete, socket);
 }

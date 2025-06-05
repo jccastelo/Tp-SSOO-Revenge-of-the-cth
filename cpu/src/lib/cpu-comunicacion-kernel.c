@@ -8,8 +8,11 @@ void recibir_contexto_de_kernel() {
     cod_op = recibir_operacion(socket_dispatch);
     buffer = recibir_buffer(&buffer_size, socket_dispatch);
 
-    if (cod_op == CONTEXT_PROCESS)
+    if (cod_op == CONTEXT_PROCESS) {
+        log_info(logger, "PID: %d - Programa a ejecutar - Program Counter: %d", contexto->pid, contexto->pc);
         deserializar_contexto(buffer);
+    }
+
     else
         //TODO ERROR
 

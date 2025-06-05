@@ -3,7 +3,6 @@
 void loading_process_instructions(int id_process, char *file_procces) {
     // Completa la ruta del archivo pseudocódigo asociándola al directorio correspondiente
     associate_instructions_folder_path(&file_procces);
-    log_info(logger, "%s", file_procces);
 
     // Abre el archivo en modo lectura ("r")
     FILE *pseudocode_file = fopen(file_procces, "r");

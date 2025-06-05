@@ -6,7 +6,7 @@ int main(int argc, char* argv[]) {
     // if (argc < 2) {
     //     abort(); // aborta si no se le pasó un identificador
     // }
-    id_cpu = 0;
+    id_cpu = "0";
 
     // Inicializamos un logger:
     char log_name[10];
@@ -19,12 +19,12 @@ int main(int argc, char* argv[]) {
     //Conectamos CPU a Kernel y memoria
     cpu_connect();
 
-    while (1) {
-        
-        recibir_contexto_de_kernel();
+    // while (1) {
+    //     recibir_contexto_de_kernel();
+    //     realizar_ciclo_de_instruccion();
+    // }
 
-        realizar_ciclo_de_instruccion();
-    }
+    while(1) {} 
     
     return 0;
 }
