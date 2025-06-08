@@ -34,7 +34,7 @@ void planner_init(){
         break;
     
     case PMCP:
-        //planner->long_term->algoritmoPlanificador_long = queue_PMCP();
+        planner->long_term->algoritmo_planificador= queue_PMCP;
         break;
     
     default:
@@ -156,6 +156,39 @@ void queue_FIFO(t_pcb *process, t_list *lista)
 {
     list_add(lista, process);
 }
+
+void queue_PMCP(t_pcb *process, t_list *lista)
+{
+    int tamano_proceso_nuevo = process->tamanio_proceso;
+
+            
+    if( list_size(lista)==0)//Lista vacia?
+    {
+        list_add(lista,process);
+        return;
+    }
+
+    int i =0;
+    int tamano_Lista_Foto = list_size(lista);
+
+    while (i < tamano_Lista_Foto) 
+    {
+
+        t_pcb *procesoIterado = list_get(lista,i);
+        int tamProcesoIt = procesoIterado -> tamanio_proceso;
+
+        if(tamano_proceso_nuevo <= tamProcesoIt)//Soy menor o igual que el que esta aca?
+        {
+            list_add_in_index(lista,i,process);
+            return;
+        }
+
+        i++;
+    }
+
+    list_add(lista,process); //AL final si no entr en ningun lado
+}
+
 
 void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc){
 

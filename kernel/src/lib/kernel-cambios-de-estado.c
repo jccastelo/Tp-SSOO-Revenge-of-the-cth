@@ -10,13 +10,26 @@ void queue_process(t_pcb* process, int estado){
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->NEW));
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW); 
 
-        if(list_size(planner->long_term->queue_NEW->cola) == 1 ){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
+
+        if(list_size(planner->long_term->queue_NEW->cola) == 1 && list_size(planner->medium_term->queue_READY_SUSPENDED->cola) == 0){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
             
             if(strcmp(memoria_init_proc(process), "OK") == 0){
 
                 queue_process(process, READY);
             } 
         }
+
+        if( list_get(planner->long_term->queue_NEW->cola,0) == process //El nuevo proceso es el mas chico ahora?
+            && get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP //ES algoritmo pmcp?
+            && list_size(planner->medium_term->queue_READY_SUSPENDED->cola) == 0 //No hay nada en ready_susp
+            )
+        {
+            if(strcmp(memoria_init_proc(process), "OK") == 0){
+
+                queue_process(process, READY);
+            } 
+        }
+
 
         break;
 

@@ -13,5 +13,5 @@ void actualizarTiempo(t_temporal **metrica_actual,t_temporal **metricas_de_tiemp
 void queue_FIFO(t_pcb *process, t_list *queue);
 void traer_proceso_a_MP();
 void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc);
-
+void queue_PMCP(t_pcb *process, t_list *lista);
 #endif //KERNEL_PLANNER_H

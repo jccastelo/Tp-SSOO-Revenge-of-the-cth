@@ -5,6 +5,7 @@
 #include "kernel-types.h"
 #include "kernel-syscalls.h"
 #include "kernel-free.h"
+#include "kernel-planner.h"
 
 void queue_process(t_pcb* process, int estado);
 void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estado), t_pcb* process, t_monitor* sgteEstado);
