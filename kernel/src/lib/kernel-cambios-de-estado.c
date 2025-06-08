@@ -17,18 +17,16 @@ void queue_process(t_pcb* process, int estado){
 
                 queue_process(process, READY);
             } 
-        }
+        }else if( get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP //ES algoritmo pmcp?
+                    && list_get(planner->long_term->queue_NEW->cola,0) == process //El nuevo proceso es el mas chico ahora?
+                    && list_size(planner->medium_term->queue_READY_SUSPENDED->cola) == 0 //No hay nada en ready_susp
+                    )
+                {
+                    if(strcmp(memoria_init_proc(process), "OK") == 0){
 
-        if( list_get(planner->long_term->queue_NEW->cola,0) == process //El nuevo proceso es el mas chico ahora?
-            && get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP //ES algoritmo pmcp?
-            && list_size(planner->medium_term->queue_READY_SUSPENDED->cola) == 0 //No hay nada en ready_susp
-            )
-        {
-            if(strcmp(memoria_init_proc(process), "OK") == 0){
-
-                queue_process(process, READY);
-            } 
-        }
+                        queue_process(process, READY);
+                    } 
+                }
 
 
         break;
@@ -58,7 +56,7 @@ void queue_process(t_pcb* process, int estado){
         {
             enviar_proceso_cpu(cpu_a_ocupar->socket_cpu, process);
             log_info(logger, "Se envio proceso a cpu %d", cpu_a_ocupar->id);
-            sleep(40);
+            
         } else { log_error(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
         break;
 
