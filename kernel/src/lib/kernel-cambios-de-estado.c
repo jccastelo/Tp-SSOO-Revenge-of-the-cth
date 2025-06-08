@@ -57,7 +57,8 @@ void queue_process(t_pcb* process, int estado){
         if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
         {
             enviar_proceso_cpu(cpu_a_ocupar->socket_cpu, process);
-   
+            log_info(logger, "Se envio proceso a cpu %d", cpu_a_ocupar->id);
+            sleep(40);
         } else { log_error(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
         break;
 

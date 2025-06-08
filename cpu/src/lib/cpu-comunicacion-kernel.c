@@ -1,34 +1,46 @@
 #include "../include/cpu-comunicacion-kernel.h"
 
 void recibir_contexto_de_kernel() {
-    op_code cod_op;
-    int buffer_size;
-    void* buffer;
+    int cod_op;
+    //int buffer_size;
+    //void* buffer;
+
+    t_buffer* new_buffer = malloc(sizeof(t_buffer));
+    new_buffer->size = 0;
+    new_buffer->stream = NULL;
 
     log_info(logger, "Recibiendo PID y PC desde Kernel por el puesto DISPATCH");
 
     cod_op = recibir_operacion(socket_dispatch);
-    buffer = recibir_buffer(&buffer_size, socket_dispatch);
+    //buffer = recibir_buffer(&buffer_size, socket_dispatch);
+
+    log_info(logger, "recibi el op_cod %d", cod_op);
+
+    new_buffer->stream = recibir_buffer(&new_buffer->size, socket_dispatch);
+
+    log_info(logger, "recibi el buffer");
 
     if (cod_op == CONTEXT_PROCESS) {
+        log_info(logger, "DESERIALIZANDO BUFFER");
+        deserializar_contexto(new_buffer);
         log_info(logger, "PID: %d - Programa a ejecutar - Program Counter: %d", contexto->pid, contexto->pc);
-        deserializar_contexto(buffer);
+        sleep(5);
     }
-
     else
-        //TODO ERROR
+        log_info(logger,"ERROR RECIBIENDO PROCESO DE KERNEL");
+        
 
-    free(buffer);
+    free(new_buffer);
 }
 
-void deserializar_contexto(void* buffer) {
+void deserializar_contexto(t_buffer *buffer) {
     contexto = malloc(sizeof(t_contexto));
     int desplazamiento = 0;
 
-    memcpy(&(contexto->pid), buffer + desplazamiento, sizeof(int));
+    memcpy(&(contexto->pid), buffer->stream + desplazamiento, sizeof(int));
     desplazamiento += sizeof(int);
 
-    memcpy(&(contexto->pc), buffer + desplazamiento, sizeof(int));
+    memcpy(&(contexto->pc), buffer->stream + desplazamiento, sizeof(int));
 }
 
 bool recibir_interrupciones() {

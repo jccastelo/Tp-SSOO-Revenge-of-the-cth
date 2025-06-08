@@ -1,6 +1,7 @@
 #include "../include/cpu-comunicacion-memoria.h"
 
 void conseguir_siguiente_instruccion() {
+    log_info(logger, "pidiendo la instruccion a memoria");
     t_paquete* paquete = crear_paquete(GET_INSTRUCTION);
     agregar_a_paquete(paquete, &contexto->pc, sizeof(int));
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
@@ -10,24 +11,29 @@ void conseguir_siguiente_instruccion() {
 
 char* devolver_instruccion_a_ejecutar() {
     int cod_op;
-    int buffer_size;
-    void* buffer;
     char* instruccion;
 
+    t_buffer* new_buffer = malloc(sizeof(t_buffer));
+    new_buffer->size = 0;
+    new_buffer->stream = NULL;
+
     cod_op = recibir_operacion(socket_memoria);
-    buffer = recibir_buffer(&buffer_size, socket_memoria);
-
+    
     if (cod_op == RETURN_INSTRUCCION)
-        instruccion = deserializar_instruccion(buffer);
+    {
+        new_buffer->stream = recibir_buffer(&new_buffer->size, socket_memoria);
+        log_info(logger, "deserializando la instruccion..");
+        instruccion = deserializar_instruccion(new_buffer);
+    }
     else
-        //TODO: ERROR
+        log_error(logger, "error deserializando la instruccion que viene de memoria.");
 
-    free(buffer);
+    free(new_buffer);
     return instruccion;
 }
 
-char* deserializar_instruccion(void* buffer) {
-    char* buffer_char = (char*) buffer;
+char* deserializar_instruccion(t_buffer *buffer) {
+    char* buffer_char = (char*) buffer->stream;
     char* instr = strdup(buffer_char);
     return instr;
 }

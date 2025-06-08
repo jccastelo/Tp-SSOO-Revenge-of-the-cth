@@ -32,6 +32,6 @@ char* devolver_instruccion_a_ejecutar();
  * @param buffer Buffer recibido desde Memoria.
  * @return String con la instrucción.
  */
-char* deserializar_instruccion(void* buffer);
+char* deserializar_instruccion(t_buffer *buffer);
 
 #endif // CPU_COMUNICACION_MEMORIA_H_

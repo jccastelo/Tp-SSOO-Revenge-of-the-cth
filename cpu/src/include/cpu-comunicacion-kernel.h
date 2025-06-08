@@ -24,7 +24,7 @@ void recibir_contexto_de_kernel();
  *
  * @param buffer Buffer recibido desde el Kernel.
  */
-void deserializar_contexto(void* buffer);
+void deserializar_contexto(t_buffer *buffer);
 
 
 /* -------------------- Manejo de interrupciones -------------------- */

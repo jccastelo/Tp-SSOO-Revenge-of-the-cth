@@ -73,17 +73,12 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer){
 
 void delate_process(t_buffer *buffer){
 
-    int tamanio_pid; 
+
     int pid_delate; //Solo necesito el pid del proceso
-    int desplazamiento = 0;
 
-    //memcpy(&pid_delate, buffer->stream, sizeof(int)); SI SOLO VIENE UN PID SIN TAMANO
+    memcpy(&pid_delate, buffer->stream, sizeof(int)); 
 
-    memcpy(&tamanio_pid, buffer->stream + desplazamiento, sizeof(int));
-    desplazamiento += sizeof(int);
-
-    memcpy(&pid_delate, buffer->stream + desplazamiento, tamanio_pid);
-
+   
     t_pcb *process_to_delate = list_get(list_procesos->cola, pid_delate); //Obtengo el proceso a eliminar de la lista global
 
     queue_process(process_to_delate,EXIT); 
