@@ -5,6 +5,8 @@ void recibir_contexto_de_kernel() {
     int buffer_size;
     void* buffer;
 
+    log_info(logger, "Recibiendo PID y PC desde Kernel por el puesto DISPATCH");
+
     cod_op = recibir_operacion(socket_dispatch);
     buffer = recibir_buffer(&buffer_size, socket_dispatch);
 

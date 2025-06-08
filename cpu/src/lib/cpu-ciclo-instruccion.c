@@ -34,6 +34,7 @@ char* fetch_instruction() {
 
 t_instruccion* decode(char* instruccion) {
     t_instruccion* instr = malloc(sizeof(t_instruccion));
+    log_info(logger, "Decodificando la siguiente instruccion.");
     char** palabras_instr = string_split(instruccion, " ");
     instr->argv = palabras_instr;
     instr->argc = string_array_size(palabras_instr);

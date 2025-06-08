@@ -4,11 +4,11 @@ int main(int argc, char *argv[]) {
 
     /*
     if (argc < 3) {
-        fprintf(stderr, "Uso: %s <mensaje> <Tamanio_prco>\n", argv[0]);
+        fprintf(stderr, "Uso: %s <archivoProceso> <Tamanio_prco>\n", argv[0]);
         return 1;
     }*/
 
-    char *archivo_pseudocodigo = "test.text";
+    char *archivo_pseudocodigo = "test.txt";
     int Tamanio_proc = 32;
 
 

@@ -28,7 +28,7 @@ char* memoria_init_proc(t_pcb* process) {
     pthread_join(memoria_recive_proc, &retorno);
 */  
     void *resultado = malloc(3); ;
-    int resultado99 ; //test
+    
     int tamanio_nombre_archivo = strlen(process->archivo) + 1;
 
     t_paquete* paquete = crear_paquete(INIT_PROC);
@@ -40,28 +40,21 @@ char* memoria_init_proc(t_pcb* process) {
     agregar_a_paquete(paquete, process->archivo, strlen(process->archivo) + 1);
     
     
-
+    int respoMemoria;
     enviar_paquete(paquete, socket_memoria);
-    int respuesta = recv(socket_memoria, &resultado99, sizeof(int), MSG_WAITALL);
+    int respuesta = recv(socket_memoria, &respoMemoria, sizeof(int), MSG_WAITALL);
     // int bytes_recibidos= recv(socket_memoria, &resultado99, sizeof(int), MSG_WAITALL);
-    // eliminar_paquete(paquete);
-    log_info(logger, "Respuesta de memoria: %d", respuesta);
+    eliminar_paquete(paquete);
 
     // if (bytes_recibidos <= 0) {
     // perror("recv");
     // log_error(logger, "No se pudo recibir respuesta de memoria para iniciar proceso");
-    // }
-
-    if(resultado99 == 1)//test
-    {log_info(logger,"MEmoria confirma espacio para iniciar proceso %d :", process->pid);
+    // 
     
-    
-    strcpy(resultado, "OK");
-    }//test
-    
-
-    
-    //char* resultado = (char*)retorno;
+    if(respoMemoria == 1)
+    {
+        strcpy(resultado, "OK");
+    }
 
     return resultado;
    
