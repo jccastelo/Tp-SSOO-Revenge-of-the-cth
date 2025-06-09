@@ -132,8 +132,7 @@ void traer_proceso_a_MP(){
 
     while(list_size(planner->medium_term->queue_READY_SUSPENDED->cola) > 0){
 
-        respuestaMemoria = memoria_init_proc(list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0));
-        // SE USA LA MISMA FUNCION PARA INCIAR PROCESOS EN MP QUE PARA TRAERLOS DE SWAP???
+        respuestaMemoria = desuspender_proceso(list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0)); // FUNCION A DEFINIR
         
         if(strcmp(respuestaMemoria, "OK"))
         {

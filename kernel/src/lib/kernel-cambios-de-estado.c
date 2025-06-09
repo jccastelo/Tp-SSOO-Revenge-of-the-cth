@@ -10,7 +10,8 @@ void queue_process(t_pcb* process, int estado){
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->NEW));
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW); 
 
-        if(list_size(planner->long_term->queue_NEW->cola) == 1 ){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
+        if(list_size(planner->long_term->queue_NEW->cola) == 1 && list_size(planner->medium_term->queue_READY_SUSPENDED->cola) == 0){ 
+            // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true) y no hay procesos en ready suspended
             
             if(strcmp(memoria_init_proc(process), "OK") == 0){
 
