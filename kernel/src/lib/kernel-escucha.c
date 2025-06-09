@@ -26,7 +26,6 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             eliminar_instancia(io_socket);
             // Si habia pid lo mandamos a exit
 
-            // LA CONSIGNA NO ESPECIFICA QUE HACER CON LOS PROCESOS EN ESPERA CUANDO SE VAN TODAS LAS INSTANCIAS DE UNA IO
             if(pid_fin >= 0){
                 t_pcb *process = list_get(list_procesos->cola, pid_fin);
                 queue_process(process, EXIT);
