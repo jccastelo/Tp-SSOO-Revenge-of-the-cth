@@ -45,9 +45,10 @@ void queue_process(t_pcb* process, int estado){
             log_info(logger, "Proceso en EJECUTANDO EN cpu...");
             queue_process(process, EXECUTE);
             
-        } 
-            
-        planner->short_term->algoritmo_desalojo(process); // Si tiene desalojo ejecuta, sino null pattern 
+        } else if(list_get(planner->short_term->queue_READY->cola,0) == process) { // Si el proceso que entro esta primero ahi se fija si desaloja
+            planner->short_term->algoritmo_desalojo(process); // Si tiene desalojo ejecuta, sino null pattern 
+        }
+
 
         break;
 
