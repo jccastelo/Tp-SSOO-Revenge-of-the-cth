@@ -14,8 +14,9 @@ void actualizarTiempo(t_temporal **metrica_actual,t_temporal **metricas_de_tiemp
 void queue_FIFO(t_pcb *process, t_list *queue);
 void traer_proceso_a_MP();
 void queue_PMCP(t_pcb *process, t_list *lista);
-void queue_SJFsD(t_pcb *process, t_list *lista);
-void queue_SJFcD(t_pcb *process, t_list *lista);
+void queue_SJF(t_pcb *process, t_list *lista);
+void sin_desalojo(t_pcb *process);
+void desalojo_SJF(t_pcb *process);
 void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc);
 void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU);
 #endif //KERNEL_PLANNER_H
