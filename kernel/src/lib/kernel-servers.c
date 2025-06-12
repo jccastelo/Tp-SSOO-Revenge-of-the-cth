@@ -36,6 +36,8 @@ void* kernel_server_dispatcher_listening(void* _) {
         "Kernel DISPATCH", 
         conection_strategy_persistence,
         kernel_server_dispatch_handler);
+    
+    return NULL;
 }
 
 void* kernel_server_interrupt_listening(void* _) {

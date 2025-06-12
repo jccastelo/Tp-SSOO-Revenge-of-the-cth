@@ -5,7 +5,12 @@ t_pcb *process_init(){
     t_pcb *new_process = malloc(sizeof(t_pcb));
     new_process->metricas_de_estado = malloc(sizeof(t_metricas_de_estados));
     new_process->metricas_de_tiempo = malloc(sizeof(t_metricas_de_tiempo));
+    new_process->estimaciones_SJF = malloc(sizeof(t_SJF));
 
+    new_process->estimaciones_SJF->rafagaEstimada=10000;
+    new_process->estimaciones_SJF->ultimaEstimacion =0;
+    new_process->estimaciones_SJF->rafagaReal=NULL;
+    
     new_process->archivo = NULL;
     new_process->tamanio_proceso = 0;
     new_process->pid = 0;
@@ -28,6 +33,24 @@ t_pcb *process_init(){
     new_process->metricas_de_tiempo->READY_SUSPENDED = NULL;
     new_process->metricas_de_tiempo->metrica_actual = NULL;
 
+    new_process->metricas_de_tiempo->NEW = temporal_create(); 
+    temporal_stop(new_process->metricas_de_tiempo->NEW);
+    new_process->metricas_de_tiempo->READY = temporal_create();
+    temporal_stop(new_process->metricas_de_tiempo->READY);
+    new_process->metricas_de_tiempo->EXECUTE = temporal_create();
+    temporal_stop(new_process->metricas_de_tiempo->EXECUTE); 
+    new_process->metricas_de_tiempo->BLOCKED = temporal_create();
+    temporal_stop(new_process->metricas_de_tiempo->BLOCKED);
+    new_process->metricas_de_tiempo->BLOCKED_SUSPENDED = temporal_create();
+    temporal_stop(new_process->metricas_de_tiempo->BLOCKED_SUSPENDED); 
+    new_process->metricas_de_tiempo->READY_SUSPENDED = temporal_create(); 
+    temporal_stop(new_process->metricas_de_tiempo->READY_SUSPENDED);
+    new_process->metricas_de_tiempo->metrica_actual = temporal_create(); 
+    temporal_stop(new_process->metricas_de_tiempo->metrica_actual);
+
+    new_process->estimaciones_SJF->rafagaReal = temporal_create(); 
+    temporal_stop(new_process->estimaciones_SJF->rafagaReal);
+    
     return new_process;
 }
 
@@ -78,8 +101,9 @@ void delate_process(t_buffer *buffer){
 
     memcpy(&pid_delate, buffer->stream, sizeof(int)); 
 
-   
-    t_pcb *process_to_delate = list_get(list_procesos->cola, pid_delate); //Obtengo el proceso a eliminar de la lista global
+    t_pcb *process = list_get(list_procesos->cola, pid_delate); //Obtengo el proceso a eliminar de la lista global
 
-    queue_process(process_to_delate,EXIT); 
+    temporal_stop(process->estimaciones_SJF->rafagaReal);
+
+    queue_process(process,EXIT); 
 }

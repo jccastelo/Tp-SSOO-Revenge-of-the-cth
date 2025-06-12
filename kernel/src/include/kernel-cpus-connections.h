@@ -12,5 +12,6 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo);
 t_pcb* recibir_proceso(t_buffer* buffer);
 t_cpu* buscar_cpu_disponible();
 void enviar_proceso_cpu(int cpu_socket, t_pcb* process);
+void desalojar_proceso(t_cpu* cpu);
 
 #endif //KERNEL_CPUS_CONNECTIONS_Hs

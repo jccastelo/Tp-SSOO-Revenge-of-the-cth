@@ -10,11 +10,9 @@ void planner_init(){
     pthread_mutex_init(&(list_cpus->mutex), NULL);
     list_cpus->cola = list_create();
 
-    //Lista IOS
     list_ios = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(list_ios->mutex), NULL);
     list_ios->cola =list_create();
-
 
     //Planner
     planner = malloc(sizeof(t_planner));
@@ -51,11 +49,11 @@ void planner_init(){
         break;
     
     case SJFsD:
-        //planner->long_term->algoritmo_planificador = queue_SJFsD;
+        planner->long_term->algoritmo_planificador = queue_SJFsD;
         break;
 
     case SJFcD:
-        //planner->long_term->algoritmo_planificador = queue_SJFcD;
+        planner->long_term->algoritmo_planificador = queue_SJFcD;
         break;
         
     default:
@@ -89,16 +87,6 @@ void planner_init(){
     planner->long_term->queue_BLOCKED = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(planner->long_term->queue_BLOCKED->mutex), NULL);
     planner->long_term->queue_BLOCKED->cola = list_create();
-    
-
-    
-   
-
-    
-   
-    
-
-   
 
     log_info(logger,"Planificador listo. Esperando para iniciar...");
 
@@ -189,6 +177,58 @@ void queue_PMCP(t_pcb *process, t_list *lista)
     list_add(lista,process); //AL final si no entr en ningun lado
 }
 
+
+void queue_SJFsD(t_pcb *process, t_list *lista) {
+    
+    if(process->estimaciones_SJF->rafagaReal != NULL) {
+        process->estimaciones_SJF->rafagaEstimada = process->estimaciones_SJF->ultimaEstimacion * config_kernel->ALFA + temporal_gettime(process->estimaciones_SJF->rafagaReal) * (1-config_kernel->ALFA);
+    }
+
+    if(list_size(lista) == 0) //Lista vacia?
+    {
+        list_add(lista,process);
+        return;
+    }
+
+    for(int i = 0; !list_is_empty(lista); i++) {
+        t_pcb* proceso_a_desplazar = list_get(lista,i);
+
+        if(process->estimaciones_SJF->rafagaEstimada < proceso_a_desplazar->estimaciones_SJF->rafagaEstimada) {
+            list_add_in_index(lista,i,process);
+            return;
+        } 
+    }
+
+    list_add(lista,process); //AL final si no entr en ningun lado
+    return;
+}
+
+void queue_SJFcD(t_pcb *process, t_list *lista){
+    
+    queue_SJFsD(process, lista);
+
+    // Desalojo
+    t_pcb* primer_proceso = list_get(lista, 0);
+
+    if(process == primer_proceso){
+
+        t_cpu* cpu = list_get_minimum(list_cpus->cola, cpu_mayor_rafaga);
+        t_pcb* proceso_cpu = list_get(list_procesos->cola, cpu->pid);
+        if(proceso_cpu->estimaciones_SJF->rafagaEstimada - 	temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal) > primer_proceso->estimaciones_SJF->rafagaEstimada) {
+            // separar logica de desalojo de encolamiento
+        }
+    }
+    
+    return;
+}
+
+void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU) {
+    t_cpu* cpu_a = (t_cpu*) unaCPU;
+    t_cpu* cpu_b = (t_cpu*) otraCPU;
+    t_pcb* proceso_a = list_get(list_procesos->cola, cpu_a->pid);
+    t_pcb* proceso_b = list_get(list_procesos->cola, cpu_b->pid);
+    return (void*) proceso_a->estimaciones_SJF->rafagaEstimada <= (void*) proceso_b->estimaciones_SJF->rafagaEstimada ? (void*) proceso_a->estimaciones_SJF->rafagaEstimada : (void*) proceso_b->estimaciones_SJF->rafagaEstimada;
+}
 
 void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc){
 

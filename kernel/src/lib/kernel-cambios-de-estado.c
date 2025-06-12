@@ -6,10 +6,12 @@ void queue_process(t_pcb* process, int estado){
     {
     case NEW:
         log_info(logger, "Proceso en NEW");
+        
         process->metricas_de_estado->new += 1;
-        actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->NEW));
-        cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW); 
+        temporal_resume(process->metricas_de_tiempo->NEW);
+        process->metricas_de_tiempo->metrica_actual = process->metricas_de_tiempo->NEW;
 
+        cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW); 
 
         if(list_size(planner->long_term->queue_NEW->cola) == 1 && list_size(planner->medium_term->queue_READY_SUSPENDED->cola) == 0){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
             
@@ -28,41 +30,51 @@ void queue_process(t_pcb* process, int estado){
                     } 
                 }
 
-
         break;
 
     case READY:
         log_info(logger, "Proceso en READY");
+        
         process->metricas_de_estado->ready += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY));
-        cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->short_term->queue_READY);
         
+        cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->short_term->queue_READY);
+
         if(buscar_cpu_disponible() != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
         {
             log_info(logger, "Proceso en EJECUTANDO EN cpu...");
             queue_process(process, EXECUTE);
             
-        }else { log_error(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
+        }else if(get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == SJFcD )
+        {
+            // SEPARA DESALOJO DE ENCOLAMIENTO
+        }
 
         break;
 
     case EXECUTE:
+        
         process->metricas_de_estado->execute += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->EXECUTE));
+        
         cambiar_estado(queue_FIFO, process, planner->queue_EXECUTE);
+
+        temporal_resume(process->estimaciones_SJF->rafagaReal);
 
         t_cpu* cpu_a_ocupar = buscar_cpu_disponible();
         if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
         {
-            enviar_proceso_cpu(cpu_a_ocupar->socket_cpu, process);
+            enviar_proceso_cpu(cpu_a_ocupar->socket_dispatch, process);
             log_info(logger, "Se envio proceso a cpu %d", cpu_a_ocupar->id);
             
         } else { log_error(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
         break;
 
     case BLOCKED:
+        
         process->metricas_de_estado->blocked += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED));
+        
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_BLOCKED);
         
         if(list_size(planner->short_term->queue_READY->cola) > 0)
@@ -74,23 +86,29 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case BLOCKED_SUSPENDED:
+        
         process->metricas_de_estado->blocked_suspended += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED_SUSPENDED));
+        
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
 
         traer_proceso_a_MP();
         break;
 
     case READY_SUSPENDED:
+        
         process->metricas_de_estado->ready_suspended += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY_SUSPENDED));
+        
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_READY_SUSPENDED);
         break;
 
     case EXIT:
         log_info(logger, "Proceso en EXIT");
+        
         process->metricas_de_estado->exit += 1;
         temporal_stop(process->metricas_de_tiempo->metrica_actual);
+        
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_EXIT);
 
         if(memory_delete_process(process) == 51)
@@ -129,21 +147,11 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
 }
 
 void actualizarTiempo(t_temporal **metrica_actual,t_temporal **metricas_de_tiempo_estado) 
-{ //La funcion recibe la metrica que se esta ejecutando y la nueva
-    
-
-    if (*metrica_actual != NULL) 
-    {  
-        temporal_stop(*metrica_actual); //Detengo la metrica actual
-    }
-
-    if( *metricas_de_tiempo_estado == NULL)
-    {
-        *metricas_de_tiempo_estado= temporal_create(); //Si es la primera vez que entra en el estado se crea e inicializa
-    }else{
-
-        temporal_resume(*metricas_de_tiempo_estado); //Si ya existe entonces lo reanuda
-    }
+{
+                                                    
+    temporal_stop(*metrica_actual); //Detengo la metrica actual                                                                                
+ 
+    temporal_resume(*metricas_de_tiempo_estado); //Si ya existe entonces lo reanuda
 
     *metrica_actual = *metricas_de_tiempo_estado;
 

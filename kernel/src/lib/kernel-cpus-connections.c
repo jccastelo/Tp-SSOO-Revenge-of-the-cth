@@ -4,22 +4,28 @@ void iniciar_cpu(t_buffer *buffer,int socket_cliente)
 {
     t_cpu *cpu = cpu_init();
 
-    memcpy(&cpu->id, buffer->stream, sizeof(int));
+    cpu->socket_dispatch = socket_cliente;
 
-    cpu->socket_cpu = socket_cliente;
-    
-    log_info(logger, "Llego cpu. ID: %d ",cpu->id);
-    list_add(list_cpus->cola,cpu);
+    int desplazamiento = 0;
+
+    memcpy(&cpu->id, buffer->stream + desplazamiento, sizeof(int));
+    desplazamiento += sizeof(int);
+
+    memcpy(&cpu->socket_interrupt, buffer->stream + desplazamiento, sizeof(int));
+
+    log_info(logger, "Llego cpu. ID: %d", cpu->id);
+    list_add(list_cpus->cola, cpu);
 
 }
 
 t_cpu *cpu_init(){
     t_cpu *new_cpu = malloc(sizeof(t_cpu));
 
-    new_cpu ->id= -1;
-    new_cpu->estado= DISPONIBLE;
-    new_cpu->pid= -1;
-    new_cpu->socket_cpu= -1;
+    new_cpu ->id = -1;
+    new_cpu->estado = DISPONIBLE;
+    new_cpu->pid = -1;
+    new_cpu->socket_interrupt = -1;
+    new_cpu->socket_dispatch = -1;
 
     return new_cpu;
 }
@@ -31,7 +37,7 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo)
     for(int i = 0; i< list_size(list_cpus->cola) ; i++)
     {   
         t_cpu *cpu =list_get(list_cpus->cola,i);
-        socket_actual = cpu->socket_cpu;
+        socket_actual = cpu->socket_dispatch;
 
         if(socket_actual == cpu_socket_buscado)
         {
@@ -69,7 +75,15 @@ void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
 
     eliminar_paquete(paquete);
 
-    set_cpu(cpu_socket,EJECUTANDO);
+    set_cpu(cpu_socket, EJECUTANDO);
+}
+
+void desalojar_proceso(t_cpu* cpu){
+    
+    t_paquete* paquete = crear_paquete(INTERRUPT); 
+    crear_buffer(paquete);
+
+    enviar_paquete(paquete, cpu->socket_interrupt);
 }
 
 t_pcb* recibir_proceso(t_buffer* buffer){
@@ -80,7 +94,7 @@ t_pcb* recibir_proceso(t_buffer* buffer){
     free(buffer->stream);
     free(buffer);
 
-    t_pcb *process_buscado=list_get(list_procesos->cola,pid_recibido);
-
+    t_pcb *process_buscado = list_get(list_procesos->cola,pid_recibido);
+    // cortamos el timer sfj
     return process_buscado;
 }

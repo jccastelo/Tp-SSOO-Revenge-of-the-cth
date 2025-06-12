@@ -4,6 +4,7 @@
 #include "kernel.h"
 #include "kernel-types.h"
 #include "kernel-syscalls.h"
+#include "kernel-cpus-connections.h"
 
 void planner_init();
 int get_algoritm(char* algoritmo);
@@ -12,6 +13,9 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
 void actualizarTiempo(t_temporal **metrica_actual,t_temporal **metricas_de_tiempo_estado);
 void queue_FIFO(t_pcb *process, t_list *queue);
 void traer_proceso_a_MP();
-void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc);
 void queue_PMCP(t_pcb *process, t_list *lista);
+void queue_SJFsD(t_pcb *process, t_list *lista);
+void queue_SJFcD(t_pcb *process, t_list *lista);
+void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc);
+void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU);
 #endif //KERNEL_PLANNER_H

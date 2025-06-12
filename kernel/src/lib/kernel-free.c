@@ -67,6 +67,7 @@ void carnicero_de_instancias_io(t_IO_instancia* instancia_io){
 }
 
 void carnicero_de_io(t_IO* io){
+    free(io->nombre);
     free(io->instancias_IO);
     free(io->procesos_esperando);
     free(io);

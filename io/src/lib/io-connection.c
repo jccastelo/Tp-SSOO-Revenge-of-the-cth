@@ -19,7 +19,15 @@ void set_socket_kernel(int socket) {
 
 void enviar_nombre_kernel(char* nombre){
 
+    t_paquete *paquete = crear_paquete(IDENTIFICAR_IO);
+
     int tamanio = string_length(nombre);
-    send(socket_kernel, &tamanio, sizeof(int), 0);
-    send(socket_kernel, nombre, tamanio + 1, 0);
+    agregar_a_paquete(paquete, &tamanio, sizeof(int)); 
+
+    agregar_a_paquete(paquete,nombre,tamanio+1);
+
+    enviar_paquete(paquete, socket_kernel); 
+    
+    eliminar_paquete(paquete);
+
 }

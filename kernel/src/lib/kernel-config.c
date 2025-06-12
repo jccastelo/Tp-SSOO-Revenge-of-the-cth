@@ -13,7 +13,6 @@ t_config_kernel* inicializar_config_kernel() {
     config_kernel->ALGORITMO_INGRESO_A_READY = NULL;
     config_kernel->ALFA = 0.0;
     config_kernel->TIEMPO_SUSPENSION = 0;
-    config_kernel->TIEMPO_DEADLOCK = 0;   
     config_kernel->LOG_LEVEL = NULL;
 
     return config_kernel;

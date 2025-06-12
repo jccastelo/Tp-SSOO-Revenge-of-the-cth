@@ -28,6 +28,7 @@ void gestionar_io(t_buffer *buffer)
     memcpy(&pid_a_io, buffer->stream + desplazamiento, sizeof(int));
 
     t_pcb* process = list_get(list_procesos->cola,pid_a_io);
+    temporal_stop(process->estimaciones_SJF->rafagaReal);
     queue_process(process, BLOCKED);
 
 
@@ -121,10 +122,12 @@ t_IO *buscar_io(char *ioNombreBuscado)
 
 
 //IO a Kernel
-int recibir_pid(int io_socket)
+int recibir_pid(t_buffer *buffer, int io_socket)
 {
+
     int pid;
-    recv(io_socket, &pid, sizeof(int), MSG_WAITALL);
+    memcpy(&pid, buffer->stream, sizeof(int));
+
     return pid;
 }
 
@@ -177,6 +180,7 @@ void eliminar_instancia(int io_socket)
 
                 if (list_is_empty(ios->instancias_IO->cola))
                 {
+                    desencolarProcesosEsperando(ios);
                     carnicero_de_io(ios);
                 }
 
@@ -184,20 +188,42 @@ void eliminar_instancia(int io_socket)
             }
         }
     }
+
+    
 }
 
-void recibir_io(int socket)
+void desencolarProcesosEsperando(t_IO *ios_estructura)
 {
-    int tamanio_nombre;
-    recv(socket, &tamanio_nombre, sizeof(int), MSG_WAITALL);
+    t_list* colaProcesosEsperando = ios_estructura->procesos_esperando->cola;
 
-    char *nombreIO = malloc(tamanio_nombre + 1);
+    int tamano_lista = list_size(colaProcesosEsperando);
+    int i =0;
 
-    recv(socket, nombreIO, tamanio_nombre, MSG_WAITALL);
-    nombreIO[tamanio_nombre] = '\0';
+    while(tamano_lista > i )
+    {
+        t_pcb *procesoEncolado = list_remove(colaProcesosEsperando,i);
+        queue_process(procesoEncolado,EXIT);
+        i++;
+    }
+}
 
+void recibir_io(t_buffer* buffer, int socket) {
 
-    t_IO *ioBuscada = buscar_io(nombreIO);
+    int desplazamiento = 0;
+    char *ioNombre;
+
+    // Copiamos el tamanio del nombre
+    int tamanio_nombre = 0;
+    memcpy(&tamanio_nombre, buffer->stream + desplazamiento, sizeof(int));
+    desplazamiento += sizeof(int);
+
+    // Copiamos el nombre de la IO
+    ioNombre = malloc(tamanio_nombre + 1);
+    memcpy(ioNombre, buffer->stream + desplazamiento, tamanio_nombre);
+    ioNombre[tamanio_nombre] = '\0';
+    desplazamiento += tamanio_nombre;
+
+    t_IO *ioBuscada = buscar_io(ioNombre);
 
     if (ioBuscada != NULL)
     {
@@ -215,9 +241,9 @@ void recibir_io(int socket)
     }
     else
     {
-        //Creo estructura de  0, inicializando todo
+        //Creo estructura de 0, inicializando todo
         t_IO *ioNueva = malloc(sizeof(t_IO));
-        ioNueva->nombre = nombreIO;
+        ioNueva->nombre = ioNombre;
 
         ioNueva->instancias_IO = malloc(sizeof(t_monitor));
         pthread_mutex_init(&(ioNueva->instancias_IO->mutex), NULL);
@@ -241,6 +267,5 @@ void recibir_io(int socket)
         pthread_mutex_unlock(&list_ios->mutex);
 
         log_info(logger, "Llego una Nueva IO de nombre %s Y SOCKET: %d ", ioNueva->nombre,nueva_instancia_io->socket );
-    }
-
+    }   
 }

@@ -18,7 +18,6 @@ typedef struct {
     float ALFA;
     int ESTIMACION_INICIAL;
     int TIEMPO_SUSPENSION;
-    int TIEMPO_DEADLOCK;
     char *LOG_LEVEL;
 } t_config_kernel;
 
@@ -57,6 +56,13 @@ typedef struct {
     t_temporal  *READY_SUSPENDED;
     t_temporal  *metrica_actual;
 }t_metricas_de_tiempo;
+
+typedef struct{
+    int64_t rafagaEstimada;
+    t_temporal *rafagaReal;
+    int64_t ultimaEstimacion;
+}t_SJF;
+
 typedef struct {
     char *archivo;
     int tamanio_proceso;
@@ -65,6 +71,7 @@ typedef struct {
     t_monitor* queue_ESTADO_ACTUAL;
     t_metricas_de_estados *metricas_de_estado;
     t_metricas_de_tiempo *metricas_de_tiempo;
+    t_SJF *estimaciones_SJF;
 }t_pcb;
 
 
@@ -118,7 +125,8 @@ typedef struct{
     int id;
     int estado;
     int pid;
-    int socket_cpu;
+    int socket_dispatch;
+    int socket_interrupt;
 }t_cpu;
 
 typedef enum{
