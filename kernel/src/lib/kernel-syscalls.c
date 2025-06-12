@@ -65,8 +65,6 @@ void recibir_y_crear_proceso(t_buffer *buffer){
 
 void cargar_proceso(t_pcb* process, t_buffer* buffer){
     
-    
-
 	int desplazamiento = 0;
     // Copiamos el tamanio del nombre
     int tamanio_nombre=0;

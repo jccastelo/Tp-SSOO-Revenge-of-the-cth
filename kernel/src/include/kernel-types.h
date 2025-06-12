@@ -80,6 +80,7 @@ typedef struct {
 typedef struct {
     t_monitor* queue_READY;
     void (*algoritmo_planificador)(t_pcb* process, t_list* estado);
+    void (*algoritmo_desalojo)(t_pcb* process);
 } t_short_term;
 
 typedef struct {

@@ -45,10 +45,9 @@ void queue_process(t_pcb* process, int estado){
             log_info(logger, "Proceso en EJECUTANDO EN cpu...");
             queue_process(process, EXECUTE);
             
-        }else if(get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == SJFcD )
-        {
-            // SEPARA DESALOJO DE ENCOLAMIENTO
-        }
+        } 
+            
+        planner->short_term->algoritmo_desalojo(process); // Si tiene desalojo ejecuta, sino null pattern 
 
         break;
 

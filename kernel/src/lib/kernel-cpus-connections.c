@@ -80,7 +80,7 @@ void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
 
 void desalojar_proceso(t_cpu* cpu){
     
-    t_paquete* paquete = crear_paquete(INTERRUPT); 
+    t_paquete* paquete = crear_paquete(INTERRUPT); // NO SE SI ESTE CODIGO DE OPERACION ESTA BIEN
     crear_buffer(paquete);
 
     enviar_paquete(paquete, cpu->socket_interrupt);

@@ -10,9 +10,11 @@ void planner_init(){
     pthread_mutex_init(&(list_cpus->mutex), NULL);
     list_cpus->cola = list_create();
 
+    //Lista IOS
     list_ios = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(list_ios->mutex), NULL);
     list_ios->cola =list_create();
+
 
     //Planner
     planner = malloc(sizeof(t_planner));
@@ -32,7 +34,7 @@ void planner_init(){
         break;
     
     case PMCP:
-        planner->long_term->algoritmo_planificador= queue_PMCP;
+        planner->long_term->algoritmo_planificador = queue_PMCP;
         break;
     
     default:
@@ -46,14 +48,17 @@ void planner_init(){
     {
     case FIFO:
         planner->short_term->algoritmo_planificador = queue_FIFO;
+        planner->short_term->algoritmo_desalojo = sin_desalojo;
         break;
     
     case SJFsD:
-        planner->long_term->algoritmo_planificador = queue_SJFsD;
+        planner->long_term->algoritmo_planificador = queue_SJF;
+        planner->short_term->algoritmo_desalojo = sin_desalojo;
         break;
 
     case SJFcD:
-        planner->long_term->algoritmo_planificador = queue_SJFcD;
+        planner->long_term->algoritmo_planificador = queue_SJF;
+        planner->short_term->algoritmo_desalojo = desalojo_SJF;
         break;
         
     default:
@@ -95,6 +100,8 @@ void planner_init(){
     log_info(logger,"PLANIFICADOR INICIADO");
 }   
 
+// Funciones del planificador
+
 int get_algoritm(char *algoritm_name)
 {
     if(!strcmp("FIFO",algoritm_name))
@@ -114,14 +121,45 @@ int get_algoritm(char *algoritm_name)
 
 }
 
+void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc){
+
+    //INICIO BUFFER
+    t_buffer* new_buffer = malloc(sizeof(t_buffer));
+    new_buffer->size = 0;
+    new_buffer->stream = NULL;
+
+    // Inicializamos los datos del buffer
+    int tamanio_nombre_archivo= strlen(archivo_pseudocodigo);
+    int total_size = sizeof(int) + tamanio_nombre_archivo + sizeof(int); // tamaño + mensaje + Tamanio_prco
+
+    new_buffer->stream = malloc(total_size);
+    new_buffer->size = total_size;
+
+    int desplazamiento = 0;
+
+    // Copiar el tamaño del archivo_pseudocodigo
+    memcpy(new_buffer->stream + desplazamiento, &tamanio_nombre_archivo, sizeof(int));
+    desplazamiento += sizeof(int);
+
+    // Copiar el mensaje
+    memcpy(new_buffer->stream + desplazamiento, archivo_pseudocodigo, tamanio_nombre_archivo);
+    desplazamiento += tamanio_nombre_archivo;
+
+    // Copiar el Tamanio_proc
+    memcpy(new_buffer->stream + desplazamiento, &Tamanio_proc, sizeof(int));
+    desplazamiento += sizeof(int);
+
+    //Llamada de la syscall INIC_PROC
+    recibir_y_crear_proceso(new_buffer);
+}
+
 void traer_proceso_a_MP(){
             
     char* respuestaMemoria;
 
     while(list_size(planner->medium_term->queue_READY_SUSPENDED->cola) > 0){
 
-        respuestaMemoria = memoria_init_proc(list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0));
-        // SE USA LA MISMA FUNCION PARA INCIAR PROCESOS EN MP QUE PARA TRAERLOS DE SWAP???
+        respuestaMemoria = desuspender_proceso(list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0)); // FUNCION A DEFINIR
         
         if(strcmp(respuestaMemoria, "OK"))
         {
@@ -139,6 +177,8 @@ void traer_proceso_a_MP(){
         } else { break; }
     }
 }
+
+// queue_X
 
 void queue_FIFO(t_pcb *process, t_list *lista)
 {
@@ -178,7 +218,7 @@ void queue_PMCP(t_pcb *process, t_list *lista)
 }
 
 
-void queue_SJFsD(t_pcb *process, t_list *lista) {
+void queue_SJF(t_pcb *process, t_list *lista) {
     
     if(process->estimaciones_SJF->rafagaReal != NULL) {
         process->estimaciones_SJF->rafagaEstimada = process->estimaciones_SJF->ultimaEstimacion * config_kernel->ALFA + temporal_gettime(process->estimaciones_SJF->rafagaReal) * (1-config_kernel->ALFA);
@@ -199,27 +239,21 @@ void queue_SJFsD(t_pcb *process, t_list *lista) {
         } 
     }
 
-    list_add(lista,process); //AL final si no entr en ningun lado
+    list_add(lista,process); //Al final si no entr en ningun lado
     return;
 }
 
-void queue_SJFcD(t_pcb *process, t_list *lista){
-    
-    queue_SJFsD(process, lista);
+// desalojo_X
 
-    // Desalojo
-    t_pcb* primer_proceso = list_get(lista, 0);
+void sin_desalojo(t_pcb* primer_proceso) {} // null patern nos permite simplificar el codigo en cambios-de-estado eliminando la verificacion de algoritmo_desalojo!=NULL
 
-    if(process == primer_proceso){
+void desalojo_SJF(t_pcb* primer_proceso) {
 
-        t_cpu* cpu = list_get_minimum(list_cpus->cola, cpu_mayor_rafaga);
-        t_pcb* proceso_cpu = list_get(list_procesos->cola, cpu->pid);
-        if(proceso_cpu->estimaciones_SJF->rafagaEstimada - 	temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal) > primer_proceso->estimaciones_SJF->rafagaEstimada) {
-            // separar logica de desalojo de encolamiento
-        }
+    t_cpu* cpu = list_get_maximum(list_cpus->cola, cpu_mayor_rafaga);
+    t_pcb* proceso_cpu = list_get(list_procesos->cola, cpu->pid);
+    if(proceso_cpu->estimaciones_SJF->rafagaEstimada - temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal) > primer_proceso->estimaciones_SJF->rafagaEstimada) {
+        desalojar_proceso(cpu);
     }
-    
-    return;
 }
 
 void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU) {
@@ -228,36 +262,4 @@ void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU) {
     t_pcb* proceso_a = list_get(list_procesos->cola, cpu_a->pid);
     t_pcb* proceso_b = list_get(list_procesos->cola, cpu_b->pid);
     return (void*) proceso_a->estimaciones_SJF->rafagaEstimada <= (void*) proceso_b->estimaciones_SJF->rafagaEstimada ? (void*) proceso_a->estimaciones_SJF->rafagaEstimada : (void*) proceso_b->estimaciones_SJF->rafagaEstimada;
-}
-
-void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc){
-
-    //INICIO BUFFER
-    t_buffer* new_buffer = malloc(sizeof(t_buffer));
-    new_buffer->size = 0;
-    new_buffer->stream = NULL;
-
-    // Inicializamos los datos del buffer
-    int tamanio_nombre_archivo= strlen(archivo_pseudocodigo);
-    int total_size = sizeof(int) + tamanio_nombre_archivo + sizeof(int); // tamaño + mensaje + Tamanio_prco
-
-    new_buffer->stream = malloc(total_size);
-    new_buffer->size = total_size;
-
-    int desplazamiento = 0;
-
-    // Copiar el tamaño del archivo_pseudocodigo
-    memcpy(new_buffer->stream + desplazamiento, &tamanio_nombre_archivo, sizeof(int));
-    desplazamiento += sizeof(int);
-
-    // Copiar el mensaje
-    memcpy(new_buffer->stream + desplazamiento, archivo_pseudocodigo, tamanio_nombre_archivo);
-    desplazamiento += tamanio_nombre_archivo;
-
-    // Copiar el Tamanio_proc
-    memcpy(new_buffer->stream + desplazamiento, &Tamanio_proc, sizeof(int));
-    desplazamiento += sizeof(int);
-
-    //Llamada de la syscall INIC_PROC
-    recibir_y_crear_proceso(new_buffer);
 }
