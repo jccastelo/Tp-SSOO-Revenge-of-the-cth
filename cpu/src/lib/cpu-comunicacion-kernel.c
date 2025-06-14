@@ -24,7 +24,6 @@ void recibir_contexto_de_kernel() {
         log_info(logger, "DESERIALIZANDO BUFFER");
         deserializar_contexto(new_buffer);
         log_info(logger, "PID: %d - Programa a ejecutar - Program Counter: %d", contexto->pid, contexto->pc);
-        sleep(20);
     }
     else
         log_info(logger,"ERROR RECIBIENDO PROCESO DE KERNEL");

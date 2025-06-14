@@ -25,9 +25,10 @@ void send_process_instruction(int cliente_socket) {
     int id_process;
     int program_counter;
     char *instruction;
-
+    
     // Llamamos a la función que recibe y configura los valores necesarios para el proceso. Luego, enviamos la instrucción correspondiente:
     rcv_instruction_consumer(cliente_socket, &id_process, &program_counter);
+    log_info(logger, "Obtener instrucción: ## PID: %d - Obtener instrucción: %d", id_process, program_counter);
     get_instruction(cliente_socket, id_process, program_counter, &instruction);
     send_instruction_consumer(cliente_socket, id_process, program_counter, instruction);
 }

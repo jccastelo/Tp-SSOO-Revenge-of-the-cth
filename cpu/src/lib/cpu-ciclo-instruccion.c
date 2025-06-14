@@ -49,6 +49,7 @@ void excecute(t_instruccion* instruccion) {
     switch (instruccion->tipo)
     {
     case INSTR_NOOP:
+        log_info(logger, "ESTOY EJECUTANDO UN NOOP :)");
         usleep(500000);
         break;
     case INSTR_WRITE: 

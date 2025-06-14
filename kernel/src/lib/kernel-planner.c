@@ -170,6 +170,8 @@ void traer_proceso_a_MP(){
 
     while(list_size(planner->long_term->queue_NEW->cola) > 0){ 
 
+        log_info(logger, "ENTRE A LA LISTA");
+
         respuestaMemoria = memoria_init_proc(list_get(planner->long_term->queue_NEW->cola,0));
 
         if(!strcmp(respuestaMemoria, "OK"))

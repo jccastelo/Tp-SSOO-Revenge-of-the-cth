@@ -33,7 +33,7 @@ void send_instruction_consumer(int cliente_socket, int id_process, int program_c
         return;
     }
  
-    t_paquete *instruction_package = crear_paquete(GET_INSTRUCTION);
+    t_paquete *instruction_package = crear_paquete(RETURN_INSTRUCCION);
     agregar_a_paquete_string(instruction_package, instruction, strlen(instruction) + 1);
     enviar_paquete(instruction_package, cliente_socket);
     eliminar_paquete(instruction_package);

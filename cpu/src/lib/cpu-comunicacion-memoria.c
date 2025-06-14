@@ -3,8 +3,8 @@
 void conseguir_siguiente_instruccion() {
     log_info(logger, "pidiendo la instruccion a memoria");
     t_paquete* paquete = crear_paquete(GET_INSTRUCTION);
-    agregar_a_paquete(paquete, &contexto->pc, sizeof(int));
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
+    agregar_a_paquete(paquete, &contexto->pc, sizeof(int));
     enviar_paquete(paquete, socket_memoria);
 }
 
@@ -12,6 +12,7 @@ void conseguir_siguiente_instruccion() {
 char* devolver_instruccion_a_ejecutar() {
     int cod_op;
     char* instruccion;
+    int desplazamiento = 0;
 
     t_buffer* new_buffer = malloc(sizeof(t_buffer));
     new_buffer->size = 0;
@@ -23,7 +24,8 @@ char* devolver_instruccion_a_ejecutar() {
     {
         new_buffer->stream = recibir_buffer(&new_buffer->size, socket_memoria);
         log_info(logger, "deserializando la instruccion..");
-        instruccion = deserializar_instruccion(new_buffer);
+        parsear_string(new_buffer->stream, &desplazamiento , &instruccion);
+        log_info(logger, "Instruccion: %s", instruccion);
     }
     else
         log_error(logger, "error deserializando la instruccion que viene de memoria.");
@@ -32,8 +34,8 @@ char* devolver_instruccion_a_ejecutar() {
     return instruccion;
 }
 
-char* deserializar_instruccion(t_buffer *buffer) {
-    char* buffer_char = (char*) buffer->stream;
-    char* instr = strdup(buffer_char);
-    return instr;
-}
+// char* deserializar_instruccion(t_buffer *buffer) {
+//     int desplazamiento + 0;
+//     int size;
+//     return instr;
+// }

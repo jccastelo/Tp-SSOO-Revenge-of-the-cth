@@ -19,6 +19,10 @@ void set_socket_memoria(int socket) {
 
 char* memoria_init_proc(t_pcb* process) {
 
+    log_info(logger, "solicito crear proceso");
+
+    kernel_memory_connection();
+
     //void* retorno;
 /*
     pthread_t memoria_recive_proc;
@@ -43,7 +47,7 @@ char* memoria_init_proc(t_pcb* process) {
     int respoMemoria;
     enviar_paquete(paquete, socket_memoria);
     int respuesta = recv(socket_memoria, &respoMemoria, sizeof(int), MSG_WAITALL);
-    // int bytes_recibidos= recv(socket_memoria, &resultado99, sizeof(int), MSG_WAITALL);
+    
     eliminar_paquete(paquete);
 
      if (respuesta <= 0) {
@@ -55,6 +59,8 @@ char* memoria_init_proc(t_pcb* process) {
         strcpy(resultado, "OK");
     }
 
+    close(socket_memoria);
+
     return resultado;
    
 }
@@ -62,7 +68,9 @@ char* memoria_init_proc(t_pcb* process) {
 int avisar_dump_memory(int pid){
     // este tendria que ir en un hilo
 
-     t_paquete* paquete = crear_paquete(DUMP_MEMORY); //Creo paquete con syscall Dump
+    kernel_memory_connection();
+
+    t_paquete* paquete = crear_paquete(DUMP_MEMORY); //Creo paquete con syscall Dump
 
     agregar_a_paquete(paquete, &pid, sizeof(int)); //Pongo en el paquete el PID Del proceso a eliminar
 
@@ -86,6 +94,8 @@ int avisar_dump_memory(int pid){
 
     //int retorno_int = *(int*)resultado;
 
+    close(socket_memoria);
+
     return resultado61;
 
 }
@@ -100,6 +110,9 @@ int memory_delete_process(t_pcb *process_to_delate)
     void* retorno; // se supone que es entero
     pthread_join(memoria_delate_proc, &retorno);
     */
+
+   kernel_memory_connection();
+
     t_paquete* paquete = crear_paquete(EXIT_SYS); //Creo paquete con syscall de salida
 
     agregar_a_paquete(paquete, &(process_to_delate->pid), sizeof(int)); //Pongo en el paquete el PID Del proceso a eliminar
@@ -123,6 +136,8 @@ int memory_delete_process(t_pcb *process_to_delate)
 
 
     //int retorno_int = *(int*)resultado;
+
+    close(socket_memoria);
 
     return resultado51;
 }

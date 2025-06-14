@@ -22,10 +22,7 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
             send(client_socket,&ELIMINALO,sizeof(int),0);
         break;
         case GET_INSTRUCTION:
-            log_info(logger, "CPU ME PIDIOOOOO INSTRUCCUON, NO HAGA NADA GG");            
-            //Es importante siempre gacer el recv del buffer aunque no haga nada porque sino,
-            // cuando haga otro recv lo voy a agarrar a este
-
+            send_process_instruction(client_socket);
         break;
 
 
