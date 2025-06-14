@@ -77,11 +77,7 @@ void queue_process(t_pcb* process, int estado){
         
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_BLOCKED);
         
-        if(list_size(planner->short_term->queue_READY->cola) > 0)
-        {
-            t_pcb *sgte_proceso = list_get(planner->short_term->queue_READY->cola,0);
-            queue_process(sgte_proceso, EXECUTE);
-        }
+        bloquearProceso(process);
 
         break;
 
@@ -91,6 +87,8 @@ void queue_process(t_pcb* process, int estado){
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED_SUSPENDED));
         
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
+
+        //Avisar memoria
 
         traer_proceso_a_MP();
         break;
