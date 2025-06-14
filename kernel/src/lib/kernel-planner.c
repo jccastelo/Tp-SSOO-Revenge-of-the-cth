@@ -159,7 +159,8 @@ void traer_proceso_a_MP(){
 
     while(list_size(planner->medium_term->queue_READY_SUSPENDED->cola) > 0){
 
-        respuestaMemoria = desuspender_proceso(list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0)); // FUNCION A DEFINIR
+        respuestaMemoria = "a";
+        //respuestaMemoria = desuspender_proceso(list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0)); // FUNCION A DEFINIR
         
         if(strcmp(respuestaMemoria, "OK"))
         {

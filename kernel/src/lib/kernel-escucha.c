@@ -2,6 +2,13 @@
 
 void kernel_server_io_handler(int io_socket, int operation, const char *server_name) {
 
+    if (operation == HANDSHAKE) {
+        log_info(logger,"LLego op handssake");
+        recibir_handshake(io_socket);
+        log_info(logger,"Coonexion IO lista");
+        return;
+    }
+
     t_buffer* new_buffer = malloc(sizeof(t_buffer));
     new_buffer->size = 0;
     new_buffer->stream = NULL;
@@ -11,14 +18,9 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
       new_buffer->stream = recibir_buffer(&new_buffer->size, io_socket);
     }
 
-    if (operation == HANDSHAKE) {
-        log_info(logger,"LLego op handssake");
-        recibir_handshake(io_socket);
-        log_info(logger,"Coonexion IO lista");
-    }
-
     switch(operation){
         case IDENTIFICAR_IO:
+            log_info(logger,"IO A identificarse");
             recibir_io(new_buffer, io_socket);
         break;
         case DESBLOQUEO_IO:
@@ -43,8 +45,12 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             // Borramos la instancia y si era la ultima instancia borramos la estructura general
             eliminar_instancia(io_socket);
         break;
+        default:
+            log_error(logger, "Operación no válida para el servidor IO: %d", operation);
+            break;
     }
     free(new_buffer);
+    return;
 }
 
 void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *server_name) {
@@ -74,13 +80,6 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
 
     log_info(logger, "LLEGO OPERACION A KERNEL DISPATCH %d", operation);
 
-    t_buffer* new_buffer = malloc(sizeof(t_buffer));
-    new_buffer->size = 0;
-    new_buffer->stream = NULL;
-
-    if((operation != HANDSHAKE)) 
-        new_buffer->stream = recibir_buffer(&new_buffer->size, cpu_socket);
-
     if (operation == HANDSHAKE) {
         log_info(logger,"LLego op handssake");
         recibir_handshake(cpu_socket);
@@ -88,6 +87,12 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
         return;
     }
 
+    t_buffer* new_buffer = malloc(sizeof(t_buffer));
+    new_buffer->size = 0;
+    new_buffer->stream = NULL;
+
+    if((operation != HANDSHAKE)) 
+        new_buffer->stream = recibir_buffer(&new_buffer->size, cpu_socket);
     
     switch(operation) {
         case CPU_ID:
@@ -125,7 +130,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             log_info(logger,"Se recibio la syscall EXIT_Sys desde el server %s",server_name);
             break;
         default:
-            log_error(logger, "Operación no válida para el servidor INTERRUPT: %d", operation);
+            log_error(logger, "Operación no válida para el servidor HANDLER: %d", operation);
             break;
     }
 

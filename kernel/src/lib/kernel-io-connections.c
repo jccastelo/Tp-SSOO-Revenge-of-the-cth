@@ -223,8 +223,10 @@ void recibir_io(t_buffer* buffer, int socket) {
     ioNombre[tamanio_nombre] = '\0';
     desplazamiento += tamanio_nombre;
 
-    t_IO *ioBuscada = buscar_io(ioNombre);
+    log_info(logger ,"Llego IO a kernel de nombre: %s",ioNombre);
 
+    t_IO *ioBuscada = buscar_io(ioNombre);
+    
     if (ioBuscada != NULL)
     {
         //Creo instancia y agrego a estructura ya existente

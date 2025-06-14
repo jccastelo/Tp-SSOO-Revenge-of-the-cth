@@ -5,7 +5,7 @@ void io_connect(char* nombre) {
     char *puerto = string_itoa(config_io->PUERTO_KERNEL);
 
     setup_connection_with_server("KERNEL", config_io->IP_KERNEL, puerto, set_socket_kernel);
-
+    sleep(5);
     enviar_nombre_kernel(nombre);
 }
 
@@ -24,10 +24,11 @@ void enviar_nombre_kernel(char* nombre){
     int tamanio = string_length(nombre);
     agregar_a_paquete(paquete, &tamanio, sizeof(int)); 
 
-    agregar_a_paquete(paquete,nombre,tamanio+1);
+    agregar_a_paquete(paquete,nombre,tamanio);
 
     enviar_paquete(paquete, socket_kernel); 
     
     eliminar_paquete(paquete);
 
+    log_info(logger,"Paquete de identificacion de IO enviado a Kernl");
 }

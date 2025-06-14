@@ -46,10 +46,9 @@ char* memoria_init_proc(t_pcb* process) {
     // int bytes_recibidos= recv(socket_memoria, &resultado99, sizeof(int), MSG_WAITALL);
     eliminar_paquete(paquete);
 
-    // if (bytes_recibidos <= 0) {
-    // perror("recv");
-    // log_error(logger, "No se pudo recibir respuesta de memoria para iniciar proceso");
-    // 
+     if (respuesta <= 0) {
+     log_error(logger, "No se pudo recibir respuesta de memoria para iniciar proceso");}
+
     
     if(respoMemoria == 1)
     {

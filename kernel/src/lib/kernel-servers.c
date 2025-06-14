@@ -22,7 +22,7 @@ void* kernel_server_io_listening(void* _) {
     server_with_thread(
         server_socket, 
         "Kernel IO", 
-        conection_strategy_once,
+        conection_strategy_persistence,
         kernel_server_io_handler);
 
     return NULL;
