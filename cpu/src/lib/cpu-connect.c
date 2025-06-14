@@ -23,7 +23,7 @@ void set_socket_kernel_dispatch(int socket) {
 
 void set_socket_kernel_interrupt(int socket) {
     // Guardamos el socket del kernel interrupt en la variable global:
-    int socket_interrupt = socket;
+    socket_interrupt = socket;
     
     // Enviamos el handshake al kernel interrupt:
     generar_handshake(socket_interrupt, "Kernel INTERRUPT");
@@ -31,7 +31,7 @@ void set_socket_kernel_interrupt(int socket) {
 
 void set_socket_memoria(int socket) {
     // Guardamos el socket de memoria en la variable global:ñ
-    int socket_memoria = socket;
+    socket_memoria = socket;
 
     // Enviamos el handshake a memoria:
     generar_handshake(socket_memoria, "Memoria");
