@@ -117,6 +117,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             queue_process(proceso, READY);
 
             set_cpu(cpu_socket, DISPONIBLE); // Por consigna, la cpu tiene que quedarse esperando
+            mandar_procesos_a_execute();
         break;
         case INIT_PROC:
             recibir_y_crear_proceso(new_buffer);
