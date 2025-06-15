@@ -18,7 +18,7 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
             //Es importante siempre gacer el recv del buffer aunque no haga nada porque sino,
             // cuando haga otro recv lo voy a agarrar a este
 
-            int ELIMINALO = 51;
+            int ELIMINALO = 1;
             send(client_socket,&ELIMINALO,sizeof(int),0);
         break;
         case GET_INSTRUCTION:
