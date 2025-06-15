@@ -16,7 +16,31 @@ void set_socket_memoria(int socket) {
     generar_handshake(socket_memoria, "KERNEL a MEMORIA");
 }
 
+int enviar_pid_memoria(t_pcb* proceso, int codigo_operacion) {
+    
+    t_paquete* paquete = crear_paquete(codigo_operacion); // Creo paquete con codigo de operacion
 
+    agregar_a_paquete(paquete, &(proceso->pid), sizeof(int)); // Pongo en el paquete el PID Del proceso
+
+    enviar_paquete(paquete, socket_memoria); //Envio el paquete
+    
+    eliminar_paquete(paquete);
+
+    int resultado;
+
+    log_info(logger, "Proceso en Consultando: %i", codigo_operacion);
+    int bytes_recibidos = recv(socket_memoria, &resultado, sizeof(int), MSG_WAITALL); // Espero una respuesta de OK
+
+     if (bytes_recibidos <= 0) {
+    perror("recv");
+    log_error(logger, "No se pudo recibir respuesta de memoria para %i proceso", codigo_operacion);
+    }
+
+    if(resultado == 1)
+    {log_info(logger,"Memoria confirma %i %i:", codigo_operacion, proceso->pid);}
+
+    return resultado;
+}
 
 int solicitar_a_memoria(int (*operacion)(t_pcb* proceso), t_pcb* proceso_a_enviar) {
 
@@ -56,53 +80,20 @@ int memoria_init_proc(t_pcb* proceso) {
 
 int avisar_dump_memory(t_pcb* proceso){
 
-    t_paquete* paquete = crear_paquete(DUMP_MEMORY); //Creo paquete con syscall Dump
-
-    agregar_a_paquete(paquete, &(proceso->pid), sizeof(int)); //Pongo en el paquete el PID Del proceso a eliminar
-
-    enviar_paquete(paquete, socket_memoria); //Envio el paquete
-    
-    eliminar_paquete(paquete);
-
-    int resultado;
-
-    log_info(logger, "Proceso en COnsultando DUMP");
-    int bytes_recibidos = recv(socket_memoria, &resultado, sizeof(int), MSG_WAITALL); //Espero una respuesta de OK
-
-     if (bytes_recibidos <= 0) {
-    perror("recv");
-    log_error(logger, "No se pudo recibir respuesta de memoria parA DUMP MEMORY proceso");
-    }
-
-    if(resultado == 1)
-    {log_info(logger,"MEmoria confirma DUMP MEMORY %i:", proceso->pid);}
-
-    return resultado;
-
+    return enviar_pid_memoria(proceso, DUMP_MEMORY);
 }
 
-int memoria_delete_process(t_pcb* proceso)
-{
-    t_paquete* paquete = crear_paquete(EXIT_SYS); //Creo paquete con syscall de salida
-
-    agregar_a_paquete(paquete, &(proceso->pid), sizeof(int)); //Pongo en el paquete el PID Del proceso a eliminar
-
-    enviar_paquete(paquete, socket_memoria); //Envio el paquete
+int memoria_delete_process(t_pcb* proceso) {
     
-    eliminar_paquete(paquete);
+    return enviar_pid_memoria(proceso, EXIT_SYS);
+}
 
-    int resultado;
+int suspender_proceso(t_pcb* proceso){ 
 
-    log_info(logger, "Proceso en COnsultando salida");
-    int bytes_recibidos = recv(socket_memoria, &resultado, sizeof(int), MSG_WAITALL); //Espero una respuesta de OK
+    return enviar_pid_memoria(proceso, SUSPENDER);
+}
 
-     if (bytes_recibidos <= 0) {
-    perror("recv");
-    log_error(logger, "No se pudo recibir respuesta de memoria par eliminar proceso");
-    }
+int desuspender_proceso(t_pcb* proceso){
 
-    if(resultado == 1)
-    {log_info(logger,"MEmoria confirma Eliminar proceso %d :", proceso->pid);}
-
-    return resultado;
+    return enviar_pid_memoria(proceso, DESUSPENDER);
 }

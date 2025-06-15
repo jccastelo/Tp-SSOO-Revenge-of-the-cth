@@ -22,4 +22,6 @@ int solicitar_a_memoria(int (*operacion)(t_pcb* proceso), t_pcb* proceso_a_envia
 int memoria_init_proc(t_pcb* proceso);
 int memoria_delete_process(t_pcb* proceso);
 int avisar_dump_memory(t_pcb* proceso);
+int suspender_proceso(t_pcb* proceso);
+int desuspender_proceso(t_pcb* proceso);
 #endif // KERNEL_MEMORY_CONNECTION_H
