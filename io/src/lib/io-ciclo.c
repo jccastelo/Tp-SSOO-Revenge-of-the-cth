@@ -4,6 +4,8 @@ void ciclo_de_io(){
 
     t_proceso* proceso = recibir_proceso();
 
+    pid_proceso_Actual = proceso->pid;
+
     usleep(proceso->milisegundos);
 
     notificar_liberacion(proceso);
@@ -41,4 +43,5 @@ void notificar_liberacion(t_proceso* proceso){
     agregar_a_paquete(paquete, &proceso->pid, sizeof(int));
     enviar_paquete(paquete, socket_kernel);
     eliminar_paquete(paquete);
+    pid_proceso_Actual = -1;
 }

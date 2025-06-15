@@ -4,3 +4,4 @@
 t_config_io *config_io;
 int socket_kernel;
 char *nombreIO;
+int pid_proceso_Actual;

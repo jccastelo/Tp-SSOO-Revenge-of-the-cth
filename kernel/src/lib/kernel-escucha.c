@@ -28,12 +28,17 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             int pid_desbloqueo = recibir_pid(new_buffer, io_socket);
             // Reviso la cola de bloqueados de esa IO, si hay alguno lo mando
             enviar_proceso_io(io_socket);
-            // Con el pid busco el proceso y lo mando a READY
+
+            // Con el pid busco el proceso 
             t_pcb *process = list_get(list_procesos->cola, pid_desbloqueo);
-            queue_process(process, READY);
+
+            //Si esta en block va a ready, sino a readysuspended
+            if(process->queue_ESTADO_ACTUAL->cola == planner->long_term->queue_BLOCKED->cola) 
+            {queue_process(process, READY);}
+            else {queue_process(process, READY_SUSPENDED); }
         break;
         case FIN_CONEXION_DE_IO:
-            // Recibo el pid (no hace falta paquete), puede no haber EN ESE CASO IO MANDA -1
+            
             int pid_fin = recibir_pid(new_buffer, io_socket);
         
             //Si habia pid lo mando a exit
@@ -42,7 +47,9 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
                 queue_process(process, EXIT);
             }
 
+
             // Borramos la instancia y si era la ultima instancia borramos la estructura general
+            // Si habia procesos esperando, van a exit
             eliminar_instancia(io_socket);
         break;
         default:
@@ -111,6 +118,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             log_info(logger,"Se recibio la syscall DUMP MEMORY desde el server %s",server_name);
             set_cpu(cpu_socket, DISPONIBLE);
             queue_process(process, BLOCKED);
+            void mandarProcesosAExecute();
 
             if(solicitar_a_memoria(avisar_dump_memory, process))
                 queue_process(process, READY);
@@ -120,14 +128,14 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
         case IO:
             log_info(logger,"Se recibio la syscall IO desde el server %s",server_name);
             set_cpu(cpu_socket, DISPONIBLE);
-
-            //SE REALIZA EL BLOC ACA, PORQUE EL PID ESTA EN EL BUFFER
             gestionar_io(new_buffer);
+            void mandarProcesosAExecute();
             break;
         case EXIT_SYS:
             delate_process(new_buffer);
             set_cpu(cpu_socket, DISPONIBLE);
             log_info(logger,"Se recibio la syscall EXIT_Sys desde el server %s",server_name);
+            void mandarProcesosAExecute();
             break;
         default:
             log_error(logger, "Operación no válida para el servidor HANDLER: %d", operation);

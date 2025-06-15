@@ -31,18 +31,18 @@ void planner_init(){
     {
     case FIFO:
         planner->long_term->algoritmo_planificador = queue_FIFO;
+        planner->medium_term->algoritmo_planificador = queue_FIFO;
         break;
     
     case PMCP:
         planner->long_term->algoritmo_planificador = queue_PMCP;
+        planner->medium_term->algoritmo_planificador = queue_PMCP;
         break;
     
     default:
         log_info(logger,"Mal ingresado el nombre del algoritmo planificador");
         abort();
     }
-
-    planner->medium_term->algoritmo_planificador = queue_FIFO;
 
     switch(get_algoritm(config_kernel->ALGORITMO_CORTO_PLAZO))
     {
@@ -154,14 +154,16 @@ void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc){
 }
 
 void traer_proceso_a_MP(){
-    // FALTA DESUSPENDER PROCESO        
-    //while(!list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola)){
-    //   
-    //    if(solicitar_a_memoria(desuspender_proceso, list_get(planner->long_term->queue_NEW->cola,0)))
-    //    {
-    //        queue_process(list_remove(planner->medium_term->queue_READY_SUSPENDED->cola,0), READY);
-    //    } else { break; }
-    //}
+
+
+    while(!list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola)){
+     
+       if(solicitar_a_memoria(desuspender_proceso, list_get(planner->long_term->queue_NEW->cola,0)))
+      {
+           queue_process(list_remove(planner->medium_term->queue_READY_SUSPENDED->cola,0), READY);
+       } else { return; }// "ningún proceso que esté esperando en la cola de NEW podrá ingresar al sistema si hay al menos un proceso en SUSP. READY."
+
+    }
 
     while(!list_is_empty(planner->long_term->queue_NEW->cola)){ 
 
@@ -169,6 +171,19 @@ void traer_proceso_a_MP(){
         {
             queue_process(list_remove(planner->long_term->queue_NEW->cola,0), READY);
         } else { break; }
+    }
+}
+
+void mandarProcesosAExecute()
+{
+    while(!list_is_empty(planner->short_term->queue_READY->cola))
+    {
+       if(buscar_cpu_disponible() != NULL)
+        {
+            queue_process(list_remove(planner->short_term->queue_READY->cola,0), EXECUTE);
+           
+        } else { return; }
+
     }
 }
 

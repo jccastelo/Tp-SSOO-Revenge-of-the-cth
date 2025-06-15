@@ -4,7 +4,8 @@
 // Incluye las bibliotecas necesarias externas:
 #include <utils/logger.h>
 #include <stdlib.h>
-
+#include <stdio.h>
+#include <signal.h>
 // Incluyo las bibliotecas necesarias internas:
 #include "io-config.h"
 #include "io-state.h"

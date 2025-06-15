@@ -10,4 +10,5 @@
 extern t_config_io *config_io;
 extern int socket_kernel;
 extern char *nombreIO;
+extern int pid_proceso_Actual;
 #endif 

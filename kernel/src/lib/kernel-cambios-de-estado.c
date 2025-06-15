@@ -33,7 +33,7 @@ void queue_process(t_pcb* process, int estado){
 
         if(buscar_cpu_disponible() != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
         {
-            log_info(logger, "Proceso en EJECUTANDO EN cpu...");
+            
             queue_process(process, EXECUTE);
             
         } else if(list_get(planner->short_term->queue_READY->cola,0) == process) { // Si el proceso que entro esta primero ahi se fija si desaloja
@@ -44,7 +44,7 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case EXECUTE:
-        
+        log_info(logger, "Proceso en EXECUTE");
         process->metricas_de_estado->execute += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->EXECUTE));
         
@@ -58,7 +58,9 @@ void queue_process(t_pcb* process, int estado){
             enviar_proceso_cpu(cpu_a_ocupar->socket_dispatch, process);
             log_info(logger, "Se envio proceso a cpu %d", cpu_a_ocupar->id);
             
-        } else { log_error(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
+        } else {
+             queue_process(process,READY);//NO puede haber procesos en EXECUTE que no estan ejecutando
+             log_error(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
         break;
 
     case BLOCKED:
@@ -79,9 +81,10 @@ void queue_process(t_pcb* process, int estado){
         
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
 
-        //Avisar memoria
-
-        traer_proceso_a_MP();
+        if(solicitar_a_memoria(suspender_proceso, process))
+        {traer_proceso_a_MP();}
+        else{ log_error(logger,"Error al suspender proceso");}
+        
         break;
 
     case READY_SUSPENDED:

@@ -7,6 +7,8 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    
+
     char *nombre = strdup(argv[1]);
 
     // Inicializamos un logger
@@ -17,9 +19,9 @@ int main(int argc, char *argv[]) {
     io_connect(nombre);
     
 
+    // Capturamos Ctrl + C
+    signal(SIGINT, cierre_de_io);
+
     ciclo_de_io();
 
-    atexit(cierre_de_io());
-
-    return 0;
-}
+ }
