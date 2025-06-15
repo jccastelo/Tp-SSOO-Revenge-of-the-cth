@@ -13,18 +13,18 @@ void queue_process(t_pcb* process, int estado){
 
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW); 
 
-        if(list_size(planner->long_term->queue_NEW->cola) == 1 && list_size(planner->medium_term->queue_READY_SUSPENDED->cola) == 0){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
+        if(list_size(planner->long_term->queue_NEW->cola) == 1 && list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola)){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
             
-            if(strcmp(memoria_init_proc(process), "OK") == 0){
+            if(solicitar_a_memoria(memoria_init_proc, process)){
 
                 queue_process(process, READY);
             } 
         }else if( get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP //ES algoritmo pmcp?
                     && list_get(planner->long_term->queue_NEW->cola,0) == process //El nuevo proceso es el mas chico ahora?
-                    && list_size(planner->medium_term->queue_READY_SUSPENDED->cola) == 0 //No hay nada en ready_susp
+                    && list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola) //No hay nada en ready_susp
                     )
                 {
-                    if(strcmp(memoria_init_proc(process), "OK") == 0){
+                    if(solicitar_a_memoria(memoria_init_proc, process)){
 
                         queue_process(process, READY);
                     } 
@@ -109,7 +109,7 @@ void queue_process(t_pcb* process, int estado){
         
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_EXIT);
 
-        if(memory_delete_process(process) == 51)
+        if(solicitar_a_memoria(memoria_delete_process, process))
         {
             carnicero(process);
         }

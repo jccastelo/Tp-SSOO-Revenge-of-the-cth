@@ -154,27 +154,18 @@ void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc){
 }
 
 void traer_proceso_a_MP(){
-            
-    char* respuestaMemoria;
+    // FALTA DESUSPENDER PROCESO        
+    //while(!list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola)){
+    //   
+    //    if(solicitar_a_memoria(desuspender_proceso, list_get(planner->long_term->queue_NEW->cola,0)))
+    //    {
+    //        queue_process(list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0), READY);
+    //    } else { break; }
+    //}
 
-    while(list_size(planner->medium_term->queue_READY_SUSPENDED->cola) > 0){
+    while(!list_is_empty(planner->long_term->queue_NEW->cola)){ 
 
-        respuestaMemoria = "a";
-        //respuestaMemoria = desuspender_proceso(list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0)); // FUNCION A DEFINIR
-        
-        if(strcmp(respuestaMemoria, "OK"))
-        {
-            queue_process(list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0), READY);
-        } else { break; }
-    }
-
-    while(list_size(planner->long_term->queue_NEW->cola) > 0){ 
-
-        log_info(logger, "ENTRE A LA LISTA");
-
-        respuestaMemoria = memoria_init_proc(list_get(planner->long_term->queue_NEW->cola,0));
-
-        if(!strcmp(respuestaMemoria, "OK"))
+        if(!solicitar_a_memoria(memoria_init_proc, list_get(planner->long_term->queue_NEW->cola,0)))
         {
             queue_process(list_get(planner->long_term->queue_NEW->cola,0), READY);
         } else { break; }

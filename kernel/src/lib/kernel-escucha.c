@@ -112,7 +112,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             set_cpu(cpu_socket, DISPONIBLE);
             queue_process(process, BLOCKED);
 
-            if(avisar_dump_memory(process->pid) == 61)
+            if(solicitar_a_memoria(avisar_dump_memory, process))
                 queue_process(process, READY);
             else
                 queue_process(process, EXIT);
