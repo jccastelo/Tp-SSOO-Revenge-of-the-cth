@@ -161,7 +161,7 @@ void traer_proceso_a_MP(){
        if(solicitar_a_memoria(desuspender_proceso, list_get(planner->long_term->queue_NEW->cola,0)))
       {
            queue_process(list_remove(planner->medium_term->queue_READY_SUSPENDED->cola,0), READY);
-       } else { return; }// "ningún proceso que esté esperando en la cola de NEW podrá ingresar al sistema si hay al menos un proceso en SUSP. READY."
+       } else { break; }
 
     }
 
@@ -172,9 +172,11 @@ void traer_proceso_a_MP(){
             queue_process(list_remove(planner->long_term->queue_NEW->cola,0), READY);
         } else { break; }
     }
+
+    return;
 }
 
-void mandarProcesosAExecute()
+void mandar_procesos_a_execute()
 {
     while(!list_is_empty(planner->short_term->queue_READY->cola))
     {
@@ -182,10 +184,14 @@ void mandarProcesosAExecute()
         {
             queue_process(list_remove(planner->short_term->queue_READY->cola,0), EXECUTE);
            
-        } else { return; }
+        } else { break; }
 
     }
+
+    return;
 }
+
+//
 
 // queue_X
 
@@ -231,6 +237,8 @@ void queue_SJF(t_pcb *process, t_list *lista) {
     
     if(process->estimaciones_SJF->rafagaReal != NULL) {
         process->estimaciones_SJF->rafagaEstimada = process->estimaciones_SJF->ultimaEstimacion * config_kernel->ALFA + temporal_gettime(process->estimaciones_SJF->rafagaReal) * (1-config_kernel->ALFA);
+    } else {
+        process->estimaciones_SJF->rafagaEstimada = process->estimaciones_SJF->rafagaRestante; // Al desalojar, la rafaga estimada pasa a ser la rafaga restante
     }
 
     if(list_size(lista) == 0) //Lista vacia?

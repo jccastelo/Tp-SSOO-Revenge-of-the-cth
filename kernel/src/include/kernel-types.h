@@ -58,6 +58,7 @@ typedef struct {
 }t_metricas_de_tiempo;
 
 typedef struct{
+    int64_t rafagaRestante;
     int64_t rafagaEstimada;
     t_temporal *rafagaReal;
     int64_t ultimaEstimacion;

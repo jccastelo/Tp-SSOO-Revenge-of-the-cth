@@ -19,5 +19,5 @@ void sin_desalojo(t_pcb *process);
 void desalojo_SJF(t_pcb *process);
 void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc);
 void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU);
-void mandarProcesosAExecute();
+void mandar_procesos_a_execute();
 #endif //KERNEL_PLANNER_H

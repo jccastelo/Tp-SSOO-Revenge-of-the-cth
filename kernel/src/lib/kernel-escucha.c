@@ -107,6 +107,17 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             iniciar_cpu(new_buffer,cpu_socket);
             log_info(logger,"Se recibio la ID de la CPU desde el server %s",server_name);
             break;
+        case CONTEXTO_DESALOJO:
+            t_pcb* proceso = recibir_proceso(new_buffer);
+            temporal_stop(proceso->estimaciones_SJF->rafagaReal);
+
+            // No hay que voler a estimar, unicamente hay que restarle el tiempo que estuvo en CPU
+            proceso->estimaciones_SJF->rafagaEstimada -= temporal_gettime(proceso->estimaciones_SJF->rafagaReal);
+
+            queue_process(proceso, READY);
+
+            set_cpu(cpu_socket, DISPONIBLE); // Por consigna, la cpu tiene que quedarse esperando
+        break;
         case INIT_PROC:
             recibir_y_crear_proceso(new_buffer);
             log_info(logger,"Se recibio la syscall INIC_PROC desde el server %s",server_name);
@@ -118,7 +129,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             log_info(logger,"Se recibio la syscall DUMP MEMORY desde el server %s",server_name);
             set_cpu(cpu_socket, DISPONIBLE);
             queue_process(process, BLOCKED);
-            void mandarProcesosAExecute();
+            mandar_procesos_a_execute();
 
             if(solicitar_a_memoria(avisar_dump_memory, process))
                 queue_process(process, READY);
@@ -129,13 +140,13 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             log_info(logger,"Se recibio la syscall IO desde el server %s",server_name);
             set_cpu(cpu_socket, DISPONIBLE);
             gestionar_io(new_buffer);
-            void mandarProcesosAExecute();
+            mandar_procesos_a_execute();
             break;
         case EXIT_SYS:
             delate_process(new_buffer);
             set_cpu(cpu_socket, DISPONIBLE);
             log_info(logger,"Se recibio la syscall EXIT_Sys desde el server %s",server_name);
-            void mandarProcesosAExecute();
+            mandar_procesos_a_execute();
             break;
         default:
             log_error(logger, "Operación no válida para el servidor HANDLER: %d", operation);

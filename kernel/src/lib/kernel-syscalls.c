@@ -7,9 +7,10 @@ t_pcb *process_init(){
     new_process->metricas_de_tiempo = malloc(sizeof(t_metricas_de_tiempo));
     new_process->estimaciones_SJF = malloc(sizeof(t_SJF));
 
-    new_process->estimaciones_SJF->rafagaEstimada=10000;
-    new_process->estimaciones_SJF->ultimaEstimacion =0;
-    new_process->estimaciones_SJF->rafagaReal=NULL;
+    new_process->estimaciones_SJF->rafagaRestante = 0;
+    new_process->estimaciones_SJF->rafagaEstimada = config_kernel->ESTIMACION_INICIAL;
+    new_process->estimaciones_SJF->ultimaEstimacion = 0;
+    new_process->estimaciones_SJF->rafagaReal = NULL;
     
     new_process->archivo = NULL;
     new_process->tamanio_proceso = 0;
