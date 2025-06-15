@@ -13,22 +13,13 @@ void queue_process(t_pcb* process, int estado){
 
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW); 
 
-        if(list_size(planner->long_term->queue_NEW->cola) == 1 && list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola)){ // Si la cola estaba vacia manda la solicitud a memoria (size retornaria 1 que es igual a true)
-            
-            if(solicitar_a_memoria(memoria_init_proc, process)){
-
+        if(list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola) && // READY_SUSP vacia => pueden entrar los de NEW
+           (list_size(planner->long_term->queue_NEW->cola) == 1 || // Si es el unico en la cola => se le pregunta a memoria si puede entrar
+           (get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP && list_get(planner->long_term->queue_NEW->cola,0) == process))) // Sino, en el caso de PMCP => si esta primero le pregunta a memoria
+            {
+                if(solicitar_a_memoria(memoria_init_proc, process))
                 queue_process(process, READY);
-            } 
-        }else if( get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP //ES algoritmo pmcp?
-                    && list_get(planner->long_term->queue_NEW->cola,0) == process //El nuevo proceso es el mas chico ahora?
-                    && list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola) //No hay nada en ready_susp
-                    )
-                {
-                    if(solicitar_a_memoria(memoria_init_proc, process)){
-
-                        queue_process(process, READY);
-                    } 
-                }
+            }
 
         break;
 
