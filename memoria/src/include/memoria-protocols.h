@@ -47,4 +47,18 @@ void rcv_instruction_consumer(int client_socket, int *id_process, int *program_c
  */
 void send_instruction_consumer(int cliente_socket, int id_process, int program_counter, char *instruction);
 
+/**
+ * @brief Recibe la finalización de un proceso desde un cliente a través de un socket.
+ *
+ * Esta función recibe un paquete enviado por un cliente, que indica que un proceso sera finalizado.
+ * El paquete se recibe mediante el socket especificado y se interpreta para extraer el identificador
+ * del proceso correspondiente. El ID se almacena en la dirección de memoria provista por el puntero
+ * `id_process`. Luego de procesar el paquete, se libera la memoria asignada al buffer recibido.
+ *
+ * @param client_socket Descriptor del socket desde el cual se recibe el paquete.
+ * @param id_process Puntero a una variable donde se almacenará el ID del proceso finalizado.
+ */
+void rcv_process_to_end(int client_socket, int *id_process);
+
+
 #endif // MEMORIA_PROTOCOLS_H

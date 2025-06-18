@@ -31,14 +31,19 @@ typedef enum {
 	RETURN_INSTRUCCION
 } op_code;
 
-typedef struct
-{
+typedef enum {
+	OK = 0,
+	ERROR = -1,
+	HANDSHAKE_OK = 1,
+	HANDSHAKE_ERROR = -2
+} response_code;
+
+typedef struct {
 	int size;
 	void* stream;
 } t_buffer;
 
-typedef struct
-{
+typedef struct {
 	op_code codigo_operacion;
 	t_buffer* buffer;
 } t_paquete;

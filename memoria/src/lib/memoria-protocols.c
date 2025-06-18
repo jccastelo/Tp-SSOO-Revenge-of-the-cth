@@ -12,6 +12,7 @@ void rcv_setup_to_process(int client_socket, int *id_process, int *tam_process, 
 
     // Parseamos las cadenas de caracteres contenidas en el buffer y las almacenamos en una lista:
     parsear_string(buffer, &desplazamiento, file_procces);
+    free(buffer);
 }
 
 void rcv_instruction_consumer(int client_socket, int *id_process, int *program_counter) {
@@ -23,6 +24,7 @@ void rcv_instruction_consumer(int client_socket, int *id_process, int *program_c
     // Parseamos los primeros valores enteros del buffer, actualizando el desplazamiento en cada paso:
     parsear_int(buffer, &desplazamiento, id_process);
     parsear_int(buffer, &desplazamiento, program_counter);
+    free(buffer);
 }
 
 void send_instruction_consumer(int cliente_socket, int id_process, int program_counter, char *instruction) {
@@ -38,3 +40,14 @@ void send_instruction_consumer(int cliente_socket, int id_process, int program_c
     enviar_paquete(instruction_package, cliente_socket);
     eliminar_paquete(instruction_package);
 } 
+
+void rcv_process_to_end(int client_socket, int *id_process) {
+    // Inicializamos las variables necesarias:
+    int size;
+    int desplazamiento = 0;
+    void *buffer = recibir_buffer(&size, client_socket);
+
+    // Parseamos el ID del proceso del buffer:
+    parsear_int(buffer, &desplazamiento, id_process);
+    free(buffer);
+}
