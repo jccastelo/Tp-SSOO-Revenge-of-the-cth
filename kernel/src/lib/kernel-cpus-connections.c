@@ -90,11 +90,15 @@ t_pcb* recibir_proceso(t_buffer* buffer){
     
     int pid_recibido;
     memcpy(&pid_recibido, buffer->stream, sizeof(int));
+
+    int pc_recibido;
+    memcpy(&pc_recibido, buffer->stream + sizeof(int), sizeof(int));
     
     free(buffer->stream);
     free(buffer);
 
-    t_pcb *process_buscado = list_get(list_procesos->cola,pid_recibido);
-    // cortamos el timer sfj
-    return process_buscado;
+    t_pcb *proceso_buscado = list_get(list_procesos->cola,pid_recibido);
+    proceso_buscado->pc = pc_recibido;
+
+    return proceso_buscado;
 }
