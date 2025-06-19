@@ -1,6 +1,8 @@
 #ifndef CPU_TYPES_H_
 #define CPU_TYPES_H_
 
+#define MAX_NIVELES = 10;
+
 typedef struct {
     char *IP_MEMORIA;
     char *IP_KERNEL;
@@ -36,6 +38,12 @@ typedef struct {
     char** argv;
     int argc;
 } t_instruccion;
+
+typedef struct {
+    int nro_pagina;
+    int entradas[MAX_NIVELES];
+    int desplazamiento;
+} t_traduccion;
 
 
 #endif // CPU_TYPES_H_ 

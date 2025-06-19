@@ -15,4 +15,8 @@ extern int socket_interrupt;
 extern int socket_memoria;
 extern char *id_cpu;
 
+extern int TAM_PAGINA;
+extern int ENTRADAS_POR_TABLA;
+extern int CANTIDAD_NIVELES;
+
 #endif // CPU_STATE_H_
