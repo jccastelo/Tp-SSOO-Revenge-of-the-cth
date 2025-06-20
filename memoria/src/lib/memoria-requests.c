@@ -44,8 +44,9 @@ void finish_process(int client_socket) {
     rcv_process_to_end(client_socket, &id_process);
     log_info(logger, "Finalizar proceso: ## PID: %d", id_process);
 
+    log_warning(logger,"ACA ESTA COMENTADO UN IF");
     // Verificamos si el proceso ya ha finalizado o no:
-    if (is_process_end(id_process)) { // To Do: Verificar si el proceso ya ha finalizado, funcion que mezcla consulta y estado del proceso
+    if ( /*is_process_end(id_process)*/1==0) { // To Do: Verificar si el proceso ya ha finalizado, funcion que mezcla consulta y estado del proceso
         log_info(logger, "El proceso %d ya ha finalizado", id_process);
         resquest = OK;
     } else {

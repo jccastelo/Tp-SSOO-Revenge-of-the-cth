@@ -38,7 +38,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             else {queue_process(process, READY_SUSPENDED); }
         break;
         case FIN_CONEXION_DE_IO:
-            
+            log_info(logger,"Llego IO A desconectarse");
             int pid_fin = recibir_pid(new_buffer, io_socket);
         
             //Si habia pid lo mando a exit
@@ -47,10 +47,10 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
                 queue_process(process, EXIT);
             }
 
-
             // Borramos la instancia y si era la ultima instancia borramos la estructura general
             // Si habia procesos esperando, van a exit
             eliminar_instancia(io_socket);
+            log_info(logger,"IO desconectada");
         break;
         default:
             log_error(logger, "Operación no válida para el servidor IO: %d", operation);

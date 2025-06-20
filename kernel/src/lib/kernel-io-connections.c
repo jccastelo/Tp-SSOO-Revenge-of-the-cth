@@ -165,7 +165,7 @@ void enviar_proceso_io(int io_socket)
 
 void eliminar_instancia(int io_socket)
 {
-
+    
     for (int i = 0; i < list_size(list_ios->cola); i++)
     {
         t_IO *ios = list_get(list_ios->cola, i);
@@ -176,19 +176,25 @@ void eliminar_instancia(int io_socket)
 
             if (io->socket == io_socket)
             {
+                list_remove(ios->instancias_IO->cola,j);
                 carnicero_de_instancias_io(io);
 
                 if (list_is_empty(ios->instancias_IO->cola))
                 {
                     desencolarProcesosEsperando(ios);
                     carnicero_de_io(ios);
+
+                    pthread_mutex_lock(&list_ios->mutex);
+                    list_remove(list_ios->cola,i);
+                    pthread_mutex_unlock(&list_ios->mutex);
+                    
                 }
 
                 return;
             }
         }
     }
-
+    
     
 }
 
