@@ -12,3 +12,13 @@ char *id_cpu;
 int TAM_PAGINA;
 int ENTRADAS_POR_TABLA;
 int CANTIDAD_NIVELES;
+t_entrada_tlb *tlb;
+
+void inicializar_tlb() {
+    tlb = malloc(sizeof(t_entrada_tlb) * config_cpu->ENTRADAS_TLB);
+    for (int i = 0; i < config_cpu->ENTRADAS_TLB; i++) {
+        tlb[i].libre = 1;
+        tlb[i].bit_presencia = 0;
+        tlb[i].bit_modificado = 0;
+    };
+}

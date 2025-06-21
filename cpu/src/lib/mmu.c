@@ -1,6 +1,6 @@
 #include "include/mmu.h"
 
-t_traduccion traducir_direccion_logica(int dir_logica) {
+t_traduccion* traducir_direccion_logica(int dir_logica) {
     t_traduccion *traduccion = malloc(sizeof(t_traduccion));
 
     get_data_memoria();

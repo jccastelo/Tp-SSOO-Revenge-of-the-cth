@@ -19,4 +19,6 @@ extern int TAM_PAGINA;
 extern int ENTRADAS_POR_TABLA;
 extern int CANTIDAD_NIVELES;
 
+extern t_entrada_tlb *tlb;
+
 #endif // CPU_STATE_H_
