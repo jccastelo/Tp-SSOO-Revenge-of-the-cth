@@ -53,9 +53,10 @@ void excecute(t_instruccion* instruccion) {
         usleep(500000);
         break;
     case INSTR_WRITE: 
-        int direccion_wr = atoi(instruccion->argv[1]);
+        int direccion_logica_wr = atoi(instruccion->argv[1]);
+        int direccion_fisica_wr = obtener_direccion_fisica(direccion_logica_wr);
         char* mensaje = instruccion->argv[2];
-        //TODO con traduccion lógica a física
+        //TODO hacer la escritura en memoria
         break;
     case INSTR_READ:
         int direccion_rd = atoi(instruccion->argv[1]);
@@ -113,4 +114,28 @@ t_tipo_instruccion mapeo_string_tipo(char* tipo_instruccion) {
     else if (string_equals_ignore_case(tipo_instruccion, "DUMP_MEMORY")) return INSTR_DUMP_MEMORY;
     else if (string_equals_ignore_case(tipo_instruccion, "EXIT")) return INSTR_EXIT;
     else return -1;
+}
+
+int obtener_direccion_fisica(int direccion_logica) {
+    t_traduccion *traduccion = traducir_direccion_logica(direccion_logica);
+
+    int pagina = traduccion->nro_pagina;
+    int marco = -1;
+
+    if (tlb_habilitada()) {
+        marco = buscar_frame_tlb(pagina);
+    }
+
+    if(marco < 0) {
+        marco = pedir_marco_a_memoria(traduccion, contexto->pid); // TODO EN COMUNICACION MEMORIA
+        if(tlb_habilitada())
+            agregar_a_tlb(pagina, marco);
+    }
+
+    int dir_fisica = marco * TAM_PAGINA + traduccion->desplazamiento;
+    return dir_fisica;
+}
+
+bool tlb_habilitada() {
+    return config_cpu->ENTRADAS_TLB > 0;
 }

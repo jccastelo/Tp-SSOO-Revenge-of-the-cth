@@ -10,6 +10,9 @@
 #include "cpu-comunicacion-memoria.h"
 #include "cpu-comunicacion-kernel.h"
 
+#include "mmu.h"
+#include "cpu-tlb.h"
+
 /**
  * @brief Realiza el ciclo de instrucción de un proceso.
  * 
@@ -75,5 +78,9 @@ bool check_interrupt();
  * @return t_tipo_instruccion Tipo de instrucción correspondiente.
  */
 t_tipo_instruccion mapeo_string_tipo(char* tipo_instruccion);
+
+int obtener_direccion_fisica(int direccion_logica);
+
+bool tlb_habilitada();
 
 #endif // CPU_COMUNICACION_MEMORIA_H_
