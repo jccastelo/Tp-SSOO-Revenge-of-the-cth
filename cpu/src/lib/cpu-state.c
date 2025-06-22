@@ -13,6 +13,8 @@ int TAM_PAGINA;
 int ENTRADAS_POR_TABLA;
 int CANTIDAD_NIVELES;
 t_entrada_tlb *tlb;
+int timestamp_global;
+int puntero_fifo = 0;
 
 void inicializar_tlb() {
     tlb = malloc(sizeof(t_entrada_tlb) * config_cpu->ENTRADAS_TLB);

@@ -50,11 +50,16 @@ typedef struct {
 typedef struct {
     int pagina;
     int marco;
-    t_temporal timestamp;
+    int timestamp;
     int bit_presencia;
     int bit_modificado;
     int libre;
 } t_entrada_tlb;
+
+typedef enum {
+    FIFO,
+    LRU
+} t_algoritmo_tlb;
 
 
 #endif // CPU_TYPES_H_ 

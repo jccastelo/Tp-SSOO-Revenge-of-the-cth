@@ -20,5 +20,7 @@ extern int ENTRADAS_POR_TABLA;
 extern int CANTIDAD_NIVELES;
 
 extern t_entrada_tlb *tlb;
+extern int timestamp_global;
+extern int puntero_fifo;
 
 #endif // CPU_STATE_H_
