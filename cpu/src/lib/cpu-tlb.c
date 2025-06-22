@@ -11,8 +11,8 @@ int buscar_frame_tlb(int pagina) {
 }
 
 void actualizar_timestamp(int posicion) {
-    tlb[posicion].timestamp += timestamp_global;
     timestamp_global++; 
+    tlb[posicion].timestamp = timestamp_global;
 }
 
 void agregar_a_tlb(int pagina, int marco) {

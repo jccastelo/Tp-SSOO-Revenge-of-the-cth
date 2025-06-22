@@ -59,7 +59,8 @@ void excecute(t_instruccion* instruccion) {
         //TODO hacer la escritura en memoria
         break;
     case INSTR_READ:
-        int direccion_rd = atoi(instruccion->argv[1]);
+        int direccion_logica_rd = atoi(instruccion->argv[1]);
+        int direccion_fisica_rd = obtener_direccion_fisica(direccion_logica_rd);
         int tamanio_rd = atoi(instruccion->argv[2]);
         //TODO con traduccion lógica a física
         break;
