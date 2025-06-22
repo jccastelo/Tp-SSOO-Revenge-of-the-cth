@@ -23,6 +23,9 @@ void realizar_ciclo_de_instruccion() {
         free(instruccion_a_ejecutar);
         free(instruccion);
     }
+
+    limpiar_tlb(); //limpio la TLB porque se desalojó el proceso
+
 }
 
 char* fetch_instruction() {
@@ -134,6 +137,7 @@ int obtener_direccion_fisica(int direccion_logica) {
     }
 
     int dir_fisica = marco * TAM_PAGINA + traduccion->desplazamiento;
+    free(traduccion);
     return dir_fisica;
 }
 

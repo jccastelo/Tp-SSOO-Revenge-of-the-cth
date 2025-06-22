@@ -71,3 +71,16 @@ t_algoritmo_tlb get_algoritmo(char* algoritmo_str) {
     else if (string_equals_ignore_case(algoritmo_str, "LRU")) return LRU;
     else return -1;
 }
+
+void limpiar_tlb() {
+    for (int i = 0; i < config_cpu->ENTRADAS_TLB; i++) {
+        tlb[i].libre = 1;
+        tlb[i].pagina = -1;
+        tlb[i].marco = -1;
+        tlb[i].bit_presencia = 0;
+        tlb[i].bit_modificado = 0;
+        tlb[i].timestamp = 0;
+    }
+
+    puntero_fifo = 0;
+}
