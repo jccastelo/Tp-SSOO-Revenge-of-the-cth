@@ -3,21 +3,12 @@
 t_traduccion* traducir_direccion_logica(int dir_logica) {
     t_traduccion *traduccion = malloc(sizeof(t_traduccion));
 
-    get_data_memoria();
-
     int nro_pagina = obtener_nro_pagina(dir_logica);
     traduccion->nro_pagina = nro_pagina;
     obtener_entradas_por_nivel(traduccion->entradas, nro_pagina);
     traduccion->desplazamiento = obtener_desplazamiento(dir_logica);
 
     return traduccion;
-}
-
-void get_data_memoria() {
-    // TODO -> pedir estos datos a memoria
-    TAM_PAGINA = 64;
-    ENTRADAS_POR_TABLA = 4;
-    CANTIDAD_NIVELES = 3;
 }
 
 int obtener_nro_pagina(int dir_logica) {

@@ -24,4 +24,6 @@ int elegir_victima_tlb();
 
 t_algoritmo_tlb get_algoritmo(char* algoritmo_str);
 
+void limpiar_tlb();
+
 #endif //CPU_TLB_H

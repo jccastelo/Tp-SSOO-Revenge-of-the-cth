@@ -24,14 +24,4 @@ void conseguir_siguiente_instruccion();
  */
 char* devolver_instruccion_a_ejecutar();
 
-/**
- * @brief Convierte un buffer crudo recibido de Memoria en un string.
- *
- * Crea una copia del contenido del buffer como cadena de caracteres.
- *
- * @param buffer Buffer recibido desde Memoria.
- * @return String con la instrucción.
- */
-char* deserializar_instruccion(t_buffer *buffer);
-
 #endif // CPU_COMUNICACION_MEMORIA_H_

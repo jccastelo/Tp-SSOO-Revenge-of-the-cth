@@ -33,9 +33,3 @@ char* devolver_instruccion_a_ejecutar() {
     free(new_buffer);
     return instruccion;
 }
-
-// char* deserializar_instruccion(t_buffer *buffer) {
-//     int desplazamiento + 0;
-//     int size;
-//     return instr;
-// }
