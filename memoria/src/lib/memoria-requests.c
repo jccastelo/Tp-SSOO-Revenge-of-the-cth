@@ -1,23 +1,30 @@
 #include "../include/memoria-requests.h"
 
-void init_process (int client_socket) {
-    // Inicializamos las variables necesarias para el proceso:
+void init_process(int client_socket) {
+    // Inicializamos las variables necesarias para el proceso
     int id_process;
     int tam_process;
-    int resquest = 1;
-    char *file_procces;
-    
-    // Llamamos a la función que recibe y configura los valores para el proceso:
-    rcv_setup_to_process(client_socket, &id_process, &tam_process, &file_procces);
-    log_info(logger, "PID: %d - Proceso a punto de crearse - Tamanio: %d - Archivo: %s", id_process, tam_process, file_procces);
+    int request;
+    char *file_process;  
 
-    // To Do: Deberiamos de validar, si memoria tiene espacio para el proceso
+    // Recibimos y configuramos los valores para el proceso
+    rcv_setup_to_process(client_socket, &id_process, &tam_process, &file_process);
+    log_info(logger, "PID: %d - Proceso a punto de crearse - Tamaño: %d - Archivo: %s",
+            id_process, tam_process, file_process);
 
-    // Cargar las instrucciones en la estructura administrativa: instrucciones por proceso
-    loading_process_instructions(id_process, file_procces);
+    // Verificamos si hay suficiente espacio en memoria para el proceso
+    t_list *free_frames = is_memory_sufficient(tam_process);
 
-    // Enviamos respuesta afimartiva que se mando se creo el proceso:
-    send(client_socket, &resquest, sizeof(resquest), 0);
+    if(free_frames) {
+        loading_process_instructions(id_process, file_process);
+        add_process_to_memory(id_process);
+        setup_page_tables(id_process, free_frames);
+        request = OK;
+    } else
+        request = ERROR;
+
+    // Enviamos la respuesta indicando si el proceso fue creado correctamente o no
+    send(client_socket, &request, sizeof(request), 0);
 }
 
 void send_process_instruction(int cliente_socket) {
