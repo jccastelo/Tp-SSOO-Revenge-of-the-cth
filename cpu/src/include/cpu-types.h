@@ -64,7 +64,7 @@ typedef enum {
 typedef struct {
     int pagina;
     char* contenido;
-    int bit_presencia;
+    int bit_uso;
     int bit_modificado;
     int libre;
 } t_entrada_cache;
