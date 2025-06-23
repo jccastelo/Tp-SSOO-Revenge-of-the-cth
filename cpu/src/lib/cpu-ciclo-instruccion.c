@@ -131,7 +131,7 @@ int obtener_direccion_fisica(int direccion_logica) {
     }
 
     if(marco < 0) {
-        marco = pedir_marco_a_memoria(traduccion, contexto->pid); // TODO EN COMUNICACION MEMORIA
+        marco = pedir_marco_a_memoria(traduccion); // TODO EN COMUNICACION MEMORIA
         if(tlb_habilitada())
             agregar_a_tlb(pagina, marco);
     }

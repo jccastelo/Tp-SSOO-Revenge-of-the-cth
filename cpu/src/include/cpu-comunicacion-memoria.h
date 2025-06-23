@@ -24,4 +24,6 @@ void conseguir_siguiente_instruccion();
  */
 char* devolver_instruccion_a_ejecutar();
 
+int pedir_marco_a_memoria(t_traduccion *traduccion);
+
 #endif // CPU_COMUNICACION_MEMORIA_H_
