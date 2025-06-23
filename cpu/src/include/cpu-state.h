@@ -23,4 +23,7 @@ extern t_entrada_tlb *tlb;
 extern int timestamp_global;
 extern int puntero_fifo;
 
+extern t_entrada_cache *cache;
+extern int puntero_clock;
+
 #endif // CPU_STATE_H_

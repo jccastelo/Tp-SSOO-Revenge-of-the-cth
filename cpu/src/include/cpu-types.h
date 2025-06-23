@@ -61,5 +61,13 @@ typedef enum {
     LRU
 } t_algoritmo_tlb;
 
+typedef struct {
+    int pagina;
+    char* contenido;
+    int bit_presencia;
+    int bit_modificado;
+    int libre;
+} t_entrada_cache;
+
 
 #endif // CPU_TYPES_H_ 

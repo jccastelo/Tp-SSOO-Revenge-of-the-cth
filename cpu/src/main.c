@@ -17,14 +17,23 @@ int main(int argc, char* argv[]) {
     // Inicializamos la configuración
     cpu_config_init();
 
-    //Conectamos CPU a Kernel y memoria
+    // Conectamos CPU a Kernel y memoria
     cpu_connect();
 
+    // Ejecutamos el ciclo de instrucciones durante la vida del cpu
     while (1) {
 
         recibir_contexto_de_kernel();
-        
+
+        // Inicializamos la TLB y la memoria CACHE
+        inicializar_tlb();
+        inicializar_cache();
+
         realizar_ciclo_de_instruccion();
+
+        // Limpiamos al ser desalojado el proceso
+        limpiar_tlb();
+        limpiar_cache();
     }
     
     return 0;

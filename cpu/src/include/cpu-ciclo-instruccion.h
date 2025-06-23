@@ -12,6 +12,7 @@
 
 #include "mmu.h"
 #include "cpu-tlb.h"
+#include "cpu-cache.h"
 
 /**
  * @brief Realiza el ciclo de instrucción de un proceso.

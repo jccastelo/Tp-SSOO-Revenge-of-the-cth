@@ -10,8 +10,6 @@
 #include "cpu-config.h"
 #include "cpu-connect.h"
 
-#include "include/cpu-tlb.h"
-
 int buscar_frame_tlb(int pagina);
 
 void actualizar_timestamp(int posicion);
@@ -23,6 +21,8 @@ void agregar_en_entrada(int entrada, int pagina, int marco);
 int elegir_victima_tlb();
 
 t_algoritmo_tlb get_algoritmo(char* algoritmo_str);
+
+void inicializar_tlb();
 
 void limpiar_tlb();
 

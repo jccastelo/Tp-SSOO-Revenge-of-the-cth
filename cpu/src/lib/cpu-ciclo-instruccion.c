@@ -23,9 +23,6 @@ void realizar_ciclo_de_instruccion() {
         free(instruccion_a_ejecutar);
         free(instruccion);
     }
-
-    limpiar_tlb(); //limpio la TLB porque se desalojó el proceso
-
 }
 
 char* fetch_instruction() {
