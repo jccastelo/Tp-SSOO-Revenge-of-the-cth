@@ -1,4 +1,5 @@
-#include "../include/memoria-page-tables.h"
+#include "../include/memoria-pages-tables.h"
+
 
 void setup_page_tables(int id_process, t_list *free_frames) {
     // Creamos el nodo raíz de la tabla de páginas del proceso
@@ -48,7 +49,7 @@ void insert_frame_in_table(t_list *current_node, int level, int total_levels, in
     t_list *child = get_or_create_child(current_node, index);
 
     // Recurre al siguiente nivel para insertar el frame:
-    insert_frame_in_table(child, level + 1, total_levels, entries_per_level, divisors, frame_id);
+    insert_frame_in_table(child, level + 1, total_levels, entries_per_level, divisors,frame , frame_id);
 }
 
 int calculate_index(int frame_id, int level, int entries_per_level, int *divisors) {

@@ -1,5 +1,5 @@
-#include "../include/memoria-procces.h"
-
+#include "../include/memoria-process.h"
+#include "../include/memoria-state.h"
 t_process_in_memory *initialization_process() {
     // Solicitamos memoria dinámica para un nuevo proceso en memoria:
     t_process_in_memory *process = malloc(sizeof(t_process_in_memory));
