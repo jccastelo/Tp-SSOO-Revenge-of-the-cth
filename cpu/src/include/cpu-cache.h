@@ -18,4 +18,10 @@ void agregar_a_cache(int pagina, char* contenido);
 
 void agregar_en_entrada_cache(int entrada, int pagina, char* contenido);
 
+int elegir_victima_cache();
+
+void aumentar_puntero_clock();
+
+t_algoritmo_cache get_algoritmo_cache(char* algoritmo_str);
+
 #endif //CPU_CACHE_H

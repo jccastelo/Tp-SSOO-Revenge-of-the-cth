@@ -69,5 +69,10 @@ typedef struct {
     int libre;
 } t_entrada_cache;
 
+typedef enum {
+    CLOCK,
+    CLOCK_M
+} t_algoritmo_cache;
+
 
 #endif // CPU_TYPES_H_ 
