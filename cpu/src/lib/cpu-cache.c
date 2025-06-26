@@ -24,14 +24,34 @@ void limpiar_cache() {
     free(cache);
 }
 
-char* buscar_pagina_cache(int pagina) {
+int buscar_pagina_cache(int pagina) {
     for (int i=0; i < config_cpu->ENTRADAS_CACHE; i++) {
         if (!cache[i].libre && cache[i].pagina == pagina) {
             cache[i].bit_uso = 1;
-            return cache[i].contenido; // TODO LOG CACHE HIT?
+            return i; // TODO LOG CACHE HIT?
         }
     }
-    return NULL; // TODO LOG CACHE MISS
+    return -1; // TODO LOG CACHE MISS
+}
+
+char* leer_pagina_cache(int entrada) {
+    cache[entrada].bit_uso = 1;
+    return cache[entrada].contenido;
+}
+
+char* leer_pagina_cache_parcial(int entrada, int offset, int tamanio) {
+    cache[entrada].bit_uso = 1;
+    char* resultado = malloc(tamanio + 1);
+    memcpy(resultado, &cache[entrada].contenido[offset], tamanio);
+    resultado[tamanio] = '\0';
+
+    return resultado;
+}
+
+void escribir_pagina_cache(int entrada, int offset, char* contenido) {
+    cache[entrada].bit_uso = 1;
+    cache[entrada].bit_modificado = 1;
+    memcpy(&cache[entrada].contenido[offset], contenido, strlen(contenido));
 }
 
 int conseguir_entrada_libre() {

@@ -84,4 +84,12 @@ int obtener_direccion_fisica(int direccion_logica);
 
 bool tlb_habilitada();
 
+void leer(int direccion_logica, int tamanio);
+
+void escribir(int direccion_logica, char* contenido);
+
+bool cache_habilitada();
+
+char* leer_frame_memoria(int nro_pagina);
+
 #endif // CPU_COMUNICACION_MEMORIA_H_

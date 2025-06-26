@@ -37,7 +37,7 @@ char* devolver_instruccion_a_ejecutar() {
 int pedir_marco_a_memoria(t_traduccion *traduccion) {
     t_paquete* paquete = crear_paquete(GET_FRAME);
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
-    agregar_a_paquete(paquete, &traduccion->entradas, sizeof(int) * CANTIDAD_NIVELES);
+    agregar_a_paquete(paquete, traduccion->entradas, sizeof(int) * CANTIDAD_NIVELES);
     enviar_paquete(paquete, socket_memoria);
 
     int cod_op;
@@ -62,9 +62,33 @@ int pedir_marco_a_memoria(t_traduccion *traduccion) {
     return frame;
 }
 
+char* conseguir_contenido_frame(int frame) {
+    t_paquete* paquete = crear_paquete(GET_CONTENT);
+    agregar_a_paquete(paquete, &frame, sizeof(int));
+    enviar_paquete(paquete, socket_memoria);
+
+    t_buffer* new_buffer = malloc(sizeof(t_buffer));
+    new_buffer->size = 0;
+    new_buffer->stream = NULL;
+
+    int cod_op = recibir_operacion(socket_memoria);
+    if (cod_op != RETURN_CONTENT) {
+        log_error(logger, "Error al recibir el contenido del frame desde Memoria.");
+        return NULL;
+    }
+
+    char* contenido = malloc(TAM_PAGINA);
+
+    new_buffer->stream = recibir_buffer(&new_buffer->size, socket_memoria);
+    memcpy(contenido, new_buffer->stream, TAM_PAGINA);
+
+    free(new_buffer);
+    return contenido;
+}
+
 void escribir_pagina_en_memoria(int frame, char* contenido) {
     t_paquete* paquete = crear_paquete(WRITE_MEM);
     agregar_a_paquete(paquete, &frame, sizeof(int));
-    agregar_a_paquete(paquete, contenido, strlen(contenido) + 1);
+    agregar_a_paquete(paquete, contenido, TAM_PAGINA);
     enviar_paquete(paquete, socket_memoria);
 }

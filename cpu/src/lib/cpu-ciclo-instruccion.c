@@ -54,15 +54,13 @@ void excecute(t_instruccion* instruccion) {
         break;
     case INSTR_WRITE: 
         int direccion_logica_wr = atoi(instruccion->argv[1]);
-        int direccion_fisica_wr = obtener_direccion_fisica(direccion_logica_wr);
         char* mensaje = instruccion->argv[2];
-        //TODO hacer la escritura en memoria
+        escribir(direccion_logica_wr, mensaje);
         break;
     case INSTR_READ:
         int direccion_logica_rd = atoi(instruccion->argv[1]);
-        int direccion_fisica_rd = obtener_direccion_fisica(direccion_logica_rd);
         int tamanio_rd = atoi(instruccion->argv[2]);
-        //TODO con traduccion lógica a física
+        leer(direccion_logica_rd, tamanio_rd);
         break;
     case INSTR_GOTO:
         contexto->pc = atoi(instruccion->argv[1]);
@@ -128,7 +126,7 @@ int obtener_direccion_fisica(int direccion_logica) {
     }
 
     if(marco < 0) {
-        marco = pedir_marco_a_memoria(traduccion); // TODO EN COMUNICACION MEMORIA
+        marco = pedir_marco_a_memoria(traduccion);
         if(tlb_habilitada())
             agregar_a_tlb(pagina, marco);
     }
@@ -140,4 +138,91 @@ int obtener_direccion_fisica(int direccion_logica) {
 
 bool tlb_habilitada() {
     return config_cpu->ENTRADAS_TLB > 0;
+}
+
+
+//TODO: ABSTRAER LÓGICA REPETIDA EN LEER Y ESCRIBIR
+
+void leer(int direccion_logica, int tamanio) {
+    t_traduccion *traduccion = traducir_direccion_logica(direccion_logica);
+    char* resultado = malloc(tamanio + 1);
+
+    if(cache_habilitada()) {
+        int entrada = buscar_pagina_cache(traduccion->nro_pagina);
+
+        if (entrada == -1) {
+            entrada = conseguir_entrada_libre();
+
+            // DESALOJO
+            if (cache[entrada].bit_modificado) {
+                int frame = obtener_direccion_fisica(cache[entrada].pagina * TAM_PAGINA);
+                escribir_pagina_en_memoria(frame, cache[entrada].contenido);
+            }
+
+            // ACTUALIZO LA CACHE
+            char* contenido_frame = leer_frame_memoria(traduccion->nro_pagina);
+            agregar_en_entrada_cache(entrada, traduccion->nro_pagina, contenido_frame);
+        }
+
+        char* contenido = leer_pagina_cache_parcial(entrada, traduccion->desplazamiento, tamanio);
+        memcpy(resultado, contenido, tamanio);
+        free(contenido);
+    }
+    else {
+        char* contenido_frame = leer_frame_memoria(traduccion->nro_pagina);
+        memcpy(resultado, &contenido_frame[traduccion->desplazamiento], tamanio);
+        free(contenido_frame);
+    }
+    
+    resultado[tamanio] = '\0';
+    // TODO -> LOG DE RESULTADO
+
+    free(resultado);
+    free(traduccion);
+}
+
+void escribir(int direccion_logica, char* contenido) {
+    t_traduccion *traduccion = traducir_direccion_logica(direccion_logica);
+
+    if(cache_habilitada()) {
+        int entrada = buscar_pagina_cache(traduccion->nro_pagina);
+
+        if (entrada == -1) {
+            entrada = conseguir_entrada_libre();
+
+            // DESALOJO
+            if (cache[entrada].bit_modificado) {
+                int frame = obtener_direccion_fisica(cache[entrada].pagina * TAM_PAGINA);
+                escribir_pagina_en_memoria(frame, cache[entrada].contenido);
+            }
+
+            // ACTUALIZO LA CACHE
+            char* contenido_frame = leer_frame_memoria(traduccion->nro_pagina);
+            agregar_en_entrada_cache(entrada, traduccion->nro_pagina, contenido_frame);
+        }
+
+        escribir_pagina_cache(entrada, traduccion->desplazamiento, contenido);
+
+    }
+    else {
+        int dir_fisica = obtener_direccion_fisica(direccion_logica);
+        escribir_pagina_en_memoria(dir_fisica, contenido);
+    }
+
+    free(traduccion);
+}
+
+bool cache_habilitada() {
+    return config_cpu->ENTRADAS_CACHE > 0;
+}
+
+char* leer_frame_memoria(int nro_pagina) {
+    int dir_logica = nro_pagina * TAM_PAGINA;
+    t_traduccion* traduccion = traducir_direccion_logica(dir_logica);
+
+    int frame = pedir_marco_a_memoria(traduccion);
+    free(traduccion);
+
+    char* contenido = conseguir_contenido_frame(frame);
+    return contenido;
 }

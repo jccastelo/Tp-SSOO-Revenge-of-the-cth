@@ -12,7 +12,13 @@ void inicializar_cache();
 
 void limpiar_cache();
 
-char* buscar_pagina_cache(int pagina);
+int buscar_pagina_cache(int pagina);
+
+char* leer_pagina_cache(int entrada);
+
+char* leer_pagina_cache_parcial(int entrada, int offset, int tamanio);
+
+void escribir_pagina_cache(int entrada, int offset, char* contenido);
 
 int conseguir_entrada_libre();
 
