@@ -8,6 +8,7 @@
 
 // Incluimos bibliotecas propias:
 #include "memoria-types.h"
+#include "memoria-user-spaces.h"
 
 // Definimos las variables globales:
 extern t_config_memoria *config_memoria;
