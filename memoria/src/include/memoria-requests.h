@@ -4,6 +4,9 @@
 // Incluimos las biblotecas internas:
 #include "memoria-protocols.h"
 #include "memoria-instructions.h"
+#include "memoria-user-spaces.h"
+#include "memoria-pages-tables.h"
+#include "memoria-processes.h"
 
 /**
  * @brief Inicializa un proceso en el servidor en respuesta a una solicitud del kernel.
@@ -17,6 +20,7 @@
  *                      permitiendo la transmisión de datos necesarios para la inicialización.
  */
 void init_process(int client_socket);
+
 /**
  * @brief Envía una instrucción de un proceso a solicitud del cliente (CPU).
  * 

@@ -1,10 +1,13 @@
-#ifndef MEMORIA_PROCESS_H
-#define MEMORIA_PROCESS_H
+#ifndef MEMORIA_PROCESSES_H
+#define MEMORIA_PROCESSES_H
 
 // Incluyo las bibliotecas externas necesarias:
 #include <stdlib.h>
 #include <commons/collections/dictionary.h>
 #include <commons/string.h>
+
+// Incluyo las bibliotecas externas necesarias:
+#include "memoria-state.h"
 
 typedef struct {
     int tablas_requests;         
@@ -46,6 +49,6 @@ void add_process_to_memory(int id_process);
  * @param size_process Tamaño del proceso en bytes.
  * @return Número entero de frames necesarios para almacenar el proceso.
  */
-int required_frames_for_process(int size_process);
+int required_frames_for_process(int size_process); 
 
 #endif

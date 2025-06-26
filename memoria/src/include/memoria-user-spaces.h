@@ -8,6 +8,7 @@
 
 // Incluyo las bibliotecas internas necesarias:
 #include "memoria-state.h"
+#include "memoria-processes.h"
 
 /**
  * @brief Inicializa el bitmap que representa la disponibilidad de frames en memoria.

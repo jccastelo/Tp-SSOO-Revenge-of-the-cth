@@ -1,5 +1,5 @@
-#include "../include/memoria-process.h"
-#include "../include/memoria-state.h"
+#include "../include/memoria-processes.h"
+
 t_process_in_memory *initialization_process() {
     // Solicitamos memoria dinámica para un nuevo proceso en memoria:
     t_process_in_memory *process = malloc(sizeof(t_process_in_memory));
@@ -17,7 +17,7 @@ t_process_in_memory *initialization_process() {
 
 void add_process_to_memory(int id_process) {
     // Se convierte el ID del proceso a string para usarlo como clave, y se inicializa su estructura en memoria
-    int key_id_process = string_itoa(id_process);
+    char* key_id_process = string_itoa(id_process);
     t_process_in_memory *new_process = initialization_process();
 
     // Se guarda en el diccionario global de procesos activos:
