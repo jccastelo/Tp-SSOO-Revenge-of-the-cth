@@ -34,7 +34,7 @@ char* buscar_pagina_cache(int pagina) {
     return NULL; // TODO LOG CACHE MISS
 }
 
-void agregar_a_cache(int pagina, char* contenido) {
+int conseguir_entrada_libre() {
     int entrada_libre = -1;
     for (int i = 0; i < config_cpu->ENTRADAS_CACHE; i++) {
         if (cache[i].libre) {
@@ -47,7 +47,7 @@ void agregar_a_cache(int pagina, char* contenido) {
         entrada_libre = elegir_victima_cache();
     }
 
-    agregar_en_entrada_cache(entrada_libre, pagina, contenido);
+    return entrada_libre;
 }
 
 void agregar_en_entrada_cache(int entrada, int pagina, char* contenido) {

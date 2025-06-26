@@ -61,3 +61,10 @@ int pedir_marco_a_memoria(t_traduccion *traduccion) {
     free(new_buffer);
     return frame;
 }
+
+void escribir_pagina_en_memoria(int frame, char* contenido) {
+    t_paquete* paquete = crear_paquete(WRITE_MEM);
+    agregar_a_paquete(paquete, &frame, sizeof(int));
+    agregar_a_paquete(paquete, contenido, strlen(contenido) + 1);
+    enviar_paquete(paquete, socket_memoria);
+}

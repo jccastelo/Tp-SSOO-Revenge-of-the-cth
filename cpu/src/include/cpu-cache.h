@@ -14,7 +14,7 @@ void limpiar_cache();
 
 char* buscar_pagina_cache(int pagina);
 
-void agregar_a_cache(int pagina, char* contenido);
+int conseguir_entrada_libre();
 
 void agregar_en_entrada_cache(int entrada, int pagina, char* contenido);
 

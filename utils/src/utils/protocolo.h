@@ -31,7 +31,9 @@ typedef enum {
 	RETURN_INSTRUCCION,
 	MEMORY_CONFIG,
 	GET_FRAME,
-	RETURN_FRAME
+	RETURN_FRAME,
+	WRITE_MEM,
+	READ_MEM
 } op_code;
 
 typedef enum {
