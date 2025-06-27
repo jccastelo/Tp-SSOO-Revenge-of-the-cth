@@ -13,6 +13,7 @@ t_log* logger;
 Suite* suite_instructions(void);
 Suite* suite_protocols(void);
 Suite* suite_page_tables(void);
+Suite *suite_user_spaces(void);
 
 int main(void) {
     int failed_total = 0;
@@ -21,6 +22,7 @@ int main(void) {
     
     srunner_add_suite(sr,suite_page_tables());
     srunner_add_suite(sr, suite_protocols());
+    srunner_add_suite(sr,suite_user_spaces());
     
     logger = log_create("tests.log", "Tests", true, LOG_LEVEL_INFO);
     srunner_run_all(sr, CK_NORMAL);
@@ -62,11 +64,11 @@ Suite *suite_page_tables(void){
     return s;    
 }
 
-// Suite *suite_user_spaces(void){
-//     Suite *s = suite_create("User spaces");
-//     TCase *tc_core = tcase_create("Core"); 
+Suite *suite_user_spaces(void){
+    Suite *s = suite_create("User spaces");
+    TCase *tc_core = tcase_create("Core"); 
 
-//     agregar_tests_page_tables(tc_core);
-//     suite_add_tcase(s, tc_core); 
-//     return s;    
-// }
+    agregar_tests_page_tables(tc_core);
+    suite_add_tcase(s, tc_core); 
+    return s;    
+}
