@@ -33,6 +33,7 @@ int main(int argc, char* argv[]) {
 
         // Limpiamos al ser desalojado el proceso
         limpiar_tlb();
+        guardado_cache_por_desalojo();
         limpiar_cache();
     }
     

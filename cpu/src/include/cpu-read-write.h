@@ -25,4 +25,6 @@ int busqueda_cache(int nro_pagina);
 
 char* leer_frame_memoria(int nro_pagina);
 
+void guardado_cache_por_desalojo();
+
 #endif //CPU_READ_WRITE_H

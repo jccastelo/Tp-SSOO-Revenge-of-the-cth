@@ -2,6 +2,7 @@
 
 
 // TRADUCCIONES
+
 int obtener_direccion_fisica(int direccion_logica) {
     t_traduccion *traduccion = traducir_direccion_logica(direccion_logica);
 
@@ -62,7 +63,7 @@ void escribir(int direccion_logica, char* contenido) {
     }
     else {
         int dir_fisica = obtener_direccion_fisica(direccion_logica);
-        escribir_pagina_en_memoria(dir_fisica, contenido);
+        escribir_pagina_en_memoria(dir_fisica, contenido); //TODO -> AGREGAR OFFSET?
     }
 
     free(traduccion);
@@ -98,4 +99,14 @@ char* leer_frame_memoria(int nro_pagina) {
 
     char* contenido = conseguir_contenido_frame(frame);
     return contenido;
+}
+
+
+void guardado_cache_por_desalojo() {
+    for (int i=0; i < config_cpu->ENTRADAS_CACHE; i++) {
+        if (cache[i].bit_modificado) {
+            int frame = obtener_direccion_fisica(cache[i].pagina * TAM_PAGINA);
+            escribir_pagina_en_memoria(frame, cache[i].contenido);
+        }
+    }
 }
