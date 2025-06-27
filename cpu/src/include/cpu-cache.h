@@ -12,6 +12,8 @@ void inicializar_cache();
 
 void limpiar_cache();
 
+bool cache_habilitada();
+
 int buscar_pagina_cache(int pagina);
 
 char* leer_pagina_cache(int entrada);

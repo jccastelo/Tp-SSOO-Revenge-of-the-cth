@@ -26,4 +26,6 @@ void inicializar_tlb();
 
 void limpiar_tlb();
 
+bool tlb_habilitada();
+
 #endif //CPU_TLB_H

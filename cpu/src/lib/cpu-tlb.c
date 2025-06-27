@@ -93,3 +93,7 @@ void limpiar_tlb() {
 
     puntero_fifo = 0;
 }
+
+bool tlb_habilitada() {
+    return config_cpu->ENTRADAS_TLB > 0;
+}

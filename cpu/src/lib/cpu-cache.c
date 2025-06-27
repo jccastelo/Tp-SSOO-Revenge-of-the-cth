@@ -24,6 +24,10 @@ void limpiar_cache() {
     free(cache);
 }
 
+bool cache_habilitada() {
+    return config_cpu->ENTRADAS_CACHE > 0;
+}
+
 int buscar_pagina_cache(int pagina) {
     for (int i=0; i < config_cpu->ENTRADAS_CACHE; i++) {
         if (!cache[i].libre && cache[i].pagina == pagina) {
