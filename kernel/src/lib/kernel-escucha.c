@@ -34,8 +34,11 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
 
             //Si esta en block va a ready, sino a readysuspended
             if(process->queue_ESTADO_ACTUAL->cola == planner->long_term->queue_BLOCKED->cola) 
-            {queue_process(process, READY);}
-            else {queue_process(process, READY_SUSPENDED); }
+            {   log_info(logger,"## %d finalizó IO y pasa a READY",process->pid);
+                queue_process(process, READY);}
+
+            else {log_info(logger,"## %d finalizó IO y pasa a READY_SUSPENDED",process->pid);
+                queue_process(process, READY_SUSPENDED); }
         break;
         case FIN_CONEXION_DE_IO:
             log_info(logger,"Llego IO A desconectarse");

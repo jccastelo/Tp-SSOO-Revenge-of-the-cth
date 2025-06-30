@@ -2,10 +2,13 @@
 
 void queue_process(t_pcb* process, int estado){
 
+    char *estadoActual = get_NombreDeEstado(process->queue_ESTADO_ACTUAL);
+
     switch(estado)
     {
     case NEW:
-        log_info(logger, "Proceso en NEW");
+       
+        log_info(logger,"## %d Se crea el proceso - Estado: NEW", process->pid);
         
         process->metricas_de_estado->new += 1;
         temporal_resume(process->metricas_de_tiempo->NEW);
@@ -24,7 +27,8 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case READY:
-        log_info(logger, "Proceso en READY");
+        
+        log_info(logger,"## %d Pasa del estado %s al estado READY",process->pid,estadoActual);
         
         process->metricas_de_estado->ready += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY));
@@ -44,7 +48,9 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case EXECUTE:
-        log_info(logger, "Proceso en EXECUTE");
+       
+        log_info(logger,"## %d Pasa del estado %s al estado EXECUTE",process->pid,estadoActual);
+
         process->metricas_de_estado->execute += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->EXECUTE));
         
@@ -64,7 +70,8 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case BLOCKED:
-        
+        log_info(logger,"## %d Pasa del estado %s al estado BLOCKED",process->pid,estadoActual);
+
         process->metricas_de_estado->blocked += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED));
         
@@ -76,6 +83,8 @@ void queue_process(t_pcb* process, int estado){
 
     case BLOCKED_SUSPENDED:
         
+        log_info(logger,"## %d Pasa del estado %s al estado BLOCKED_SUSPENDED",process->pid,estadoActual);
+
         process->metricas_de_estado->blocked_suspended += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED_SUSPENDED));
         
@@ -88,7 +97,8 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case READY_SUSPENDED:
-        
+        log_info(logger,"## %d Pasa del estado %s al estado READY_SUSPENDED",process->pid,estadoActual);
+
         process->metricas_de_estado->ready_suspended += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY_SUSPENDED));
         
@@ -96,7 +106,11 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case EXIT:
-        log_info(logger, "Proceso en EXIT");
+       
+
+        log_info(logger,"## %d Pasa del estado %s al estado EXIT",process->pid,estadoActual);
+
+        log_info(logger,"## %d - Finaliza el proceso",process->pid);
         
         process->metricas_de_estado->exit += 1;
         temporal_stop(process->metricas_de_tiempo->metrica_actual);
@@ -146,5 +160,28 @@ void actualizarTiempo(t_temporal **metrica_actual,t_temporal **metricas_de_tiemp
     temporal_resume(*metricas_de_tiempo_estado); //Si ya existe entonces lo reanuda
 
     *metrica_actual = *metricas_de_tiempo_estado;
+
+}
+
+char *get_NombreDeEstado(t_monitor* queue_ESTADO)
+{
+    if(queue_ESTADO == planner->long_term->queue_NEW)
+    {return "NEW";}
+
+    else if(queue_ESTADO == planner->long_term->queue_BLOCKED)
+    {return "BLOCKED";}
+
+    else if(queue_ESTADO == planner->long_term->queue_EXIT)
+    {return "EXIT";}
+
+    else if(queue_ESTADO == planner->short_term->queue_READY)
+    {return "READY";}
+
+    else if(queue_ESTADO == planner->medium_term->queue_BLOCKED_SUSPENDED)
+    {return "BLOCKED_SUSPENDED";}
+
+    else if(queue_ESTADO == planner->medium_term->queue_READY_SUSPENDED)
+    {return "READY_SUSPENDED";}
+    else{return "NULL";}
 
 }
