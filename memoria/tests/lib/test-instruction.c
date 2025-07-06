@@ -4,7 +4,7 @@
 
 // Incluimos las biblotecas internas:
 #include "../src/include/memoria-instructions.h"
-#include "../src/include/memoria-state.h"
+#include "../src/include/memoria-state.h" 
 
 START_TEST(test_read_pseudocode_file) {
     log_info(logger, "[TEST] Comenzando: test_read_pseudocode_file");
@@ -44,4 +44,4 @@ END_TEST
 void agregar_tests_instructions(TCase* tc) {
     tcase_add_test(tc, test_read_pseudocode_file);
     tcase_add_test(tc, test_associate_instructions_folder_path);
-}
+}  

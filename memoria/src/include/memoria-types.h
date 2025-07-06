@@ -1,6 +1,5 @@
 #ifndef MEMORIA_TYPES_H_
 #define MEMORIA_TYPES_H_
-
 typedef struct {
     int PUERTO_ESCUCHA;
     int TAM_MEMORIA;

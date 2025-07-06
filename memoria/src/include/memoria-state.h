@@ -8,13 +8,18 @@
 
 // Incluimos bibliotecas propias:
 #include "memoria-types.h"
+#include "memoria-user-spaces.h"
 
 // Definimos las variables globales:
 extern t_config_memoria *config_memoria;
 extern t_memoria_servers *memoria_servers;
 extern t_dictionary *instrucciones_por_procesos;
 extern t_dictionary *metricas_por_procesos;
+extern t_dictionary *all_process_page_tables;
 extern void *espacio_usuario;
+extern void *frames_memory;
+extern void *frames_bitmap;
+extern int quantity_frames;
 
 /**
  * @brief Inicializa el estado del servidor de Memoria.
