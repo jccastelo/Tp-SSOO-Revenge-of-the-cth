@@ -59,6 +59,11 @@ void send_instruction_consumer(int cliente_socket, int id_process, int program_c
  * @param id_process Puntero a una variable donde se almacenará el ID del proceso finalizado.
  */
 void rcv_process_to_end(int client_socket, int *id_process);
+/**
+ * @brief recibo el buffer y solo retorno el pid del proceso
+ * @param client_socket Descriptor del socket donde se recibe el paquete. 
+ */
+int rcv_only_pid(int client_socket);
 
 
 #endif // MEMORIA_PROTOCOLS_H

@@ -6,7 +6,8 @@
 #include <utils/protocolo.h>
 
 // Incluyo las bibliotecas internas necesarias:
-#include "memoria-requests.h"
+#include "memoria-requests.h" 
+#include "memoria-pages-tables.h"
 
 /**
  * @brief Maneja las conexiones entrantes al servidor de Memoria.

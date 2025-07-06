@@ -51,3 +51,15 @@ void rcv_process_to_end(int client_socket, int *id_process) {
     parsear_int(buffer, &desplazamiento, id_process);
     free(buffer);
 }
+int rcv_only_pid(int socket_cliente) {
+    int size;
+    int desplazamiento = 0;
+    void* buffer = recibir_buffer(&size, socket_cliente);  
+
+    int pid;
+    parsear_int(buffer, &desplazamiento, &pid);            
+
+    free(buffer); 
+
+    return pid;
+}

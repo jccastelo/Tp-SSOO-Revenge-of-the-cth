@@ -23,7 +23,16 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
         break;
         case GET_INSTRUCTION:
             send_process_instruction(client_socket);
+        break; 
+        case SUSPENDER:
+            suspend_process(client_socket);
         break;
+        case DESUSPENDER:
+            remove_suspend_process(client_socket);
+        break;
+        // case FINALIZAR:
+        //  debería liberar las entradas de swap 
+        // break;
 
 
         // Otros casos de operaciones pueden ir aquí.
