@@ -60,5 +60,49 @@ void send_instruction_consumer(int cliente_socket, int id_process, int program_c
  */
 void rcv_process_to_end(int client_socket, int *id_process);
 
+/**
+ * @brief Recibe y parsea un acceso a memoria solicitado por un cliente a través de un socket.
+ *
+ * Esta función recibe un paquete enviado por un cliente que contiene los datos necesarios para 
+ * resolver una traducción de dirección en un esquema de paginación multinivel. El paquete incluye 
+ * el identificador del proceso que realiza el acceso, así como una lista de índices que representan 
+ * las entradas a recorrer en cada nivel de la tabla de páginas.
+ * 
+ * A través del socket especificado, la función interpreta el contenido del paquete recibido, 
+ * almacenando el ID del proceso en la variable apuntada por `id_process` y devolviendo una lista 
+ * dinámica (`t_list*`) con los índices correspondientes a cada nivel.
+ * 
+ * Además, permite recibir datos adicionales a través del parámetro `extra_data` y personalizar 
+ * el parseo del contenido utilizando la función `parse_fn`, útil para manejar distintos tipos 
+ * de operaciones o estructuras.
+ *
+ * @param client_socket Descriptor del socket desde el cual se recibe el paquete.
+ * @param id_process Puntero a una variable donde se almacenará el ID del proceso recibido.
+ * @param extra_data Puntero a una estructura donde se almacenarán datos adicionales parseados, si corresponde.
+ * @param parse_fn Función encargada de interpretar los datos adicionales recibidos.
+ *
+ * @return t_list* Lista de índices por nivel que representan el camino a recorrer en la estructura de paginación.
+ */
+t_list *rcv_and_parse_memory_access(int client_socket, int *id_process, void* extra_data, parse_func_t parse_fn);
+
+/**
+ * Envía al cliente un paquete de respuesta que contiene el código de estado 
+ * y, en caso exitoso, el contenido leído desde la memoria.
+ *
+ * Esta función crea un paquete utilizando el código de respuesta recibido. 
+ * Si el estado es OK, también se agrega el buffer con el contenido leído (interpretado como string).
+ * Finalmente, el paquete se envía al cliente y se elimina para liberar recursos.
+ *
+ * Parámetros:
+ * - client_socket: Socket del cliente al cual se enviará el paquete.
+ * - buffer: Puntero al contenido leído desde memoria (interpretado como string).
+ * - response: Código de estado de la operación (por ejemplo, OK o ERROR).
+ *
+ * Notas:
+ * - Si el contenido leído no es textual (binario), se recomienda adaptar la función
+ *   para enviar datos binarios en lugar de strings.
+ */
+
+void send_read_content(int client_socket, char *buffer, int response);
 
 #endif // MEMORIA_PROTOCOLS_H

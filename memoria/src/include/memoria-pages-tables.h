@@ -108,5 +108,44 @@ t_list* get_or_create_child(t_list *parent, int index);
  */
 void precompute_divisors(int total_levels, int entries_per_level, int *divisors);
 
+/**
+ * @brief Busca el frame correspondiente dado un proceso y una lista de índices por nivel.
+ *
+ * Recorre la tabla multinivel desde la raíz, navegando por las entradas indicadas en 'entries_per_level'.
+ * Al llegar al último nivel, devuelve el frame asociado.
+ *
+ * @param id_process Identificador del proceso.
+ * @param entries_per_level Lista de índices para cada nivel de la tabla de páginas.
+ * @return El número de frame encontrado, o -1 si no se encuentra.
+ */
+int find_frame_from_entries(int id_process, t_list *entries_per_level);
+
+/**
+ * @brief Obtiene la tabla raíz de páginas de un proceso dado su ID.
+ *
+ * Convierte el ID del proceso a cadena para usarlo como clave en el diccionario
+ * global de tablas de páginas y devuelve la tabla raíz asociada.
+ *
+ * @param id_process Identificador del proceso.
+ * @return Puntero a la lista que representa la tabla raíz de páginas, o NULL si no existe.
+ */
+t_list *get_root_table(int id_process);
+
+
+/**
+ * @brief Resuelve el número de frame físico a partir de una dirección física.
+ *
+ * Determina el frame físico correspondiente a una dirección dada, considerando si la
+ * dirección incluye un offset (cuando hay N+1 niveles). En ese caso, el offset se
+ * extrae y se retorna por parámetro, y el frame se calcula a partir de las entradas.
+ * Si no hay offset, se asume que el primer elemento de la lista ya es el frame.
+ *
+ * @param id_process Identificador del proceso que accede a la memoria.
+ * @param physical_address Lista de entradas que representan la dirección física.
+ *                         Puede contener N entradas o N+1 si incluye offset.
+ * @param offeset Puntero a entero donde se almacenará el offset, si aplica.
+ * @return Número de frame físico correspondiente a la dirección.
+ */
+int resolve_physical_frame(int id_process, t_list *physical_address, int *offeset);
 
 #endif

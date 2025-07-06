@@ -35,3 +35,69 @@ t_list *is_memory_sufficient(int size_process) {
 
     return free_frames;
 }
+
+void mark_frames_as_busy(t_list *free_frames) {
+    // Función auxiliar que marca un único marco como ocupado en el bitmap
+    void set_frame_as_busy(void *frame) {
+        int value_frame = (int) frame;  
+        bitarray_set_bit(frames_bitmap, value_frame - 1);
+    }
+
+    // Itera sobre todos los marcos de la lista y los marca como ocupados
+    list_iterate(free_frames, set_frame_as_busy); 
+}
+
+void write_memory(int client_socket, int id_process, int searched_frame, void *extra_data, int offset) {
+    // Preparamos el contenido a escribir en memoria
+    char *data = (char *)extra_data;
+    int data_size = string_length(data);
+
+    // Inicializamos variable para manejar la respuesta al cliente:
+    int response;
+    char *process_status;
+
+    // Determinamos el byte de memoria que nos deberemos de parar:
+    int frame_size = config_memoria->TAM_PAGINA;
+    int memory_position  = searched_frame * frame_size + offset;
+
+    if ((memory_position + data_size > config_memoria->TAM_MEMORIA) || (offset + data_size > frame_size)) {
+        process_status = "ERROR";
+        response = ERROR;
+    } else {
+        memcpy(espacio_usuario + memory_position, data, data_size);
+        process_status = "OK";
+        response = OK;
+    }
+
+    // Informamos situacion:
+    log_info(logger, "Process %d: Write to memory (frame: %d, offset: %d, size: %d bytes) - Status: %s", id_process, searched_frame, offset, data_size, process_status);
+    send(client_socket, &response, sizeof(int), 0);
+}
+
+void read_memory(int client_socket, int id_process, int searched_frame, void *extra_data, int offset) {
+    // Preparamos el contenido a leer de memoria:
+    int data_size = *((int *)extra_data);
+    void *buffer = malloc(data_size); 
+
+    // Inicializamos variable para manejar la respuesta al cliente:
+    int response;
+    char *process_status;
+
+    // Determinamos el byte de memoria que nos deberemos de parar:
+    int frame_size = config_memoria->TAM_PAGINA;
+    int memory_position  = searched_frame * frame_size + offset;
+
+    if ((memory_position + data_size > config_memoria->TAM_MEMORIA) || (offset + data_size > frame_size)) {
+        process_status = "ERROR";
+        response = ERROR;
+    } else {
+        memcpy(buffer, espacio_usuario + memory_position, data_size);
+        process_status = "OK";
+        response = OK;
+    }
+
+    // Informamos situacion:
+    log_info(logger, "Process %d: Read from memory (frame: %d, offset: %d, size: %d bytes) - Status: %s", id_process, searched_frame, offset, data_size, process_status);
+    send_read_content(client_socket, buffer, response);
+}
+

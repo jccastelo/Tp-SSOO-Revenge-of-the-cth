@@ -15,6 +15,7 @@ void memoria_state_init() {
     // Inicializamos las variables globales:
     instrucciones_por_procesos = dictionary_create();
     metricas_por_procesos = dictionary_create();
+    all_process_page_tables = dictionary_create();
     espacio_usuario = malloc(config_memoria->TAM_MEMORIA);
     quantity_frames = config_memoria->TAM_MEMORIA / config_memoria->TAM_PAGINA;
 

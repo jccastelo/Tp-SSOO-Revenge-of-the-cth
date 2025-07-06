@@ -114,25 +114,47 @@ void generar_handshake(int socket, char *server_name) {
     }
 }
 
-void parsear_int(void* buffer ,int* desplazamiento,int* ubicacion ){
+void parsear_int(void* buffer ,int* desplazamiento, void* ubicacion) {
     memcpy(ubicacion, buffer + *desplazamiento, sizeof(int));
     *desplazamiento += sizeof(int);
 }
 
-void parsear_string(void *buffer, int *desplazamiento, char **destino) {
+void parsear_string(void *buffer, int *desplazamiento, void *dest) {
     int longitud;
-
     memcpy(&longitud, buffer + *desplazamiento, sizeof(int));
     *desplazamiento += sizeof(int);
 
-    *destino = malloc(longitud + 1);
-    if (*destino == NULL) {
+    char **string_ptr = (char **)dest;
+    *string_ptr = malloc(longitud + 1);
+    if (*string_ptr == NULL) {
         perror("Error al asignar memoria para la cadena");
         exit(1);
     }
 
-    memcpy(*destino, buffer + *desplazamiento, longitud);
-    (*destino)[longitud] = '\0';
+    memcpy(*string_ptr, buffer + *desplazamiento, longitud);
+    (*string_ptr)[longitud] = '\0';
 
     *desplazamiento += longitud;
+}
+
+t_list *parsear_ints(void *buffer, int *desplazamiento, int size) {
+    t_list *integers = list_create();
+    parse_values_and_add_to_list(integers, (parse_func_t)parsear_int, buffer, desplazamiento, size, sizeof(int));
+    return integers;
+}
+
+void parse_values_and_add_to_list(t_list *list, parse_func_t parse_func, void *buffer, int *offset, int buffer_size, size_t elem_size) {
+    while (*offset < buffer_size) {
+        void *element = malloc(elem_size);
+        if (!element) {
+            perror("Error allocating memory");
+            exit(1);
+        }
+        parse_func(buffer, offset, element);
+        list_add(list, element);
+    }
+}
+
+void noop_parse_entry(void *buffer, int *desplazamiento, void *extra_data) {
+    // No realiza ninguna acción; función de parseo vacía
 }

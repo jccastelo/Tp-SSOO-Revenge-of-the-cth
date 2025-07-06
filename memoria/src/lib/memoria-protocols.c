@@ -27,6 +27,20 @@ void rcv_instruction_consumer(int client_socket, int *id_process, int *program_c
     free(buffer);
 }
 
+t_list *rcv_and_parse_memory_access(int client_socket, int *id_process, void* extra_data, parse_func_t parse_fn) {
+    // Inicializamos las variables necessarias:
+    int size;
+    int desplazamiento = 0;
+    void *buffer = recibir_buffer(&size, client_socket);
+
+    // Extraemos el ID del proceso, datos adicionales y las entradas por nivel del buffer recibido
+    parsear_int(buffer, &desplazamiento, id_process);
+    parse_fn(buffer, &desplazamiento, extra_data);
+    t_list *entries_per_level = parsear_ints(buffer, &desplazamiento, size);
+
+    return entries_per_level;
+}
+
 void send_instruction_consumer(int cliente_socket, int id_process, int program_counter, char *instruction) {
     // Verificamos que haya instruccion para enviar al cliente.
     // Si no hay instruccion valida, registramos un error y salimos. 
@@ -50,4 +64,14 @@ void rcv_process_to_end(int client_socket, int *id_process) {
     // Parseamos el ID del proceso del buffer:
     parsear_int(buffer, &desplazamiento, id_process);
     free(buffer);
+}
+
+void send_read_content(int client_socket, char *buffer, int response) {
+    t_paquete *response_package = crear_paquete(response);
+
+    if(response == OK)
+        agregar_a_paquete_string(response_package, buffer, string_length(buffer));
+    
+    enviar_paquete(response_package, client_socket);
+    eliminar_paquete(response_package);
 }

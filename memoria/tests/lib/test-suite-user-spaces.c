@@ -15,6 +15,6 @@ START_TEST(test_memory_sufficient){
 }
 END_TEST 
 
-void agregar_tests_page_tables(TCase* tc){
+void agregar_tests_user_spaces(TCase* tc){
     tcase_add_test(tc, test_memory_sufficient);
 }

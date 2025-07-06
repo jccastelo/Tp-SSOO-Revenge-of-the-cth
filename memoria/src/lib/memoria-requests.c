@@ -19,12 +19,47 @@ void init_process(int client_socket) {
         loading_process_instructions(id_process, file_process);
         add_process_to_memory(id_process);
         setup_page_tables(id_process, free_frames);
+        mark_frames_as_busy(free_frames);
         request = OK;
     } else
         request = ERROR;
 
     // Enviamos la respuesta indicando si el proceso fue creado correctamente o no
     send(client_socket, &request, sizeof(request), 0);
+}
+
+void access_to_page_tables(int client_socket) {
+    // Se recibe la dirección física, representada por las entradas por nivel asociadas al proceso.
+    int id_process;
+    t_list *physical_address = rcv_and_parse_memory_access(client_socket, &id_process, NULL, noop_parse_entry);
+
+    // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
+    int searched_frame = find_frame_from_entries(id_process, physical_address);
+
+    // Enviar el frame encontrado al cliente que lo solicitó, y liberamos memoria
+    send(client_socket, &searched_frame, sizeof(int), 0);
+    list_destroy(physical_address);
+}
+
+void operation_in_user_spaces(int cliente_socket, t_execute_operation execute_operation, parse_func_t parse_fn) {
+    // Recibimos la dirección física y obtenemos las entradas por nivel asociadas al proceso
+    int offeset = -1;
+    int id_process;
+    void *extra_data;
+    t_list *physical_address = rcv_and_parse_memory_access(cliente_socket, &id_process, extra_data, parse_fn);
+
+    // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
+    int searched_frame = resolve_physical_frame(id_process, physical_address, &offeset);
+
+    execute_operation(cliente_socket, id_process, searched_frame, extra_data, offeset);
+}
+
+void write_in_user_spaces(int client_socket) {
+    operation_in_user_spaces(client_socket, write_memory, parsear_string);
+}
+
+void read_in_user_spaces(int client_socket) {
+    operation_in_user_spaces(client_socket, read_memory, noop_parse_entry);
 }
 
 void send_process_instruction(int cliente_socket) {
