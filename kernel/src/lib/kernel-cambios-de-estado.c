@@ -110,7 +110,6 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case EXIT:
-       
 
         log_info(logger,"## PID: %d Pasa del estado %s al estado EXIT",process->pid,estadoActual);
 

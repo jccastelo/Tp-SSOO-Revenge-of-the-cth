@@ -212,15 +212,27 @@ void eliminar_instancia(int io_socket)
 
 void desencolarProcesosEsperando(t_IO *ios_estructura)
 {
-    t_list* colaProcesosEsperando = ios_estructura->procesos_esperando->cola;
+    int tamano_lista = list_size(ios_estructura->procesos_esperando->cola);
+    int i = 0;
+    
+    while(tamano_lista > i && tamano_lista > 0)
+    {   
+        pthread_mutex_lock(&ios_estructura->procesos_esperando->mutex);
+        t_buffer *pid_milisegundos  = list_remove(ios_estructura->procesos_esperando->cola,0);
+        
+        if(i != tamano_lista - 1){
+            pthread_mutex_unlock(&ios_estructura->procesos_esperando->mutex);
+        }
 
-    int tamano_lista = list_size(colaProcesosEsperando);
-    int i =0;
+        int pid_a_remover;
+        memcpy(&pid_a_remover, pid_milisegundos->stream, sizeof(int));
 
-    while(tamano_lista > i )
-    {
-        t_pcb *procesoEncolado = list_remove(colaProcesosEsperando,i);
-        queue_process(procesoEncolado,EXIT);
+        log_info(logger, "PID A ELIMINAR: %d, ELEMENTOS RESTANTES: %d",pid_a_remover, tamano_lista > i);
+
+        free(pid_milisegundos);
+        
+        queue_process(list_get(list_procesos->cola,pid_a_remover), EXIT);
+        
         i++;
     }
 }

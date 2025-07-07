@@ -92,10 +92,6 @@ void planner_init(){
     planner->long_term->queue_BLOCKED = malloc(sizeof(t_monitor));
     pthread_mutex_init(&(planner->long_term->queue_BLOCKED->mutex), NULL);
     planner->long_term->queue_BLOCKED->cola = list_create();
-
-    log_info(logger,"Planificador listo. Esperando para iniciar...");
-
-    getchar();
     
     log_info(logger,"PLANIFICADOR INICIADO");
 }   

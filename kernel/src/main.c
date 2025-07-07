@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
         //fprintf(stderr, "Uso: %s <archivoProceso> <Tamanio_prco>\n", argv[0]);
         //return 1;
         log_warning(logger, "INICIALIZADO EN MODO DEFAULT");
-        archivo_pseudocodigo = "test2CPUSIO.txt"; //PARA DEBUG O POR DEFAULT
+        archivo_pseudocodigo = "PLANI_CORTO_PLAZO.txt"; //PARA DEBUG O POR DEFAULT
         Tamanio_proc = 0;
     } else {
         archivo_pseudocodigo = argv[1];
