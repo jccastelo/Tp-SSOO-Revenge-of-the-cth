@@ -40,7 +40,7 @@ void planner_init(){
         break;
     
     default:
-        log_info(logger,"Mal ingresado el nombre del algoritmo planificador");
+        log_error(logger,"Mal ingresado el nombre del algoritmo planificador");
         abort();
     }
 
@@ -52,17 +52,17 @@ void planner_init(){
         break;
     
     case SJFsD:
-        planner->long_term->algoritmo_planificador = queue_SJF;
+        planner->short_term->algoritmo_planificador = queue_SJF;
         planner->short_term->algoritmo_desalojo = sin_desalojo;
         break;
 
     case SJFcD:
-        planner->long_term->algoritmo_planificador = queue_SJF;
+        planner->short_term->algoritmo_planificador = queue_SJF;
         planner->short_term->algoritmo_desalojo = desalojo_SJF;
         break;
         
     default:
-        log_info(logger,"Mal ingresado el nombre del algoritmo planificador");
+        log_error(logger,"Mal ingresado el nombre del algoritmo planificador");
         abort();
     }
 
@@ -231,10 +231,14 @@ void queue_PMCP(t_pcb *process, t_list *lista)
 
 void queue_SJF(t_pcb *process, t_list *lista) {
     
-    if(process->estimaciones_SJF->rafagaReal != NULL) {
-        process->estimaciones_SJF->rafagaEstimada = process->estimaciones_SJF->ultimaEstimacion * config_kernel->ALFA + temporal_gettime(process->estimaciones_SJF->rafagaReal) * (1-config_kernel->ALFA);
+    if(process->estimaciones_SJF->rafagaEstimada == 0 ) {
+
+        process->estimaciones_SJF->ultimaEstimacion = process->estimaciones_SJF->ultimaEstimacion * config_kernel->ALFA + temporal_gettime(process->estimaciones_SJF->rafagaReal) * (1-config_kernel->ALFA);
+        process->estimaciones_SJF->rafagaEstimada = process->estimaciones_SJF->ultimaEstimacion; 
+        process->estimaciones_SJF->rafagaTotalReal = 0;
     } else {
-        process->estimaciones_SJF->rafagaEstimada = process->estimaciones_SJF->rafagaRestante; // Al desalojar, la rafaga estimada pasa a ser la rafaga restante
+        process->estimaciones_SJF->rafagaEstimada -= temporal_gettime(process->estimaciones_SJF->rafagaReal); // Al desalojar, la rafaga estimada pasa a ser la rafaga restante
+        process->estimaciones_SJF->rafagaTotalReal += temporal_gettime(process->estimaciones_SJF->rafagaReal);
     }
 
     if(list_size(lista) == 0) //Lista vacia?
@@ -246,7 +250,7 @@ void queue_SJF(t_pcb *process, t_list *lista) {
     for(int i = 0; !list_is_empty(lista); i++) {
         t_pcb* proceso_a_desplazar = list_get(lista,i);
 
-        if(process->estimaciones_SJF->rafagaEstimada < proceso_a_desplazar->estimaciones_SJF->rafagaEstimada) {
+        if(process->estimaciones_SJF->rafagaEstimada< proceso_a_desplazar->estimaciones_SJF->rafagaEstimada) {
             list_add_in_index(lista,i,process);
             return;
         } 

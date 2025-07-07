@@ -70,7 +70,7 @@ void queue_process(t_pcb* process, int estado){
             
         } else {
              queue_process(process,READY);//NO puede haber procesos en EXECUTE que no estan ejecutando
-             log_error(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
+             log_warning(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
         break;
 
     case BLOCKED:

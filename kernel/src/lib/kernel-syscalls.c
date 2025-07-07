@@ -7,10 +7,10 @@ t_pcb *process_init(){
     new_process->metricas_de_tiempo = malloc(sizeof(t_metricas_de_tiempo));
     new_process->estimaciones_SJF = malloc(sizeof(t_SJF));
 
-    new_process->estimaciones_SJF->rafagaRestante = 0;
-    new_process->estimaciones_SJF->rafagaEstimada = config_kernel->ESTIMACION_INICIAL;
-    new_process->estimaciones_SJF->ultimaEstimacion = 0;
+    new_process->estimaciones_SJF->rafagaEstimada = (int64_t)config_kernel->ESTIMACION_INICIAL;
+    new_process->estimaciones_SJF->ultimaEstimacion = (int64_t)config_kernel->ESTIMACION_INICIAL;
     new_process->estimaciones_SJF->rafagaReal = NULL;
+    new_process->estimaciones_SJF->rafagaTotalReal = 0;
     
     new_process->archivo = NULL;
     new_process->tamanio_proceso = 0;
@@ -88,8 +88,8 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer){
     pthread_mutex_unlock(&list_procesos->mutex);
 
     if(desplazamiento < buffer->size) 
-    {log_info(logger,"Hay informacion sin deserializar en INIC_PROC"); }
-    else{ log_info(logger,"Se inicializo proceso PID: %d ",process->pid ); }
+    {log_error(logger,"Hay informacion sin deserializar en INIC_PROC"); }
+    else{ log_error(logger,"Se inicializo proceso PID: %d ",process->pid ); }
     sleep(1);
 
 }
@@ -103,7 +103,6 @@ void delate_process(t_buffer *buffer){
 
     t_pcb *process = list_get(list_procesos->cola, pid_delate); //Obtengo el proceso a eliminar de la lista global
 
-    log_info(logger,"Proceso a eliminar : %d",process->pid);
     temporal_stop(process->estimaciones_SJF->rafagaReal);
 
     queue_process(process,EXIT); 

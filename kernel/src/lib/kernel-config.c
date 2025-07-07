@@ -12,6 +12,7 @@ t_config_kernel* inicializar_config_kernel() {
     config_kernel->ALGORITMO_CORTO_PLAZO = NULL;
     config_kernel->ALGORITMO_INGRESO_A_READY = NULL;
     config_kernel->ALFA = 0.0;
+    config_kernel->ESTIMACION_INICIAL = 0;
     config_kernel->TIEMPO_SUSPENSION = 0;
     config_kernel->LOG_LEVEL = NULL;
 
@@ -63,7 +64,9 @@ void configurar_valores_de_planificacion(t_config_kernel* config_io, t_config* c
 
     config_kernel->ALGORITMO_INGRESO_A_READY = strdup(config_get_string_value(config, "ALGORITMO_INGRESO_A_READY"));
     config_kernel->ALFA = config_get_double_value(config, "ALFA");
+    config_kernel->ESTIMACION_INICIAL = config_get_int_value(config,"ESTIMACION_INICIAL");
     config_kernel->TIEMPO_SUSPENSION = config_get_int_value(config, "TIEMPO_SUSPENSION");
+    
 }
 
 void configurar_valores_de_log(t_config_kernel* config_io, t_config* config) {
