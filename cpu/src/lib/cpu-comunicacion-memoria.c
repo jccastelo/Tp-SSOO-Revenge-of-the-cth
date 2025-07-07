@@ -110,6 +110,8 @@ char* leer_en_memoria_desde(int dir_fisica, int tamanio) {
         log_error(logger, "Error al recibir contenido parcial de memoria.");
     }
 
+
+    //TODO -> hacer igual q el otro?
     t_buffer* buffer = malloc(sizeof(t_buffer));
     buffer->stream = recibir_buffer(&buffer->size, socket_memoria);
     char* resultado = malloc(tamanio + 1);
@@ -125,11 +127,15 @@ void escribir_en_memoria_desde(int dir_fisica, char* contenido) {
     log_info(logger, "PID: %d - Acción: ESCRIBIR - Dirección Física: %d - Valor: %s", contexto->pid, dir_fisica, contenido);
     t_paquete* paquete = crear_paquete(WRITE_MEM);
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
-    agregar_a_paquete(paquete, contenido, strlen(contenido));
+    agregar_a_paquete_string(paquete, contenido, string_length(contenido));
     agregar_a_paquete(paquete, &dir_fisica, sizeof(int));
     enviar_paquete(paquete, socket_memoria);
 
     int respuesta;
     recv(socket_memoria, &respuesta, sizeof(int), 0);
-    //TODO CHECKEAR SI LO ESCIRBIO BIEN CON EL OK
+    
+    int cod_op = recibir_operacion(socket_memoria);
+    if (cod_op != OK) {
+        log_error(logger, "Error al escribir en memoria.");
+    }
 }
