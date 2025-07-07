@@ -57,7 +57,7 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->execute += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->EXECUTE));
         
-        cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->queue_EXECUTE);
+        cambiar_estado(planner->short_term->algoritmo_planificador, process, planner->queue_EXECUTE);
 
         temporal_resume(process->estimaciones_SJF->rafagaReal);
 
@@ -180,6 +180,9 @@ char *get_NombreDeEstado(t_monitor* queue_ESTADO)
 
     else if(queue_ESTADO == planner->short_term->queue_READY)
     {return "READY";}
+
+    else if(queue_ESTADO == planner->queue_EXECUTE)
+    {return "EXECUTE";}
 
     else if(queue_ESTADO == planner->medium_term->queue_BLOCKED_SUSPENDED)
     {return "BLOCKED_SUSPENDED";}

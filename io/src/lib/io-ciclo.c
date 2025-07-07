@@ -20,7 +20,7 @@ t_proceso* recibir_proceso(){
     buffer->stream = NULL;
 
     // Leer el tamaño del buffer
-    recv(socket_kernel, &buffer->size, sizeof(int), 0);
+    recv(socket_kernel, &buffer->size, sizeof(int), MSG_WAITALL);
 
     // Reservar memoria para el stream y recibirlo
     buffer->stream = malloc(buffer->size);

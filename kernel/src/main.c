@@ -4,12 +4,17 @@ int main(int argc, char *argv[]) {
 
     
     if (argc < 3) {
-        fprintf(stderr, "Uso: %s <archivoProceso> <Tamanio_prco>\n", argv[0]);
-        return 1;
+        //fprintf(stderr, "Uso: %s <archivoProceso> <Tamanio_prco>\n", argv[0]);
+        //return 1;
+          char *archivo_pseudocodigo = "IOtest.txt"; //PARA DEBUG O POR DEFAULT
+            int Tamanio_proc =  2;
+    }else{
+        char *archivo_pseudocodigo = argv[1];
+        int Tamanio_proc =  atoi(argv[2]);
     }
 
-    char *archivo_pseudocodigo = argv[1];
-    int Tamanio_proc =  atoi(argv[2]);
+    
+    
 
 
     // Inicializamos un logger
