@@ -52,40 +52,36 @@ t_list *is_memory_sufficient(int size_process);
 void mark_frames_as_busy(t_list *free_frames);
 
 /**
- * Escribe datos en el espacio de memoria de usuario en una posición específica.
+ * @brief Escribe datos en el espacio de memoria de usuario en una posición física específica.
  *
- * Esta función copia un buffer de datos proporcionado por el proceso en la memoria de usuario,
- * comenzando desde la posición calculada a partir del frame físico y el offset indicados.
+ * Esta función copia el contenido de un buffer de datos proporcionado por el proceso
+ * en la memoria de usuario, comenzando desde la posición calculada a partir de la 
+ * dirección física indicada.
  *
- * Parámetros:
- * - client_socket: Socket del cliente al que se enviará la respuesta de estado.
- * - id_process: Identificador del proceso que solicita la escritura.
- * - searched_frame: Número de frame físico donde se debe realizar la escritura.
- * - extra_data: Puntero al buffer con los datos a escribir (se interpreta como char *).
- * - offset: Desplazamiento dentro del frame donde comienza la escritura.
+ * @param client_socket Descriptor del socket del cliente al cual se enviará la respuesta de estado.
+ * @param id_process Identificador del proceso que solicita la escritura.
+ * @param extra_data Puntero al buffer con los datos a escribir (interpretado como char *).
+ * @param physical_address Dirección física absoluta donde se debe comenzar a escribir.
  *
- * En caso de error (overflow de memoria o frame), se responde con ERROR.
- * Si la operación es exitosa, se responde con OK.
+ * @details En caso de error (por ejemplo, overflow de memoria), se envía una respuesta con ERROR.
+ * Si la operación se completa exitosamente, se envía una respuesta con OK.
  */
-void write_memory(int client_socket, int id_process, int searched_frame, void *extra_data, int offset);
+void write_memory(int client_socket, int id_process, void *extra_data, int physical_address);
 
 /**
- * Lee datos del espacio de memoria de usuario en una posición específica y los devuelve al cliente.
+ * @brief Lee datos desde el espacio de memoria de usuario en una posición física específica.
  *
- * Esta función copia un bloque de memoria desde la memoria de usuario a un buffer temporal,
- * a partir de la posición calculada con el frame físico y el offset indicados. Luego,
- * envía el estado de la operación y el contenido leído al cliente.
+ * Esta función copia un bloque de datos desde la memoria de usuario, comenzando en la dirección
+ * física indicada, y luego envía el contenido leído al cliente a través del socket especificado.
  *
- * Parámetros:
- * - client_socket: Socket del cliente al que se enviará la respuesta y los datos leídos.
- * - id_process: Identificador del proceso que solicita la lectura.
- * - searched_frame: Número de frame físico desde donde se debe leer.
- * - extra_data: Puntero a un entero que indica la cantidad de bytes a leer.
- * - offset: Desplazamiento dentro del frame donde comienza la lectura.
+ * @param client_socket Descriptor del socket del cliente al cual se enviará la respuesta con los datos leídos.
+ * @param id_process Identificador del proceso que solicita la lectura.
+ * @param extra_data Puntero a un entero que indica el tamaño (en bytes) de los datos a leer.
+ * @param physical_address Dirección física absoluta desde donde se debe comenzar la lectura.
  *
- * En caso de error (overflow de memoria o frame), se responde con ERROR y no se envía contenido.
- * Si la operación es exitosa, se responde con OK seguido del contenido leído.
+ * @details En caso de error (por ejemplo, si la dirección excede los límites de la memoria),
+ * se responde con ERROR. Si la operación es exitosa, se copia el contenido y se responde con OK.
  */
-void read_memory(int client_socket, int id_process, int searched_frame, void *extra_data, int offset);
+void read_memory(int client_socket, int id_process, void *extra_data, int physical_address);
 
 #endif

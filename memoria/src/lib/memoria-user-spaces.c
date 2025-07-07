@@ -47,7 +47,7 @@ void mark_frames_as_busy(t_list *free_frames) {
     list_iterate(free_frames, set_frame_as_busy); 
 }
 
-void write_memory(int client_socket, int id_process, int searched_frame, void *extra_data, int offset) {
+void write_memory(int client_socket, int id_process, void *extra_data, int physical_address) {
     // Preparamos el contenido a escribir en memoria
     char *data = (char *)extra_data;
     int data_size = string_length(data);
@@ -56,25 +56,21 @@ void write_memory(int client_socket, int id_process, int searched_frame, void *e
     int response;
     char *process_status;
 
-    // Determinamos el byte de memoria que nos deberemos de parar:
-    int frame_size = config_memoria->TAM_PAGINA;
-    int memory_position  = searched_frame * frame_size + offset;
-
-    if ((memory_position + data_size > config_memoria->TAM_MEMORIA) || (offset + data_size > frame_size)) {
+    if ((physical_address + data_size > config_memoria->TAM_MEMORIA) || (physical_address > config_memoria->TAM_PAGINA)) {
         process_status = "ERROR";
         response = ERROR;
     } else {
-        memcpy(espacio_usuario + memory_position, data, data_size);
+        memcpy(espacio_usuario + physical_address, data, data_size);
         process_status = "OK";
         response = OK;
     }
 
-    // Informamos situacion:
-    log_info(logger, "Process %d: Write to memory (frame: %d, offset: %d, size: %d bytes) - Status: %s", id_process, searched_frame, offset, data_size, process_status);
+    // Informamos situacion
+    log_info(logger, "Process %d: Write to memory (physical_address: %d, size: %d bytes) - Status: %s", id_process, physical_address, data_size, process_status);
     send(client_socket, &response, sizeof(int), 0);
 }
 
-void read_memory(int client_socket, int id_process, int searched_frame, void *extra_data, int offset) {
+void read_memory(int client_socket, int id_process, void *extra_data, int physical_address) {
     // Preparamos el contenido a leer de memoria:
     int data_size = *((int *)extra_data);
     void *buffer = malloc(data_size); 
@@ -83,21 +79,16 @@ void read_memory(int client_socket, int id_process, int searched_frame, void *ex
     int response;
     char *process_status;
 
-    // Determinamos el byte de memoria que nos deberemos de parar:
-    int frame_size = config_memoria->TAM_PAGINA;
-    int memory_position  = searched_frame * frame_size + offset;
-
-    if ((memory_position + data_size > config_memoria->TAM_MEMORIA) || (offset + data_size > frame_size)) {
+    if ((physical_address + data_size > config_memoria->TAM_MEMORIA) || (physical_address > config_memoria->TAM_PAGINA)) {
         process_status = "ERROR";
         response = ERROR;
     } else {
-        memcpy(buffer, espacio_usuario + memory_position, data_size);
+        memcpy(buffer, espacio_usuario + physical_address, data_size);
         process_status = "OK";
         response = OK;
     }
 
     // Informamos situacion:
-    log_info(logger, "Process %d: Read from memory (frame: %d, offset: %d, size: %d bytes) - Status: %s", id_process, searched_frame, offset, data_size, process_status);
+    log_info(logger, "Process %d: Read from memory (physical_address: %d, size: %d bytes) - Status: %s", id_process, physical_address, data_size, process_status);
     send_read_content(client_socket, buffer, response);
 }
-

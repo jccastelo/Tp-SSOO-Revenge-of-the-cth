@@ -9,25 +9,26 @@
 #include "memoria-processes.h"
 
 /**
- * Tipo de función para realizar operaciones personalizadas sobre la memoria de usuario
+ * @brief Tipo de función callback para ejecutar operaciones personalizadas sobre la memoria de usuario
  * una vez resuelta la dirección física.
- * 
- * Esta función recibe:
- * - `client_socket`: Socket del cliente que solicita la operación, utilizado para enviar respuestas.
- * - `id_process`: Identificador del proceso que realiza el acceso a memoria.
- * - `frame`: Número de frame físico donde se realizará la operación.
- * - `extra_data`: Puntero a datos adicionales necesarios para la operación. 
- *                 Por ejemplo, puede ser un puntero a un entero que indique 
- *                 el tamaño de los datos a leer, o un puntero a un buffer que 
- *                 contenga los datos a escribir.
- * - `offset`: Desplazamiento dentro del frame, utilizado como punto de inicio
- *             para la operación (lectura o escritura).
- * 
- * Este tipo de función se utiliza como callback para definir operaciones 
- * específicas (lectura, escritura, etc.) que se ejecutan una vez que se 
- * resuelve la dirección física a partir de las tablas de páginas.
+ *
+ * Este tipo de función se utiliza como callback para definir operaciones específicas
+ * (por ejemplo, lectura o escritura) que se ejecutan luego de haber resuelto la dirección física
+ * a partir de las tablas de páginas.
+ *
+ * @param client_socket Descriptor del socket del cliente que solicita la operación, utilizado para enviar respuestas.
+ * @param id_process Identificador del proceso que realiza el acceso a memoria.
+ * @param extra_data Puntero a datos adicionales necesarios para la operación.
+ *                   Por ejemplo, puede ser un puntero a un entero que indique el tamaño
+ *                   de los datos a leer, o un puntero a un buffer que contenga los datos a escribir.
+ * @param physical_address Dirección física absoluta en la memoria donde se realizará la operación.
+ *
+ * @details
+ * Este callback permite desacoplar la lógica de resolución de la dirección física
+ * de la lógica concreta de la operación sobre memoria, facilitando la extensibilidad
+ * y reutilización de código.
  */
-typedef void (*t_execute_operation)(int client_socket, int id_process, int frame, void *extra_data, int offset);
+typedef void (*t_execute_operation)(int client_socket, int id_process, void *extra_data, int physical_address);
 
 /**
  * @brief Inicializa un proceso en el servidor en respuesta a una solicitud del kernel.
@@ -105,5 +106,28 @@ void write_in_user_spaces(int client_socket);
  */
 void read_in_user_spaces(int client_socket);
 
+/**
+ * @brief Finaliza un proceso solicitado por el cliente y envía la respuesta correspondiente.
+ *
+ * Esta función recibe, a través del socket especificado, el identificador del proceso que 
+ * se desea finalizar. Una vez recibido, registra en el log la intención de finalizar dicho proceso.
+ *
+ * Actualmente, la lógica para verificar si el proceso ya ha finalizado está pendiente 
+ * de implementación (comentada en el código). En el futuro, se podrá verificar el estado 
+ * real del proceso antes de enviar la respuesta.
+ *
+ * Finalmente, se envía una respuesta al cliente indicando el estado de la operación 
+ * (por ejemplo, OK o ERROR), permitiéndole conocer si la solicitud fue aceptada correctamente.
+ *
+ * @param client_socket Descriptor del socket desde el cual se recibe el ID del proceso
+ *                      y al cual se envía la respuesta.
+ *
+ * @details
+ * - Llama internamente a `rcv_process_to_end` para recibir el ID del proceso.
+ * - Loguea la acción para facilitar el seguimiento y depuración.
+ * - La verificación del estado del proceso aún está marcada como "To Do".
+ */
+
+void finish_process(int client_socket);
 
 #endif // MEMORIA_REQUESTS_H

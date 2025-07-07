@@ -16,7 +16,6 @@ void conection_strategy_persistence(void * args) {
         if (!execute_server) break;
 
         // Intentamos recibir una operación del cliente:
-        log_info(logger,"Nos hablo %d ", client_socket );
         int operation = recibir_operacion(client_socket);
 
         if (operation == -1) 

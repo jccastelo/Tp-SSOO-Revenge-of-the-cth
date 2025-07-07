@@ -5,7 +5,8 @@ void init_process(int client_socket) {
     int id_process;
     int tam_process;
     int request;
-    char *file_process;  
+    char *file_process;
+    char *status_process;
 
     // Recibimos y configuramos los valores para el proceso
     rcv_setup_to_process(client_socket, &id_process, &tam_process, &file_process);
@@ -20,38 +21,41 @@ void init_process(int client_socket) {
         add_process_to_memory(id_process);
         setup_page_tables(id_process, free_frames);
         mark_frames_as_busy(free_frames);
+        status_process = "aceptado";
         request = OK;
-    } else
+    } else {
+        status_process = "denegado";
         request = ERROR;
+    }
 
     // Enviamos la respuesta indicando si el proceso fue creado correctamente o no
+    log_info(logger, "PID: %d - Proceso %s para crearse", id_process, status_process);
     send(client_socket, &request, sizeof(request), 0);
 }
 
 void access_to_page_tables(int client_socket) {
     // Se recibe la dirección física, representada por las entradas por nivel asociadas al proceso.
     int id_process;
-    t_list *physical_address = rcv_and_parse_memory_access(client_socket, &id_process, NULL, noop_parse_entry);
+    t_list *entries_per_levels = rcv_entries_per_levels(client_socket, &id_process);
 
     // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
-    int searched_frame = find_frame_from_entries(id_process, physical_address);
+    int searched_frame = find_frame_from_entries(id_process, entries_per_levels);
 
     // Enviar el frame encontrado al cliente que lo solicitó, y liberamos memoria
     send(client_socket, &searched_frame, sizeof(int), 0);
-    list_destroy(physical_address);
+    list_destroy(entries_per_levels);
 }
 
 void operation_in_user_spaces(int cliente_socket, t_execute_operation execute_operation, parse_func_t parse_fn) {
-    // Recibimos la dirección física y obtenemos las entradas por nivel asociadas al proceso
-    int offeset = -1;
+    // Inicializamos las variables:
     int id_process;
+    int physical_address;
     void *extra_data;
-    t_list *physical_address = rcv_and_parse_memory_access(cliente_socket, &id_process, extra_data, parse_fn);
 
-    // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
-    int searched_frame = resolve_physical_frame(id_process, physical_address, &offeset);
-
-    execute_operation(cliente_socket, id_process, searched_frame, extra_data, offeset);
+    // Recibimos la dirección física asociada al proceso junto con la información adicional,
+    // y ejecutamos la operación correspondiente:
+    rcv_physical_memory_and_parse_memory_access(cliente_socket, &id_process, &physical_address, extra_data, parse_fn);
+    execute_operation(cliente_socket, id_process, extra_data, physical_address);
 }
 
 void write_in_user_spaces(int client_socket) {

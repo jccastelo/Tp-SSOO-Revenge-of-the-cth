@@ -5,6 +5,9 @@
 #include <utils/protocolo.h>
 #include <utils/logger.h>
 
+// Incluyo las bibliotecas internas necesarias:
+#include "memoria-state.h"
+
 /**
  * @brief Recibe y deserializa los datos necesarios para iniciar el procesamiento de un archivo enviado por un cliente.
  *
@@ -61,29 +64,29 @@ void send_instruction_consumer(int cliente_socket, int id_process, int program_c
 void rcv_process_to_end(int client_socket, int *id_process);
 
 /**
- * @brief Recibe y parsea un acceso a memoria solicitado por un cliente a través de un socket.
+ * @brief Recibe y parsea un acceso a memoria física solicitado por un cliente a través de un socket.
  *
- * Esta función recibe un paquete enviado por un cliente que contiene los datos necesarios para 
- * resolver una traducción de dirección en un esquema de paginación multinivel. El paquete incluye 
- * el identificador del proceso que realiza el acceso, así como una lista de índices que representan 
- * las entradas a recorrer en cada nivel de la tabla de páginas.
- * 
- * A través del socket especificado, la función interpreta el contenido del paquete recibido, 
- * almacenando el ID del proceso en la variable apuntada por `id_process` y devolviendo una lista 
- * dinámica (`t_list*`) con los índices correspondientes a cada nivel.
- * 
- * Además, permite recibir datos adicionales a través del parámetro `extra_data` y personalizar 
- * el parseo del contenido utilizando la función `parse_fn`, útil para manejar distintos tipos 
- * de operaciones o estructuras.
+ * Esta función se encarga de recibir un paquete desde el socket especificado, el cual contiene
+ * la información necesaria para acceder a una dirección física en memoria. El paquete incluye
+ * el identificador del proceso que realiza el acceso, un arreglo con las entradas (índices) 
+ * correspondientes a cada nivel de la tabla de páginas, y eventualmente datos adicionales que 
+ * pueden ser parseados mediante una función personalizada.
+ *
+ * La función extrae y almacena el ID del proceso en la variable apuntada por `id_process`, 
+ * y guarda las entradas por nivel en el arreglo apuntado por `physical_memory`.
+ * Además, si se requiere procesar datos adicionales, se utiliza el puntero `extra_data` junto
+ * con la función `parse_fn` proporcionada, permitiendo flexibilidad para distintos tipos 
+ * de operaciones.
  *
  * @param client_socket Descriptor del socket desde el cual se recibe el paquete.
- * @param id_process Puntero a una variable donde se almacenará el ID del proceso recibido.
- * @param extra_data Puntero a una estructura donde se almacenarán datos adicionales parseados, si corresponde.
- * @param parse_fn Función encargada de interpretar los datos adicionales recibidos.
+ * @param id_process Puntero a la variable donde se almacenará el ID del proceso recibido.
+ * @param physical_memory Puntero al arreglo donde se guardarán las entradas por nivel parseadas.
+ * @param extra_data Puntero a la estructura donde se almacenarán datos adicionales parseados.
+ * @param parse_fn Función encargada de parsear los datos adicionales contenidos en el paquete.
  *
- * @return t_list* Lista de índices por nivel que representan el camino a recorrer en la estructura de paginación.
+ * @return void
  */
-t_list *rcv_and_parse_memory_access(int client_socket, int *id_process, void* extra_data, parse_func_t parse_fn);
+void rcv_physical_memory_and_parse_memory_access(int client_socket, int *id_process, int *physical_memory, void* extra_data, parse_func_t parse_fn);
 
 /**
  * Envía al cliente un paquete de respuesta que contiene el código de estado 
@@ -104,5 +107,45 @@ t_list *rcv_and_parse_memory_access(int client_socket, int *id_process, void* ex
  */
 
 void send_read_content(int client_socket, char *buffer, int response);
+
+/**
+ * @brief Recibe y parsea las entradas por nivel para un acceso a memoria desde un socket.
+ *
+ * Esta función se encarga de recibir un paquete enviado por un cliente a través del socket 
+ * especificado, el cual contiene el identificador del proceso que realiza la operación 
+ * y una lista de índices que representan las entradas correspondientes a cada nivel de 
+ * la tabla de páginas en un esquema de paginación multinivel.
+ *
+ * La función extrae y almacena el ID del proceso en la variable apuntada por `id_process`, 
+ * y devuelve una lista dinámica (`t_list*`) que contiene las entradas por nivel necesarias 
+ * para realizar la traducción de la dirección.
+ *
+ * @param client_socket Descriptor del socket desde el cual se recibe el paquete.
+ * @param id_process Puntero a la variable donde se almacenará el ID del proceso recibido.
+ *
+ * @return t_list* Lista de enteros que representa las entradas por nivel a recorrer en 
+ *                 la estructura de paginación.
+ */
+t_list *rcv_entries_per_levels(int client_socket, int *id_process);
+
+/**
+ * @brief Envía al cliente los valores de configuración actuales de la memoria.
+ *
+ * Esta función construye y envía un paquete al cliente a través del socket especificado,
+ * conteniendo los parámetros principales de configuración de la memoria: tamaño de página,
+ * cantidad de entradas por tabla y cantidad de niveles en el esquema de paginación multinivel.
+ *
+ * @param client_socket Descriptor del socket del cliente al cual se enviarán los datos.
+ *
+ * @details
+ * El paquete enviado tiene el código de operación `MEMORY_CONFIG` e incluye:
+ * - Tamaño de página (`TAM_PAGINA`)
+ * - Cantidad de entradas por tabla de páginas (`ENTRADAS_POR_TABLA`)
+ * - Cantidad de niveles de paginación (`CANTIDAD_NIVELES`)
+ *
+ * Esta información permite al cliente conocer la estructura y límites de la memoria
+ * administrada por el sistema.
+ */
+void send_values_memory(int client_socket);
 
 #endif // MEMORIA_PROTOCOLS_H

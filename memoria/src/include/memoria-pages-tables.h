@@ -131,21 +131,4 @@ int find_frame_from_entries(int id_process, t_list *entries_per_level);
  */
 t_list *get_root_table(int id_process);
 
-
-/**
- * @brief Resuelve el número de frame físico a partir de una dirección física.
- *
- * Determina el frame físico correspondiente a una dirección dada, considerando si la
- * dirección incluye un offset (cuando hay N+1 niveles). En ese caso, el offset se
- * extrae y se retorna por parámetro, y el frame se calcula a partir de las entradas.
- * Si no hay offset, se asume que el primer elemento de la lista ya es el frame.
- *
- * @param id_process Identificador del proceso que accede a la memoria.
- * @param physical_address Lista de entradas que representan la dirección física.
- *                         Puede contener N entradas o N+1 si incluye offset.
- * @param offeset Puntero a entero donde se almacenará el offset, si aplica.
- * @return Número de frame físico correspondiente a la dirección.
- */
-int resolve_physical_frame(int id_process, t_list *physical_address, int *offeset);
-
 #endif

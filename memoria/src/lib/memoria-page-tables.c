@@ -115,19 +115,3 @@ t_list *get_root_table(int id_process) {
     // Obtenemos la tabla de páginas raíz asociada al proceso desde el diccionario global
     return dictionary_get(all_process_page_tables, key_id_process);
 }
-
-int resolve_physical_frame(int id_process, t_list *physical_address, int *offeset) {
-    // Cantidad de entradas en la dirección física
-    int size_physical_address = list_size(physical_address);
-    int total_levels = config_memoria->CANTIDAD_NIVELES;
-    int frame;
-
-    // Si la dirección tiene un offset incluido (tiene N+1 niveles)
-    if (total_levels + 1 == size_physical_address) {
-        *offeset = list_remove(physical_address, size_physical_address - 1);
-        frame = find_frame_from_entries(id_process, physical_address);
-    } else 
-        frame = list_get(physical_address, 0); // Caso base: la dirección ya contiene el número de frame directamente
-
-    return frame;
-}
