@@ -34,6 +34,8 @@ t_proceso* recibir_proceso(){
     free(buffer->stream);
     free(buffer);
 
+    log_info(logger, "Llego PID %d con MILISEGUNDOS %d ",proceso->pid,proceso->milisegundos);
+
     return proceso;
 }
 

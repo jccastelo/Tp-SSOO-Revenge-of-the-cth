@@ -57,7 +57,7 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->execute += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->EXECUTE));
         
-        cambiar_estado(queue_FIFO, process, planner->queue_EXECUTE);
+        cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->queue_EXECUTE);
 
         temporal_resume(process->estimaciones_SJF->rafagaReal);
 
@@ -128,7 +128,7 @@ void queue_process(t_pcb* process, int estado){
         else{log_info(logger, "Error al pasar proceso a exit");}
         
         traer_proceso_a_MP();
-        log_info(logger , "NO mas porcesos por traer a mp desde exit");
+        log_info(logger , "NO mas procesos por traer a mp desde exit");
         break;
     }
 }

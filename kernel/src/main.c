@@ -2,14 +2,14 @@
 
 int main(int argc, char *argv[]) {
 
-    /*
+    
     if (argc < 3) {
         fprintf(stderr, "Uso: %s <archivoProceso> <Tamanio_prco>\n", argv[0]);
         return 1;
-    }*/
+    }
 
-    char *archivo_pseudocodigo = "test.txt";
-    int Tamanio_proc = 32;
+    char *archivo_pseudocodigo = argv[1];
+    int Tamanio_proc =  atoi(argv[2]);
 
 
     // Inicializamos un logger
@@ -31,6 +31,7 @@ int main(int argc, char *argv[]) {
     log_info(logger,"ESta escuchadno");
 
     // //Nos conectamos a la memoria como clientes
+
     kernel_memory_connection();
 
     log_info(logger, "Esperando conexion de alguna CPU para iniciar primer proceso...");

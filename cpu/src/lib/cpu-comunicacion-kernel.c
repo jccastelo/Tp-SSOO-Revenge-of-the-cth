@@ -60,7 +60,10 @@ void enviar_contexto_desalojo() {
 
 void syscall_io(char* dispositivo, int tiempo) {
     t_paquete* paquete = crear_paquete(IO);
-    agregar_a_paquete(paquete, dispositivo, strlen(dispositivo) + 1);
+
+    int longitudNombre = strlen(dispositivo) +1;
+    agregar_a_paquete(paquete,&longitudNombre,sizeof(int));
+    agregar_a_paquete(paquete, dispositivo, longitudNombre);
     agregar_a_paquete(paquete, &tiempo, sizeof(int));
     agregar_contexto_al_paquete(paquete);
     enviar_paquete(paquete, socket_dispatch);
@@ -87,6 +90,7 @@ void syscall_exit() {
 }
 
 void agregar_contexto_al_paquete(t_paquete* paquete) {
+    contexto->pc = contexto->pc +1;
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
     agregar_a_paquete(paquete, &contexto->pc, sizeof(int));
 }

@@ -22,7 +22,9 @@ int main(int argc, char *argv[]) {
     
 
    
-
-    ciclo_de_io();
+    while (1)
+    {
+        ciclo_de_io();
+    }
 
  }

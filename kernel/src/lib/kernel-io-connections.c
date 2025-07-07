@@ -26,11 +26,18 @@ void gestionar_io(t_buffer *buffer)
     int pid_a_io; // Solo necesito el pid del proces
 
     memcpy(&pid_a_io, buffer->stream + desplazamiento, sizeof(int));
+    desplazamiento += sizeof(int);
+
+    //Busco el PC
+    int pc_PID;
+    memcpy(&pc_PID, buffer->stream + desplazamiento, sizeof(int));
 
     t_pcb* process = list_get(list_procesos->cola,pid_a_io);
+
+    process->pc =pc_PID;
     temporal_stop(process->estimaciones_SJF->rafagaReal);
 
-    log_info(logger,"## %d - Bloqueado por IO: %s", process->pid,ioNombre);
+    log_info(logger,"## PID: %d - Bloqueado por IO: %s", process->pid,ioNombre);
     queue_process(process, BLOCKED);
 
 
