@@ -47,7 +47,7 @@ void leer(int direccion_logica, int tamanio) {
     }
     
     resultado[tamanio] = '\0';
-    // TODO -> LOG DE RESULTADO
+    log_info(logger, "LEI %s", resultado); //TODO HACER ESTE LOG BIEN
 
     free(resultado);
     free(traduccion);
@@ -66,6 +66,8 @@ void escribir(int direccion_logica, char* contenido) {
         int dir_fisica = obtener_direccion_fisica(direccion_logica);
         escribir_en_memoria_desde(dir_fisica, contenido);
     }
+
+    log_info(logger, "escribí %s", contenido);
 
     free(traduccion);
 }

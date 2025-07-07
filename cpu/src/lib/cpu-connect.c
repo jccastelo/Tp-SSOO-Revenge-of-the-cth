@@ -19,6 +19,7 @@ void set_socket_kernel_dispatch(int socket) {
     // Enviamos el handshake al kernel:
     generar_handshake(socket_dispatch, "Kernel DISPATCH");
     enviar_id_cpu(socket_dispatch); // Post handshake, envía a KERNEL su ID
+    enviar_socket_interrupt(socket_dispatch);
 }
 
 void set_socket_kernel_interrupt(int socket) {
@@ -27,7 +28,6 @@ void set_socket_kernel_interrupt(int socket) {
     
     // Enviamos el handshake al kernel interrupt:
     generar_handshake(socket_interrupt, "Kernel INTERRUPT");
-    enviar_id_cpu(socket_interrupt);
 }
 
 void set_socket_memoria(int socket) {
@@ -47,10 +47,11 @@ void enviar_id_cpu(int socket) {
 }
 
 void init_estructura_memoria() {
-    int cod_op = MEMORY_CONFIG;
-    log_info(logger,"ANTES DE SEND A MEMORIA INIT");
-    send(socket_memoria, &cod_op, sizeof(int), 0);
-    log_info(logger, "YA ENVIE EL MENSAJE");
+
+    send(socket_memoria, (void*) MEMORY_CONFIG, sizeof(int), MSG_WAITALL);
+
+    int cod_op;
+
     t_buffer* new_buffer = malloc(sizeof(t_buffer));
     new_buffer->size = 0;
     new_buffer->stream = NULL;
