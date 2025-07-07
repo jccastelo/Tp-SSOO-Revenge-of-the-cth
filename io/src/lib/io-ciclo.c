@@ -6,8 +6,8 @@ void ciclo_de_io(){
 
     pid_proceso_Actual = proceso->pid;
 
-    usleep(proceso->milisegundos);
-
+    usleep(proceso->milisegundos * 1000);
+    //sleep(600);
     notificar_liberacion(proceso);
 
     free(proceso);

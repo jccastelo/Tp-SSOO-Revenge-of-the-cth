@@ -161,6 +161,9 @@ void enviar_proceso_io(int io_socket)
 
                     send(io_socket, &pid_y_milisegundos->size, sizeof(int), 0);
                     send(io_socket, pid_y_milisegundos->stream, pid_y_milisegundos->size, 0);
+                    
+                    memcpy(&(io->proceso), pid_y_milisegundos->stream, sizeof(int));
+                    
                     free(pid_y_milisegundos);
                 }
 
@@ -285,4 +288,23 @@ void recibir_io(t_buffer* buffer, int socket) {
 
         log_info(logger, "Llego una Nueva IO de nombre %s Y SOCKET: %d ", ioNueva->nombre,nueva_instancia_io->socket );
     }   
+}
+
+void actualizarIO_a_libre(int pid_desbloqueo) {
+
+    for (int i = 0; i < list_size(list_ios->cola); i++)
+    {
+        t_IO *ios = list_get(list_ios->cola, i);
+
+        for (int j = 0; j < list_size(ios->instancias_IO->cola); j++)
+        {
+            t_IO_instancia *io = list_get(ios->instancias_IO->cola, j);
+
+            if (io->proceso == pid_desbloqueo)
+            {
+                io->proceso = -1;
+                return;
+            }
+        }
+    }
 }

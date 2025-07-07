@@ -26,6 +26,9 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
         case DESBLOQUEO_IO:
             // REcibo el pid (no hace falta paquete)
             int pid_desbloqueo = recibir_pid(new_buffer, io_socket);
+
+            actualizarIO_a_libre(pid_desbloqueo);
+
             // Reviso la cola de bloqueados de esa IO, si hay alguno lo mando
             enviar_proceso_io(io_socket);
 
