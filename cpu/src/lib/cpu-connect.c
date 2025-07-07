@@ -48,9 +48,10 @@ void enviar_id_cpu(int socket) {
 
 void init_estructura_memoria() {
 
-    send(socket_memoria, (void*) MEMORY_CONFIG, sizeof(int), MSG_WAITALL);
-
-    int cod_op;
+    int cod_op = MEMORY_CONFIG;
+    log_info(logger,"ANTES DE SEND A MEMORIA INIT");
+    send(socket_memoria, &cod_op, sizeof(int), 0);
+    log_info(logger, "YA ENVIE EL MENSAJE");
 
     t_buffer* new_buffer = malloc(sizeof(t_buffer));
     new_buffer->size = 0;
