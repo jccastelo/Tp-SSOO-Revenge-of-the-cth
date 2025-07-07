@@ -62,7 +62,7 @@ void syscall_io(char* dispositivo, int tiempo) {
     t_paquete* paquete = crear_paquete(IO);
 
     int longitudNombre = strlen(dispositivo) +1;
-    agregar_a_paquete(paquete,&longitudNombre,sizeof(int));
+    agregar_a_paquete(paquete, &longitudNombre, sizeof(int));
     agregar_a_paquete(paquete, dispositivo, longitudNombre);
     agregar_a_paquete(paquete, &tiempo, sizeof(int));
     agregar_contexto_al_paquete(paquete);
@@ -71,9 +71,12 @@ void syscall_io(char* dispositivo, int tiempo) {
 
 void syscall_init_proc(char* archivo, int tamanio) {
     t_paquete* paquete = crear_paquete(INIT_PROC);
-    agregar_a_paquete(paquete, archivo, strlen(archivo) + 1);
+
+    int longitudNombre = strlen(archivo) +1;
+    agregar_a_paquete(paquete, &longitudNombre, sizeof(int));
+    agregar_a_paquete(paquete, archivo, longitudNombre);
     agregar_a_paquete(paquete, &tamanio, sizeof(int));
-    agregar_contexto_al_paquete(paquete);
+    // agregar_contexto_al_paquete(paquete);
     enviar_paquete(paquete, socket_dispatch);
 }
 

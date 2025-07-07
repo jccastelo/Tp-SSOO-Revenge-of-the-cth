@@ -2,7 +2,9 @@
 
 int main(int argc, char *argv[]) {
 
-    
+    // Inicializamos un logger
+    logger = log_create("kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
+
     char *archivo_pseudocodigo;
     int Tamanio_proc;
 
@@ -10,20 +12,14 @@ int main(int argc, char *argv[]) {
         //fprintf(stderr, "Uso: %s <archivoProceso> <Tamanio_prco>\n", argv[0]);
         //return 1;
         log_warning(logger, "INICIALIZADO EN MODO DEFAULT");
-        archivo_pseudocodigo = "IOtest.txt"; //PARA DEBUG O POR DEFAULT
-        Tamanio_proc = 2;
+        archivo_pseudocodigo = "test2CPUSIO.txt"; //PARA DEBUG O POR DEFAULT
+        Tamanio_proc = 0;
     } else {
         archivo_pseudocodigo = argv[1];
         Tamanio_proc = atoi(argv[2]);
     }
 
     
-    
-
-
-    // Inicializamos un logger
-    logger = log_create("kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
-
     // Inicializamos la configuración del kernel y los servidores:
     kernel_config_init();
     planner_init();
@@ -44,8 +40,12 @@ int main(int argc, char *argv[]) {
     kernel_memory_connection();
 
     log_info(logger, "Esperando conexion de alguna CPU para iniciar primer proceso...");
+   
     while(list_size(list_cpus->cola) == 0) {}
     log_info(logger, "Primera Cpu conectada");
+
+    log_info(logger, "Esperando CONFIRMACION para iniciar");
+    getchar();
 
     // INICIO PRIMER PROCESO
     init_fist_process(archivo_pseudocodigo,Tamanio_proc);

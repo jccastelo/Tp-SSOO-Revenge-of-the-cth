@@ -3,6 +3,7 @@
 
 //Librerias externas
 #include <utils/logger.h>
+#include <unistd.h>
 
 //Librerias internas
 #include "cpu-state.h"

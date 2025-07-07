@@ -66,10 +66,11 @@ void recibir_y_crear_proceso(t_buffer *buffer){
 
 void cargar_proceso(t_pcb* process, t_buffer* buffer){
     
+    log_warning(logger, "CARGANDO PROCESO");
 	int desplazamiento = 0;
     // Copiamos el tamanio del nombre
     int tamanio_nombre=0;
-    memcpy(&tamanio_nombre, buffer->stream+ desplazamiento, sizeof(int));
+    memcpy(&tamanio_nombre, buffer->stream + desplazamiento, sizeof(int));
     desplazamiento += sizeof(int);
 
     // Copiamos el nombre del archivo

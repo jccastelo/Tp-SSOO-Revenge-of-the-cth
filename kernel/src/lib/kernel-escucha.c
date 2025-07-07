@@ -134,8 +134,8 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             mandar_procesos_a_execute();
         break;
         case INIT_PROC:
-            recibir_y_crear_proceso(new_buffer);
             log_info(logger,"Se recibio la syscall INIC_PROC desde el server %s",server_name);
+            recibir_y_crear_proceso(new_buffer);
             break;
         case DUMP_MEMORY:
             t_pcb* process = recibir_proceso(new_buffer);

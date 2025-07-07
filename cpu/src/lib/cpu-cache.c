@@ -29,6 +29,9 @@ bool cache_habilitada() {
 }
 
 int buscar_pagina_cache(int pagina) {
+
+    usleep(config_cpu->RETARDO_CACHE * 1000);
+
     for (int i=0; i < config_cpu->ENTRADAS_CACHE; i++) {
         if (!cache[i].libre && cache[i].pagina == pagina) {
             cache[i].bit_uso = 1;
