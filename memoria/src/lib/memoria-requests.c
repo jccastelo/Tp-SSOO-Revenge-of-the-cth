@@ -83,42 +83,32 @@ void remove_suspend_process(int client_socket) {
     
     int pid = rcv_only_pid(client_socket);
     char* pid_key = string_itoa(pid);
-
-    aumentar_contador(metricas_por_procesos,SWAP_IN_REQUESTS,pid_key) ;
-    aumentar_contador(metricas_por_procesos,SWAP_OUT_REQUESTS, pid_key);
-    aumentar_contador(metricas_por_procesos, MEM_WRITE_REQUESTS,pid_key);
-
-    t_list* metadata_swap = remove_marcos_list_of_proc(pid_key , diccionario_swap_metadata);
-
-    int cant_paginas = list_size(metadata_swap);
-    t_list* marcos_libres = is_memory_sufficient(cant_paginas * config_memoria->TAM_PAGINA);
-
-    if (!marcos_libres) {
-        log_error(logger, "No hay memoria suficiente para reanudar proceso %d", pid);
-        list_destroy(metadata_swap);
-        free(pid_key);
-        return;
-    }
-
-    for (int i = 0; i < cant_paginas; i++) {
-        swap_entry_t* entrada = list_get(metadata_swap, i);
-        int frame_id = (int)(intptr_t)list_get(marcos_libres, i);
-
-        void* destino = espacio_usuario + frame_id * config_memoria->TAM_PAGINA;
-        fseek(archivo_swap, entrada->offset_swap, SEEK_SET);
-        fread(destino, config_memoria->TAM_PAGINA, 1, archivo_swap);
-
-        free(entrada);
-    }
-
-    t_list* tabla_paginas = list_create();
-    populate_page_table(marcos_libres, tabla_paginas);
-    dictionary_put(all_process_page_tables, pid_key, tabla_paginas);
-
-    list_destroy(metadata_swap);
-    list_destroy(marcos_libres);
+    swap_in(pid_key);
     free(pid_key);
     log_info(logger, "OK", pid);
+}
+
+void dump_process(client_socket){
+    int pid = rcv_only_pid(client_socket);
+    char* pid_key = string_itoa;
+    
+    
+    if(estaEn(all_process_page_tables,pid_key)== false){
+        log_info(logger , "el proceso &d no está en memoria", pid);
+        log_info(logger, "buscando el proceso%d en swap", pid);
+        if(estaEn(diccionario_swap_metadata, pid_key)== false){
+            log_error(logger, "el proceso%d no existe", pid);
+            return;
+        }
+        swap_in(pid_key); 
+    }
+    //crear archivo
+    //abrir el archivo para escritura binaria 
+    //recorrer todas las paginas del proceso y cargarlas en el archivo 
+    //cerrar el arhivo y liberar recursos auxiliares 
+    //eliminar estructuras si es un dump final
+
+
 }
 
 

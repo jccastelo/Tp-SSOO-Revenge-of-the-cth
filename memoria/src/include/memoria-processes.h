@@ -46,7 +46,16 @@ t_process_in_memory *initialization_process();
  *
  * @param id_process Identificador único del proceso a agregar.
  */
-void add_process_to_memory(int id_process);
+void add_process_to_memory(int id_process); 
+
+/**
+ * @brief Se fija si ese proceso está dentro del diccionario, 
+ * si la longitud de marcos que contiene su subtabla es NULL retorna falso
+ * 
+ * @param key_pid es el char del proceso 
+ * @param diccionario es la fuente donde busca el pid
+ */
+bool estaEn(t_list* diccionario, char* key_pid);
 
 /**
  * @brief Calcula la cantidad de frames necesarios para alojar un proceso en memoria.

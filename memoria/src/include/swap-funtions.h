@@ -50,4 +50,28 @@ t_list* remove_marcos_list_of_proc(char* pid_key , t_dictionary *diccionario_swa
  * 
  * Cierra el archivo "swap.bin" si está abierto y libera la memoria del diccionario global de metadata.
  */
-void finalizar_swap();
+void finalizar_swap(); 
+
+
+/**
+ * @brief Realiza el swap in de todas las páginas de un proceso desde el archivo de swap
+ *        a la memoria principal. Reconstituye la tabla de páginas del proceso con los marcos
+ *        recién asignados y actualiza las métricas correspondientes.
+ *
+ * @param pid_key Clave (como string) que identifica al proceso cuyo contenido debe traerse
+ *                desde swap a memoria. Debe coincidir con la clave usada en las estructuras
+ *                del sistema como el diccionario de swap o de tablas de páginas.
+ *
+ * Este procedimiento implica:
+ *  - Incrementar los contadores de métricas relacionadas a swap in, swap out y escritura.
+ *  - Obtener y remover la metadata del proceso desde el diccionario de swap.
+ *  - Verificar si hay suficiente memoria para cargar todas las páginas del proceso.
+ *  - Leer cada página desde el archivo de swap y escribirla en un marco libre.
+ *  - Crear una nueva tabla de páginas para el proceso con los marcos asignados.
+ *  - Registrar esta tabla en el diccionario global de procesos en memoria.
+ *  - Liberar los recursos auxiliares utilizados (listas de metadata y marcos).
+ *
+ * @note En caso de no haber suficiente memoria disponible, se aborta el swap in
+ *       y se libera la metadata asociada al intento.
+ */
+void swap_in(char* pid_key)

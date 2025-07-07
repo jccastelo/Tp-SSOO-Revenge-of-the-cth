@@ -31,6 +31,9 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
             remove_suspend_process(client_socket);
             
         break;
+        case DUMP_MEMORY:
+            dump_process(client_socket);
+        break;
         //case FINALIZAR:
           //  finish_process(client_socket);
         //break;

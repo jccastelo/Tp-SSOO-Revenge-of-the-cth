@@ -28,7 +28,15 @@ int required_frames_for_process(int size_process) {
     int tam_pagina = config_memoria->TAM_PAGINA;
     return (size_process + tam_pagina - 1) / tam_pagina;
 } 
-
+bool estaEn(t_list* diccionario , char* pid_key){
+    t_list* lista_de_marcos = get_marcos_list_of_proc(pid_key, diccionario);
+    if(size(lista_de_marcos) == NULL){
+        list_destroy(lista_de_marcos);
+        return true;
+    }
+    list_destroy(lista_de_marcos);
+    return false;
+}
 
 
 void aumentar_contador(t_dictionary* dictionary, t_campo campo, char* pid_key) {
