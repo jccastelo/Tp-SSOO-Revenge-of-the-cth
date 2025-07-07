@@ -1,21 +1,35 @@
 #include "include/kernel-cpus-connections.h"
 
-void iniciar_cpu(t_buffer *buffer,int socket_cliente)
+void iniciar_cpu(t_buffer *buffer,int socket_cliente, int dispatch_o_interrupt)
 {
-    t_cpu *cpu = cpu_init();
+    int id;
+    memcpy(&id, buffer->stream, sizeof(int));
 
-    cpu->socket_dispatch = socket_cliente;
+    t_cpu* cpu = buscar_cpu_con_id(id);
 
-    int desplazamiento = 0;
+    if(cpu != NULL){
 
-    memcpy(&cpu->id, buffer->stream + desplazamiento, sizeof(int));
-    desplazamiento += sizeof(int);
+        if(dispatch_o_interrupt = 1) { // 1 dispatch - 0 interrupt
+            memcpy(&cpu->socket_dispatch, socket_cliente, sizeof(int));
+        } else {
+            memcpy(&cpu->socket_interrupt, socket_cliente, sizeof(int));            
+        }
 
-    memcpy(&cpu->socket_interrupt, buffer->stream + desplazamiento, sizeof(int));
+    } else {
+        
+        t_cpu *cpu = cpu_init();
 
-    log_info(logger, "Llego cpu. ID: %d", cpu->id);
-    list_add(list_cpus->cola, cpu);
+        cpu->id = id;
 
+        if(dispatch_o_interrupt = 1) {
+            memcpy(&cpu->socket_dispatch, socket_cliente, sizeof(int));
+        } else {
+            memcpy(&cpu->socket_interrupt, socket_cliente, sizeof(int));            
+        }
+
+        log_info(logger, "Llego cpu. ID: %d", cpu->id);
+        list_add(list_cpus->cola, cpu);
+    }
 }
 
 t_cpu *cpu_init(){
@@ -54,6 +68,22 @@ t_cpu* buscar_cpu_disponible(){
         t_cpu* cpu =list_get(list_cpus->cola,i);
 
         if(cpu->estado == DISPONIBLE)
+        {
+            log_info(logger,"CPu asignada a proceso");
+            return cpu;
+        }
+    }
+
+    return NULL;
+}
+
+t_cpu* buscar_cpu_con_id(int id){
+    
+    for(int i = 0; i< list_size(list_cpus->cola) ; i++)
+    {   
+        t_cpu* cpu =list_get(list_cpus->cola,i);
+
+        if(cpu->id == id)
         {
             log_info(logger,"CPu asignada a proceso");
             return cpu;
