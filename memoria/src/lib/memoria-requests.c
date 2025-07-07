@@ -40,6 +40,7 @@ void access_to_page_tables(int client_socket) {
 
     // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
     int searched_frame = find_frame_from_entries(id_process, entries_per_levels);
+    log_info(logger, "PID: %d - Frame encontrado: %d", id_process, searched_frame);
 
     // Enviar el frame encontrado al cliente que lo solicitó, y liberamos memoria
     send(client_socket, &searched_frame, sizeof(int), 0);

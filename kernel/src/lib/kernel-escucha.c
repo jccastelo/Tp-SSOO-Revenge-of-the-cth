@@ -34,10 +34,10 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
 
             //Si esta en block va a ready, sino a readysuspended
             if(process->queue_ESTADO_ACTUAL->cola == planner->long_term->queue_BLOCKED->cola) 
-            {   log_info(logger,"## %d finalizó IO y pasa a READY",process->pid);
+            {   log_info(logger,"## PID: %d finalizó IO y pasa a READY",process->pid);
                 queue_process(process, READY);}
 
-            else {log_info(logger,"## %d finalizó IO y pasa a READY_SUSPENDED",process->pid);
+            else {log_info(logger,"## PID: %d finalizó IO y pasa a READY_SUSPENDED",process->pid);
                 queue_process(process, READY_SUSPENDED); }
         break;
         case FIN_CONEXION_DE_IO:
@@ -65,6 +65,13 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
 
 void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *server_name) {
    
+    if (operation == HANDSHAKE) {
+        log_info(logger,"LLego op handssake");
+        recibir_handshake(cpu_socket);
+        log_info(logger,"Coonexion interrupt lista");
+        return;
+    }
+
     t_buffer* new_buffer = malloc(sizeof(t_buffer));
     new_buffer->size = 0;
     new_buffer->stream = NULL;
@@ -73,12 +80,6 @@ void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *
         {
             new_buffer->stream = recibir_buffer(&new_buffer->size, cpu_socket);
         }
-
-    if (operation == HANDSHAKE) {
-        log_info(logger,"LLego op handssake");
-        recibir_handshake(cpu_socket);
-        log_info(logger,"Coonexion interrupt lista");
-    }
 
     switch(operation) {
         case CPU_ID:
@@ -116,6 +117,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
     switch(operation) {
         case CPU_ID:
             log_info(logger, "Llego cpu para identificarse" );
+            log_info(logger, "CPU SOCKET %d ", cpu_socket);
             iniciar_cpu(new_buffer,cpu_socket, 1);
             log_info(logger,"Se recibio la ID de la CPU desde el server %s",server_name);
             break;

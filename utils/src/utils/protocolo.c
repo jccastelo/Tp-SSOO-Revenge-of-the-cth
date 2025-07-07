@@ -51,7 +51,7 @@ void eliminar_paquete(t_paquete* paquete) {
 }
 
 void* recibir_buffer(int* size, int socket_cliente) {
-	void * buffer;
+	void *buffer;
 
 	recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
 	buffer = malloc(*size);

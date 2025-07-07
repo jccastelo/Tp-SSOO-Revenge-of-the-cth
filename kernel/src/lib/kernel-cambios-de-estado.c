@@ -8,7 +8,7 @@ void queue_process(t_pcb* process, int estado){
     {
     case NEW:
        
-        log_info(logger,"## %d Se crea el proceso - Estado: NEW", process->pid);
+        log_info(logger,"## PID: %d Se crea el proceso - Estado: NEW", process->pid);
         
         process->metricas_de_estado->new += 1;
         temporal_resume(process->metricas_de_tiempo->NEW);
@@ -20,15 +20,18 @@ void queue_process(t_pcb* process, int estado){
            (list_size(planner->long_term->queue_NEW->cola) == 1 || // Si es el unico en la cola => se le pregunta a memoria si puede entrar
            (get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP && list_get(planner->long_term->queue_NEW->cola,0) == process))) // Sino, en el caso de PMCP => si esta primero le pregunta a memoria
             {
+              
                 if(solicitar_a_memoria(memoria_init_proc, process))
-                queue_process(process, READY);
+                {
+                    queue_process(process, READY);
+                }
             }
 
         break;
 
     case READY:
         
-        log_info(logger,"## %d Pasa del estado %s al estado READY",process->pid,estadoActual);
+        log_info(logger,"## PID: %d Pasa del estado %s al estado READY",process->pid,estadoActual);
         
         process->metricas_de_estado->ready += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY));
@@ -49,7 +52,7 @@ void queue_process(t_pcb* process, int estado){
 
     case EXECUTE:
        
-        log_info(logger,"## %d Pasa del estado %s al estado EXECUTE",process->pid,estadoActual);
+        log_info(logger,"## PID: %d Pasa del estado %s al estado EXECUTE",process->pid,estadoActual);
 
         process->metricas_de_estado->execute += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->EXECUTE));
@@ -62,6 +65,7 @@ void queue_process(t_pcb* process, int estado){
         if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
         {
             enviar_proceso_cpu(cpu_a_ocupar->socket_dispatch, process);
+            log_info(logger, "Socket de CPU %d ocupado por el proceso %d", cpu_a_ocupar->socket_dispatch, process->pid);
             log_info(logger, "Se envio proceso a cpu %d", cpu_a_ocupar->id);
             
         } else {
@@ -70,7 +74,7 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case BLOCKED:
-        log_info(logger,"## %d Pasa del estado %s al estado BLOCKED",process->pid,estadoActual);
+        log_info(logger,"## PID: %d Pasa del estado %s al estado BLOCKED",process->pid,estadoActual);
 
         process->metricas_de_estado->blocked += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED));
@@ -83,7 +87,7 @@ void queue_process(t_pcb* process, int estado){
 
     case BLOCKED_SUSPENDED:
         
-        log_info(logger,"## %d Pasa del estado %s al estado BLOCKED_SUSPENDED",process->pid,estadoActual);
+        log_info(logger,"## PID: %d Pasa del estado %s al estado BLOCKED_SUSPENDED",process->pid,estadoActual);
 
         process->metricas_de_estado->blocked_suspended += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED_SUSPENDED));
@@ -97,7 +101,7 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case READY_SUSPENDED:
-        log_info(logger,"## %d Pasa del estado %s al estado READY_SUSPENDED",process->pid,estadoActual);
+        log_info(logger,"## PID: %d Pasa del estado %s al estado READY_SUSPENDED",process->pid,estadoActual);
 
         process->metricas_de_estado->ready_suspended += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY_SUSPENDED));
@@ -108,9 +112,9 @@ void queue_process(t_pcb* process, int estado){
     case EXIT:
        
 
-        log_info(logger,"## %d Pasa del estado %s al estado EXIT",process->pid,estadoActual);
+        log_info(logger,"## PID: %d Pasa del estado %s al estado EXIT",process->pid,estadoActual);
 
-        log_info(logger,"## %d - Finaliza el proceso",process->pid);
+        log_info(logger,"## PID: %d - Finaliza el proceso",process->pid);
         
         process->metricas_de_estado->exit += 1;
         temporal_stop(process->metricas_de_tiempo->metrica_actual);

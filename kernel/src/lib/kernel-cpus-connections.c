@@ -9,10 +9,10 @@ void iniciar_cpu(t_buffer *buffer,int socket_cliente, int dispatch_o_interrupt)
 
     if(cpu != NULL){
 
-        if(dispatch_o_interrupt = 1) { // 1 dispatch - 0 interrupt
-            memcpy(&cpu->socket_dispatch, socket_cliente, sizeof(int));
+        if(dispatch_o_interrupt == 1) { // 1 dispatch - 0 interrupt
+            memcpy(&cpu->socket_dispatch, &socket_cliente, sizeof(int));
         } else {
-            memcpy(&cpu->socket_interrupt, socket_cliente, sizeof(int));            
+            memcpy(&cpu->socket_interrupt, &socket_cliente, sizeof(int));            
         }
 
     } else {
@@ -21,10 +21,10 @@ void iniciar_cpu(t_buffer *buffer,int socket_cliente, int dispatch_o_interrupt)
 
         cpu->id = id;
 
-        if(dispatch_o_interrupt = 1) {
-            memcpy(&cpu->socket_dispatch, socket_cliente, sizeof(int));
+        if(dispatch_o_interrupt == 1) {
+            memcpy(&cpu->socket_dispatch, &socket_cliente, sizeof(int));
         } else {
-            memcpy(&cpu->socket_interrupt, socket_cliente, sizeof(int));            
+            memcpy(&cpu->socket_interrupt, &socket_cliente, sizeof(int));            
         }
 
         log_info(logger, "Llego cpu. ID: %d", cpu->id);
@@ -96,14 +96,18 @@ t_cpu* buscar_cpu_con_id(int id){
 void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
     
     t_paquete* paquete = crear_paquete(CONTEXT_PROCESS); 
-    crear_buffer(paquete);
 
     agregar_a_paquete(paquete, &process->pid, sizeof(int));
     agregar_a_paquete(paquete, &process->pc, sizeof(int));
 
+    log_info(logger," CPU SOXET  %d", cpu_socket);
     enviar_paquete(paquete, cpu_socket);
 
     eliminar_paquete(paquete);
+    //int cod_op = CONTEXT_PROCESS;
+    //send(cpu_socket, &cod_op, sizeof(int), 0);
+    //send(cpu_socket, &process->pid, sizeof(int), 0);
+    //send(cpu_socket, &process->pc, sizeof(int), 0);
 
     set_cpu(cpu_socket, EJECUTANDO);
 }
@@ -111,7 +115,7 @@ void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
 void desalojar_proceso(t_cpu* cpu){
     
     t_paquete* paquete = crear_paquete(INTERRUPT); // NO SE SI ESTE CODIGO DE OPERACION ESTA BIEN
-    crear_buffer(paquete);
+    
 
     enviar_paquete(paquete, cpu->socket_interrupt);
 }

@@ -87,10 +87,18 @@ t_list *rcv_entries_per_levels(int client_socket, int *id_process) {
 }
 
 void send_values_memory(int client_socket) {
+    // Enviamos la configuración de memoria al cliente.
     t_paquete *values_packages = crear_paquete(MEMORY_CONFIG);
+
+    // Agregamos los valores de configuración de memoria al paquete.
     agregar_a_paquete(values_packages, &config_memoria->TAM_PAGINA, sizeof(int));
     agregar_a_paquete(values_packages, &config_memoria->ENTRADAS_POR_TABLA, sizeof(int));
     agregar_a_paquete(values_packages, &config_memoria->CANTIDAD_NIVELES, sizeof(int));
+
+    log_info(logger, "Enviando configuración de memoria al cliente: Tamaño de página: %d, Entradas por tabla: %d, Cantidad de niveles: %d",
+             config_memoria->TAM_PAGINA, config_memoria->ENTRADAS_POR_TABLA, config_memoria->CANTIDAD_NIVELES);
+
+    // Enviamos el paquete con los valores de configuración de memoria al cliente.
     enviar_paquete(values_packages, client_socket);
     eliminar_paquete(values_packages);
 }

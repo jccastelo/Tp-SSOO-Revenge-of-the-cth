@@ -40,7 +40,7 @@ typedef enum {
 } op_code;
 
 typedef enum {
-	OK = 0,
+	OK = 2,
 	ERROR = -1,
 	HANDSHAKE_OK = 1,
 	HANDSHAKE_ERROR = -2

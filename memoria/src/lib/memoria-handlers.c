@@ -24,6 +24,10 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
         case READ_MEM:
             read_in_user_spaces(client_socket);
         break;
+        case MEMORY_CONFIG:
+            log_info(logger,"QIESO");
+            send_values_memory(client_socket);
+        break;
         // Otros casos de operaciones pueden ir aquí.
         default:
             log_warning(logger, "Operación desconocida: %d", operation);

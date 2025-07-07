@@ -44,21 +44,19 @@ int pedir_marco_a_memoria(t_traduccion *traduccion) {
     int frame;
     int desplazamiento = 0;
 
-    t_buffer* new_buffer = malloc(sizeof(t_buffer));
-    new_buffer->size = 0;
-    new_buffer->stream = NULL;
 
-    cod_op = recibir_operacion(socket_memoria);
-    
-    if (cod_op == RETURN_FRAME)
-    {
-        new_buffer->stream = recibir_buffer(&new_buffer->size, socket_memoria);
-        memcpy(&(frame), new_buffer->stream + desplazamiento, sizeof(int));
-    }
-    else
-        log_error(logger, "error deserializando el frame proveniente de memoria.");
+    // t_buffer* new_buffer = malloc(sizeof(t_buffer));
+    // new_buffer->size = 0;
+    // new_buffer->stream = NULL;
 
-    free(new_buffer);
+    recv(socket_memoria, &frame, sizeof(int), 0);
+    // new_buffer->stream = recibir_buffer(&new_buffer->size, socket_memoria);
+    // memcpy(&(frame), new_buffer->stream + desplazamiento, sizeof(int));
+
+    // else
+    //     log_error(logger, "error deserializando el frame proveniente de memoria.");
+
+    // free(new_buffer);
     log_info(logger, "PID: %d - OBTENER MARCO - Página: %d - Marco: %d", contexto->pid, traduccion->nro_pagina, frame);
     return frame;
 }
@@ -73,7 +71,7 @@ char* conseguir_contenido_frame(int frame) {
     new_buffer->stream = NULL;
 
     int cod_op = recibir_operacion(socket_memoria);
-    if (cod_op != RETURN_CONTENT) {
+    if (cod_op != OK) {
         log_error(logger, "Error al recibir el contenido del frame desde Memoria.");
         return NULL;
     }
@@ -93,6 +91,9 @@ void escribir_pagina_en_memoria(int frame, char* contenido) {
     agregar_a_paquete(paquete, &frame, sizeof(int));
     agregar_a_paquete(paquete, contenido, TAM_PAGINA);
     enviar_paquete(paquete, socket_memoria);
+
+    int respuesta;
+    recv(socket_memoria, respuesta, sizeof(int), 0);
 }
 
 char* leer_en_memoria_desde(int dir_fisica, int tamanio) {
@@ -103,7 +104,7 @@ char* leer_en_memoria_desde(int dir_fisica, int tamanio) {
     enviar_paquete(paquete, socket_memoria);
 
     int cod_op = recibir_operacion(socket_memoria);
-    if (cod_op != RETURN_CONTENT) {
+    if (cod_op != OK) {
         log_error(logger, "Error al recibir contenido parcial de memoria.");
     }
 
@@ -126,5 +127,7 @@ void escribir_en_memoria_desde(int dir_fisica, char* contenido) {
     agregar_a_paquete(paquete, &dir_fisica, sizeof(int));
     enviar_paquete(paquete, socket_memoria);
 
+    int respuesta;
+    recv(socket_memoria, &respuesta, sizeof(int), 0);
     //TODO CHECKEAR SI LO ESCIRBIO BIEN CON EL OK
 }
