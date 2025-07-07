@@ -1,7 +1,7 @@
 #include "../include/cpu-comunicacion-memoria.h"
 
 void conseguir_siguiente_instruccion() {
-    log_info(logger, "pidiendo la instruccion a memoria");
+    // log_info(logger, "pidiendo la instruccion a memoria");
     t_paquete* paquete = crear_paquete(GET_INSTRUCTION);
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
     agregar_a_paquete(paquete, &contexto->pc, sizeof(int));
@@ -23,9 +23,9 @@ char* devolver_instruccion_a_ejecutar() {
     if (cod_op == RETURN_INSTRUCCION)
     {
         new_buffer->stream = recibir_buffer(&new_buffer->size, socket_memoria);
-        log_info(logger, "deserializando la instruccion..");
+        // log_info(logger, "deserializando la instruccion..");
         parsear_string(new_buffer->stream, &desplazamiento , &instruccion);
-        log_info(logger, "Instruccion: %s", instruccion);
+        // log_info(logger, "Instruccion: %s", instruccion);
     }
     else
         log_error(logger, "error deserializando la instruccion que viene de memoria.");
@@ -40,9 +40,9 @@ int pedir_marco_a_memoria(t_traduccion *traduccion) {
     agregar_a_paquete(paquete, traduccion->entradas, sizeof(int) * CANTIDAD_NIVELES);
     enviar_paquete(paquete, socket_memoria);
 
-    int cod_op;
+    // int cod_op;
     int frame;
-    int desplazamiento = 0;
+    // int desplazamiento = 0;
 
 
     // t_buffer* new_buffer = malloc(sizeof(t_buffer));
@@ -95,7 +95,7 @@ void escribir_pagina_en_memoria(int frame, char* contenido) {
     enviar_paquete(paquete, socket_memoria);
 
     int respuesta;
-    recv(socket_memoria, respuesta, sizeof(int), 0);
+    recv(socket_memoria, &respuesta, sizeof(int), 0);
 }
 
 char* leer_en_memoria_desde(int dir_fisica, int tamanio) {

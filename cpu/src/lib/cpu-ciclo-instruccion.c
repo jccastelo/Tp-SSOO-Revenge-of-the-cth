@@ -34,7 +34,6 @@ char* fetch_instruction() {
 
 t_instruccion* decode(char* instruccion) {
     t_instruccion* instr = malloc(sizeof(t_instruccion));
-    log_info(logger, "Decodificando la siguiente instruccion.");
     char** palabras_instr = string_split(instruccion, " ");
     instr->argv = palabras_instr;
     instr->argc = string_array_size(palabras_instr);
@@ -45,7 +44,6 @@ t_instruccion* decode(char* instruccion) {
 void excecute(t_instruccion* instruccion) {
     char* parametros = concatenar_parametros(instruccion->argv, instruccion->argc);
     log_info(logger, "## PID: %d - Ejecutando: %s - %s", contexto->pid, instruccion->argv[0], parametros);
-    log_info(logger, "Instruccion:");
     free(parametros);
 
     if (instruccion->tipo != INSTR_GOTO)
@@ -54,7 +52,6 @@ void excecute(t_instruccion* instruccion) {
     switch (instruccion->tipo)
     {
     case INSTR_NOOP:
-        log_info(logger, "ESTOY EJECUTANDO UN NOOP :)");
         usleep(500000);
         break;
     case INSTR_WRITE: 
