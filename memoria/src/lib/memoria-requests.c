@@ -42,7 +42,7 @@ void send_process_instruction(int cliente_socket) {
     send_instruction_consumer(cliente_socket, id_process, program_counter, instruction);
 }
 
-// === Suspender Proceso ===
+
 void suspend_process(int client_socket) {
     
     int pid = rcv_only_pid(client_socket);
@@ -70,7 +70,7 @@ void suspend_process(int client_socket) {
         list_add(swap_metadata_proceso, entrada);
 
         bitarray_clean_bit(frames_bitmap, frame_id);
-        eliminar_marco_de_mega_arbol(frame_id);
+        eliminar_marco(frame_id,pid);
     }
 
     dictionary_put(diccionario_swap_metadata, pid_key, swap_metadata_proceso);
@@ -126,13 +126,33 @@ void remove_suspend_process(int client_socket) {
 
 
 void finish_process(int client_socket) {
-    // Inicializamos las variables necesaria para el proceso:
-    int id_process;
-    int resquest;
+
+    int pid = rcv_only_pid(client_socket);
+    char* pid_key = string_itoa(pid);
+
+    t_list* lista_de_marcos = dictionary_get(all_process_page_tables, pid_key);
+    if (lista_de_marcos) {
+        for (int i = 0; i < list_size(lista_de_marcos); i++) {
+            int frame_id = (int)(intptr_t)list_get(lista_de_marcos, i);
+            bitarray_clean_bit(frames_bitmap, frame_id);
+            eliminar_marco(frame_id, pid);
+        }
+        destruir_tabla_de_paginas(pid);
+    }
+
+    // 2. Eliminar metadata de swap
+    t_list* swap_metadata = dictionary_remove(diccionario_swap_metadata, pid_key);
+    if (swap_metadata) {
+        for (int i = 0; i < list_size(swap_metadata); i++) {
+            free(list_get(swap_metadata, i));
+        }
+        list_destroy(swap_metadata);
+    }
+    free(pid_key);
 
     // Llamos a la función que recibe y configura los valores necesarios para el proceso.
-    rcv_process_to_end(client_socket, &id_process);
-    log_info(logger, "Finalizar proceso: ## PID: %d", id_process);
+    //rcv_process_to_end(client_socket, &id_process);
+    //log_info(logger, "Finalizar proceso: ## PID: %d", id_process);
 
     // // Verificamos si el proceso ya ha finalizado o no:
     // if (is_process_end(id_process)) { // To Do: Verificar si el proceso ya ha finalizado, funcion que mezcla consulta y estado del proceso
@@ -144,6 +164,6 @@ void finish_process(int client_socket) {
     // }
 
     // Enviamos la respuesta al cliente:
-    log_info(logger, "Enviando respuesta al cliente: %d", resquest);
-    send(client_socket, &resquest, sizeof(resquest), 0);
+    //log_info(logger, "Enviando respuesta al cliente: %d", resquest);
+    //send(client_socket, &resquest, sizeof(resquest), 0);
 }

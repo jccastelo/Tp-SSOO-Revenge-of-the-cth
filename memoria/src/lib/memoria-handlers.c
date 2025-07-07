@@ -31,9 +31,9 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
             remove_suspend_process(client_socket);
             
         break;
-        // case FINALIZAR:
-        //  debería liberar las entradas de swap 
-        // break;
+        //case FINALIZAR:
+          //  finish_process(client_socket);
+        //break;
 
 
         // Otros casos de operaciones pueden ir aquí.

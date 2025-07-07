@@ -9,6 +9,8 @@
 #include "memoria-processes.h"
 #include "swap-funtions.h"
 #include "memoria-processes.h"
+#include "memoria-page-tables-operations.h"
+
 /**
  * @brief Inicializa un proceso en el servidor en respuesta a una solicitud del kernel.
  * 
@@ -32,6 +34,37 @@ void init_process(int client_socket);
  * 
  * @param cliente_socket El socket a través del cual se recibe la solicitud y se envía la instrucción.
  */
-void send_process_instruction(int cliente_socket);
+void send_process_instruction(int cliente_socket); 
+
+/**
+ * @brief Suspende un proceso, guardando su contenido de memoria principal en el archivo de swap.
+ *
+ * Se escriben todas las páginas del proceso en el archivo `swap.bin`, se libera la memoria real 
+ * (bitarray y tabla de páginas), y se guarda la metadata de swap en un diccionario para permitir
+ * su futura restauración.
+ *
+ * @param client_socket Socket del cliente que solicita la suspensión (usado para recibir el PID).
+ */
+void suspend_process(int client_socket);
+
+/**
+ * @brief Restaura un proceso suspendido, trayendo sus páginas desde el archivo de swap a memoria real.
+ *
+ * Se verifica si hay suficiente memoria disponible, se leen los contenidos del swap en marcos libres,
+ * se reconstruye la tabla de páginas y se actualiza el diccionario global.
+ *
+ * @param client_socket Socket del cliente que solicita la reanudación (usado para recibir el PID).
+ */
+void remove_suspend_process(int client_socket);
+
+/**
+ * @brief Finaliza un proceso, liberando todos sus recursos tanto en memoria real como en swap.
+ *
+ * Se eliminan las entradas de la tabla de páginas del proceso, se liberan los marcos que ocupaba,
+ * y se destruye la metadata de swap en caso de que el proceso estuviera suspendido.
+ *
+ * @param client_socket Socket del cliente que solicita la finalización (usado para recibir el PID).
+ */
+void finish_process(int client_socket);
 
 #endif // MEMORIA_REQUESTS_H

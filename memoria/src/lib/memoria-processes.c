@@ -35,7 +35,7 @@ void aumentar_contador(t_dictionary* dictionary, t_campo campo, char* pid_key) {
     t_process_in_memory* estructura = dictionary_get(dictionary, pid_key);
     if (!estructura) return;
 
-    switch (campo) {
+    switch(campo) {
         case TABLAS_REQUESTS:
             estructura->tablas_requests++;
             break;

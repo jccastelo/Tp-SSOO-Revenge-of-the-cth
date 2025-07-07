@@ -19,7 +19,7 @@ typedef struct {
 } t_process_in_memory;  
 
 typedef enum {
-    TABLAS_REQUEST,
+    TABLAS_REQUESTS,
     INSTRS_REQUESTS,
     SWAP_OUT_REQUESTS,
     SWAP_IN_REQUESTS,

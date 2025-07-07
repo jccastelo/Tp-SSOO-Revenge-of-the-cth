@@ -14,7 +14,7 @@ void recorrer_arbol_paginas(t_list* raiz, accion_sobre_nodo_t accion) {
     recorrer_arbol_rec(raiz, accion);
 }
 
-// === Eliminar marco del árbol de páginas ===
+
 void eliminar_marco(int frame_id, int pid) {
     int total_levels = config_memoria->CANTIDAD_NIVELES;
     int entries_per_level = config_memoria->ENTRADAS_POR_TABLA;
@@ -43,7 +43,6 @@ void eliminar_marco(int frame_id, int pid) {
     }
 }
 
-// === Destruir tabla de páginas ===
 void destruir_nodo(t_list* nodo) {
     for (int i = 0; i < list_size(nodo); i++) {
         void* elem = list_get(nodo, i);

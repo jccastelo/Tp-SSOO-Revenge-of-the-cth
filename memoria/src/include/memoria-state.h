@@ -9,7 +9,7 @@
 // Incluimos bibliotecas propias:
 #include "memoria-types.h"
 #include "memoria-user-spaces.h"
-
+#include "swap-funtions.h"
 // Definimos las variables globales:
 extern t_config_memoria *config_memoria;
 extern t_memoria_servers *memoria_servers;

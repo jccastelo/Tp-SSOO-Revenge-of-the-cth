@@ -1,4 +1,6 @@
 #include "../include/swap-funtions.h"
+FILE* archivo_swap = NULL;
+t_dictionary* diccionario_swap_metadata = NULL;
 
 void init_swap() {
     archivo_swap = fopen("swap.bin", "wb");
