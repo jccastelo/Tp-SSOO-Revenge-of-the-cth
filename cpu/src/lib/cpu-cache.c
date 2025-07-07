@@ -32,10 +32,12 @@ int buscar_pagina_cache(int pagina) {
     for (int i=0; i < config_cpu->ENTRADAS_CACHE; i++) {
         if (!cache[i].libre && cache[i].pagina == pagina) {
             cache[i].bit_uso = 1;
-            return i; // TODO LOG CACHE HIT?
+            log_info(logger, "PID: %d - Cache Hit - Pagina: %d", contexto->pid, pagina);
+            return i;
         }
     }
-    return -1; // TODO LOG CACHE MISS
+    log_info(logger, "PID: %d - Cache Miss - Pagina: %d", contexto->pid, pagina);
+    return -1;
 }
 
 char* leer_pagina_cache(int entrada) {
@@ -80,6 +82,7 @@ void agregar_en_entrada_cache(int entrada, int pagina, char* contenido) {
     cache[entrada].bit_uso = 1;
     cache[entrada].bit_modificado = 0;
     cache[entrada].libre = 0;
+    log_info(logger, "PID: %d - Cache Add - Pagina: %d", contexto->pid, pagina);
 }
 
 int elegir_victima_cache() {

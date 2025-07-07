@@ -30,4 +30,8 @@ char* conseguir_contenido_frame(int frame);
 
 void escribir_pagina_en_memoria(int frame, char* contenido);
 
+char* leer_en_memoria_desde(int dir_fisica, int tamanio);
+
+void escribir_en_memoria_desde(int dir_fisica, char* contenido);
+
 #endif // CPU_COMUNICACION_MEMORIA_H_

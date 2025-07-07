@@ -59,6 +59,7 @@ int pedir_marco_a_memoria(t_traduccion *traduccion) {
         log_error(logger, "error deserializando el frame proveniente de memoria.");
 
     free(new_buffer);
+    log_info(logger, "PID: %d - OBTENER MARCO - Página: %d - Marco: %d", contexto->pid, traduccion->nro_pagina, frame);
     return frame;
 }
 
@@ -88,7 +89,42 @@ char* conseguir_contenido_frame(int frame) {
 
 void escribir_pagina_en_memoria(int frame, char* contenido) {
     t_paquete* paquete = crear_paquete(WRITE_MEM);
+    agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
     agregar_a_paquete(paquete, &frame, sizeof(int));
     agregar_a_paquete(paquete, contenido, TAM_PAGINA);
     enviar_paquete(paquete, socket_memoria);
+}
+
+char* leer_en_memoria_desde(int dir_fisica, int tamanio) {
+    t_paquete* paquete = crear_paquete(READ_MEM);
+    agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
+    agregar_a_paquete(paquete, &tamanio, sizeof(int));
+    agregar_a_paquete(paquete, &dir_fisica, sizeof(int));
+    enviar_paquete(paquete, socket_memoria);
+
+    int cod_op = recibir_operacion(socket_memoria);
+    if (cod_op != RETURN_CONTENT) {
+        log_error(logger, "Error al recibir contenido parcial de memoria.");
+    }
+
+    t_buffer* buffer = malloc(sizeof(t_buffer));
+    buffer->stream = recibir_buffer(&buffer->size, socket_memoria);
+    char* resultado = malloc(tamanio + 1);
+    memcpy(resultado, buffer->stream, tamanio);
+    resultado[tamanio] = '\0';
+
+    free(buffer);
+    log_info(logger, "PID: %d - Acción: LEER - Dirección Física: %d - Valor: %s", contexto->pid, dir_fisica, resultado);
+    return resultado;
+}
+
+void escribir_en_memoria_desde(int dir_fisica, char* contenido) {
+    log_info(logger, "PID: %d - Acción: ESCRIBIR - Dirección Física: %d - Valor: %s", contexto->pid, dir_fisica, contenido);
+    t_paquete* paquete = crear_paquete(WRITE_MEM);
+    agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
+    agregar_a_paquete(paquete, contenido, strlen(contenido));
+    agregar_a_paquete(paquete, &dir_fisica, sizeof(int));
+    enviar_paquete(paquete, socket_memoria);
+
+    //TODO CHECKEAR SI LO ESCIRBIO BIEN CON EL OK
 }

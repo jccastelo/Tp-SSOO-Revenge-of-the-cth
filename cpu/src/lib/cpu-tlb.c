@@ -4,10 +4,12 @@ int buscar_frame_tlb(int pagina) {
     for (int i=0; i < config_cpu->ENTRADAS_TLB; i++) {
         if (tlb[i].libre != 1 && tlb[i].pagina == pagina) {
             actualizar_timestamp(i);
-            return tlb[i].marco; // TODO LOG TLBHIT ACA?
+            log_info(logger, "PID: %d - TLB HIT - Pagina: %d", contexto->pid, pagina);
+            return tlb[i].marco;
         }
     }
-    return -1; //MISMO LOG PERO CON MISS
+    log_info(logger, "PID: %d - TLB MISS - Pagina: %d", contexto->pid, pagina);
+    return -1;
 }
 
 void actualizar_timestamp(int posicion) {
