@@ -74,14 +74,23 @@ void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *
             new_buffer->stream = recibir_buffer(&new_buffer->size, cpu_socket);
         }
 
-      if (operation == HANDSHAKE) {
+    if (operation == HANDSHAKE) {
         log_info(logger,"LLego op handssake");
         recibir_handshake(cpu_socket);
         log_info(logger,"Coonexion interrupt lista");
-    } else {
-        log_error(logger, "Operación no válida para el servidor INTERRUPT: %d", operation);}
+    }
 
-    
+    switch(operation) {
+        case CPU_ID:
+            log_info(logger, "Llego cpu para identificarse");
+            iniciar_cpu(new_buffer,cpu_socket, 0);
+            log_info(logger,"Se recibio la ID de la CPU desde el server %s",server_name);
+            break;
+        default:
+            log_error(logger, "Operación no válida para el servidor HANDLER: %d", operation);
+            break;
+    }
+
     free(new_buffer);
     return;
 }
@@ -107,7 +116,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
     switch(operation) {
         case CPU_ID:
             log_info(logger, "Llego cpu para identificarse" );
-            iniciar_cpu(new_buffer,cpu_socket);
+            iniciar_cpu(new_buffer,cpu_socket, 1);
             log_info(logger,"Se recibio la ID de la CPU desde el server %s",server_name);
             break;
         case CONTEXTO_DESALOJO:
