@@ -90,7 +90,6 @@ void syscall_exit() {
 }
 
 void agregar_contexto_al_paquete(t_paquete* paquete) {
-    contexto->pc = contexto->pc +1;
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
     agregar_a_paquete(paquete, &contexto->pc, sizeof(int));
 }

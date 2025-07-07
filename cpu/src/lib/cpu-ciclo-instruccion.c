@@ -47,6 +47,10 @@ void excecute(t_instruccion* instruccion) {
     log_info(logger, "## PID: %d - Ejecutando: %s - %s", contexto->pid, instruccion->argv[0], parametros);
     log_info(logger, "Instruccion:");
     free(parametros);
+
+    if (instruccion->tipo != INSTR_GOTO)
+        contexto->pc++;
+
     switch (instruccion->tipo)
     {
     case INSTR_NOOP:
@@ -85,8 +89,6 @@ void excecute(t_instruccion* instruccion) {
     default:
         break;
     }
-    if (instruccion->tipo != INSTR_GOTO)
-        {contexto->pc++;}
 }
 
 bool es_syscall_que_frena(t_tipo_instruccion tipo) {
