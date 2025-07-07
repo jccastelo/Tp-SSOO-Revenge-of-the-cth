@@ -44,8 +44,13 @@ void send_process_instruction(int cliente_socket) {
 
 // === Suspender Proceso ===
 void suspend_process(int client_socket) {
+    
     int pid = rcv_only_pid(client_socket);
     char* pid_key = string_itoa(pid);
+
+    aumentar_contador(metricas_por_procesos,SWAP_IN_REQUESTS,pid_key);
+    aumentar_contador(metricas_por_procesos,SWAP_OUT_REQUESTS, pid_key);
+    aumentar_contador(metricas_por_procesos, MEM_READ_REQUESTS,pid_key); //ver si esto se tiene que sumar por cada entrada a un marco, o con solo cambiar listo
 
     t_list* lista_de_marcos = get_marcos_list_of_proc(pid_key, all_process_page_tables);
  
@@ -75,8 +80,14 @@ void suspend_process(int client_socket) {
 
 
 void remove_suspend_process(int client_socket) {
+    
     int pid = rcv_only_pid(client_socket);
     char* pid_key = string_itoa(pid);
+
+    aumentar_contador(metricas_por_procesos,SWAP_IN_REQUESTS,pid_key) ;
+    aumentar_contador(metricas_por_procesos,SWAP_OUT_REQUESTS, pid_key);
+    aumentar_contador(metricas_por_procesos, MEM_WRITE_REQUESTS,pid_key);
+
     t_list* metadata_swap = remove_marcos_list_of_proc(pid_key , diccionario_swap_metadata);
 
     int cant_paginas = list_size(metadata_swap);
@@ -107,6 +118,7 @@ void remove_suspend_process(int client_socket) {
     list_destroy(metadata_swap);
     list_destroy(marcos_libres);
     free(pid_key);
+    log_info(logger, "OK", pid);
 }
 
 
@@ -128,7 +140,7 @@ void finish_process(int client_socket) {
     //     resquest = OK;
     // } else {
     //     log_info(logger, "El proceso %d no ha finalizado", id_process);
-    //     resquest = ERROR;     
+    //     resquest = ERROR;        
     // }
 
     // Enviamos la respuesta al cliente:

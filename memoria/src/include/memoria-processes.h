@@ -16,7 +16,16 @@ typedef struct {
     int swap_in_requests;        
     int mem_read_requests;       
     int mem_write_requests;      
-} t_process_in_memory; 
+} t_process_in_memory;  
+
+typedef enum {
+    TABLAS_REQUEST,
+    INSTRS_REQUESTS,
+    SWAP_OUT_REQUESTS,
+    SWAP_IN_REQUESTS,
+    MEM_READ_REQUESTS,
+    MEM_WRITE_REQUESTS,
+} t_campo;
 
 /**
  * @brief Inicializa un nuevo proceso en memoria solicitando espacio dinámico e inicializando sus contadores.
@@ -50,5 +59,7 @@ void add_process_to_memory(int id_process);
  * @return Número entero de frames necesarios para almacenar el proceso.
  */
 int required_frames_for_process(int size_process); 
+
+void aumentar_contador(t_dictionary* , t_campo , char*);
 
 #endif

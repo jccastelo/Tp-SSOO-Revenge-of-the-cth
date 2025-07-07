@@ -27,4 +27,32 @@ void add_process_to_memory(int id_process) {
 int required_frames_for_process(int size_process) {
     int tam_pagina = config_memoria->TAM_PAGINA;
     return (size_process + tam_pagina - 1) / tam_pagina;
+} 
+
+
+
+void aumentar_contador(t_dictionary* dictionary, t_campo campo, char* pid_key) {
+    t_process_in_memory* estructura = dictionary_get(dictionary, pid_key);
+    if (!estructura) return;
+
+    switch (campo) {
+        case TABLAS_REQUESTS:
+            estructura->tablas_requests++;
+            break;
+        case INSTRS_REQUESTS:
+            estructura->instrs_requests++;
+            break;
+        case SWAP_OUT_REQUESTS:
+            estructura->swap_out_requests++;
+            break;
+        case SWAP_IN_REQUESTS:
+            estructura->swap_in_requests++;
+            break;
+        case MEM_READ_REQUESTS: 
+            estructura->swap_out_requests++;
+            break;
+        case MEM_WRITE_REQUESTS:
+            estructura->mem_write_requests++;
+            break;
+    }
 }

@@ -8,6 +8,7 @@
 #include "memoria-pages-tables.h"
 #include "memoria-processes.h"
 #include "swap-funtions.h"
+#include "memoria-processes.h"
 /**
  * @brief Inicializa un proceso en el servidor en respuesta a una solicitud del kernel.
  * 
