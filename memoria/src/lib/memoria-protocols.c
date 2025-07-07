@@ -27,15 +27,27 @@ void rcv_instruction_consumer(int client_socket, int *id_process, int *program_c
     free(buffer);
 }
 
-void rcv_physical_memory_and_parse_memory_access(int client_socket, int *id_process, int *physical_memory, void* extra_data, parse_func_t parse_fn) {
+void rcv_physical_memory_and_content_to_write(int client_socket, int *id_process, int *physical_memory, char **content_to_write) {
     // Inicializamos las variables necessarias:
     int size;
     int desplazamiento = 0;
     void *buffer = recibir_buffer(&size, client_socket);
 
-    // Extraemos el ID del proceso, datos adicionales y las entradas por nivel del buffer recibido
+    // Parseamos los primeros valores enteros del buffer, actualizando el desplazamiento en cada paso:
     parsear_int(buffer, &desplazamiento, id_process);
-    parse_fn(buffer, &desplazamiento, extra_data);
+    parsear_string(buffer, &desplazamiento, content_to_write);
+    parsear_int(buffer, &desplazamiento, physical_memory);
+}
+
+void rcv_physical_memory_and_quantity_bytes(int client_socket, int *id_process, int *physical_memory, int *quantity_bytes) {
+    // Inicializamos las variables necessarias:
+    int size;
+    int desplazamiento = 0;
+    void *buffer = recibir_buffer(&size, client_socket);
+
+    // Parseamos los primeros valores enteros del buffer, actualizando el desplazamiento en cada paso:
+    parsear_int(buffer, &desplazamiento, id_process);
+    parsear_int(buffer, &desplazamiento, quantity_bytes);
     parsear_int(buffer, &desplazamiento, physical_memory);
 }
 

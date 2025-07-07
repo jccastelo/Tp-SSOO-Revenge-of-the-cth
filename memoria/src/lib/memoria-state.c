@@ -6,9 +6,9 @@ t_memoria_servers *memoria_servers;
 t_dictionary *instrucciones_por_procesos;
 t_dictionary *metricas_por_procesos;
 t_dictionary *all_process_page_tables;
+t_bitarray *frames_bitmap;
 void *espacio_usuario;
 void *frames_memory;
-void *frames_bitmap;
 int quantity_frames;
 
 void memoria_state_init() {

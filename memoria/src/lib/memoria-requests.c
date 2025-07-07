@@ -37,6 +37,8 @@ void access_to_page_tables(int client_socket) {
     // Se recibe la dirección física, representada por las entradas por nivel asociadas al proceso.
     int id_process;
     t_list *entries_per_levels = rcv_entries_per_levels(client_socket, &id_process);
+    int size_entries_per_levels = list_size(entries_per_levels);
+    log_info(logger, "PID: %d - Cantidad de entradas por nivel: %d", id_process, size_entries_per_levels);
 
     // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
     int searched_frame = find_frame_from_entries(id_process, entries_per_levels);
@@ -47,24 +49,22 @@ void access_to_page_tables(int client_socket) {
     list_destroy(entries_per_levels);
 }
 
-void operation_in_user_spaces(int cliente_socket, t_execute_operation execute_operation, parse_func_t parse_fn) {
-    // Inicializamos las variables:
+void write_in_user_spaces(int client_socket) {
     int id_process;
     int physical_address;
-    void *extra_data;
+    char* content_to_write;
 
-    // Recibimos la dirección física asociada al proceso junto con la información adicional,
-    // y ejecutamos la operación correspondiente:
-    rcv_physical_memory_and_parse_memory_access(cliente_socket, &id_process, &physical_address, extra_data, parse_fn);
-    execute_operation(cliente_socket, id_process, extra_data, physical_address);
-}
-
-void write_in_user_spaces(int client_socket) {
-    operation_in_user_spaces(client_socket, write_memory, parsear_string);
+    rcv_physical_memory_and_content_to_write(client_socket, &id_process, &physical_address, &content_to_write);
+    write_memory(client_socket, id_process, content_to_write, physical_address);
 }
 
 void read_in_user_spaces(int client_socket) {
-    operation_in_user_spaces(client_socket, read_memory, noop_parse_entry);
+    int id_process;
+    int physical_address;
+    int quantity_bytes;
+
+    rcv_physical_memory_and_quantity_bytes(client_socket, &id_process, &physical_address, &quantity_bytes);
+    read_memory(client_socket, id_process, quantity_bytes, physical_address);
 }
 
 void send_process_instruction(int cliente_socket) {

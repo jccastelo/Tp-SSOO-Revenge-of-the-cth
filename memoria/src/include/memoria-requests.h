@@ -9,28 +9,6 @@
 #include "memoria-processes.h"
 
 /**
- * @brief Tipo de función callback para ejecutar operaciones personalizadas sobre la memoria de usuario
- * una vez resuelta la dirección física.
- *
- * Este tipo de función se utiliza como callback para definir operaciones específicas
- * (por ejemplo, lectura o escritura) que se ejecutan luego de haber resuelto la dirección física
- * a partir de las tablas de páginas.
- *
- * @param client_socket Descriptor del socket del cliente que solicita la operación, utilizado para enviar respuestas.
- * @param id_process Identificador del proceso que realiza el acceso a memoria.
- * @param extra_data Puntero a datos adicionales necesarios para la operación.
- *                   Por ejemplo, puede ser un puntero a un entero que indique el tamaño
- *                   de los datos a leer, o un puntero a un buffer que contenga los datos a escribir.
- * @param physical_address Dirección física absoluta en la memoria donde se realizará la operación.
- *
- * @details
- * Este callback permite desacoplar la lógica de resolución de la dirección física
- * de la lógica concreta de la operación sobre memoria, facilitando la extensibilidad
- * y reutilización de código.
- */
-typedef void (*t_execute_operation)(int client_socket, int id_process, void *extra_data, int physical_address);
-
-/**
  * @brief Inicializa un proceso en el servidor en respuesta a una solicitud del kernel.
  * 
  * Esta función se utiliza para recibir una solicitud del kernel para la creación y inicialización 
@@ -66,23 +44,6 @@ void send_process_instruction(int cliente_socket);
  * @param client_socket Socket del cliente que realiza la solicitud de traducción de dirección.
  */
 void access_to_page_tables(int client_socket);
-
-/**
- * @brief Ejecuta una operación de acceso a memoria en espacios de usuario.
- *
- * Esta función generaliza el manejo de accesos a memoria (lectura o escritura) 
- * en los espacios de usuario de un proceso. Recibe el socket del cliente, 
- * una función que define la operación a ejecutar (por ejemplo, `write_memory` o `read_memory`), 
- * y una función de parseo para interpretar datos adicionales si es necesario.
- *
- * Internamente, recibe una dirección física y datos asociados desde el cliente, 
- * obtiene el frame físico correspondiente y ejecuta la operación solicitada.
- *
- * @param cliente_socket Socket del cliente que realiza la solicitud.
- * @param execute_operation Función que define la operación a ejecutar sobre memoria.
- * @param parse_fn Función encargada de parsear los datos extra del buffer recibido.
- */
-void operation_in_user_spaces(int cliente_socket, t_execute_operation execute_operation, parse_func_t parse_fn);
 
 /**
  * @brief Ejecuta una operación de escritura en espacios de usuario.

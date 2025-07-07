@@ -89,14 +89,14 @@ int find_frame_from_entries(int id_process, t_list *entries_per_level) {
     t_list *current_table = get_root_table(id_process);
 
     void closure(void *entry_index_ptr) {
-        int entry_index = (int) entry_index_ptr;
+        int entry_index = (int)(intptr_t) entry_index_ptr;
 
         // Obtener la entrada de la tabla actual
         void *entry = list_get(current_table, entry_index);
 
-        // Si estamos en el último nivel, asignamos el frame correspondiente, de lo contrario, continuemos recorriendo los niveles siguientes.
+        // Si estamos en el último nivel, asignamos el frame correspondiente, de lo contrario, seguimos recorriendo.
         if (current_level == total_levels) 
-            frame = (int) entry;
+            frame = (int)(intptr_t) entry;  // Ojo: depende si entry representa un número o puntero
         else 
             current_table = (t_list *) entry;
 

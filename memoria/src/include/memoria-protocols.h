@@ -64,29 +64,32 @@ void send_instruction_consumer(int cliente_socket, int id_process, int program_c
 void rcv_process_to_end(int client_socket, int *id_process);
 
 /**
- * @brief Recibe y parsea un acceso a memoria física solicitado por un cliente a través de un socket.
+ * @brief Recibe y parsea información enviada por el cliente para una operación de escritura en memoria.
  *
- * Esta función se encarga de recibir un paquete desde el socket especificado, el cual contiene
- * la información necesaria para acceder a una dirección física en memoria. El paquete incluye
- * el identificador del proceso que realiza el acceso, un arreglo con las entradas (índices) 
- * correspondientes a cada nivel de la tabla de páginas, y eventualmente datos adicionales que 
- * pueden ser parseados mediante una función personalizada.
+ * Esta función se encarga de recibir un buffer desde el socket del cliente, extraer el ID del proceso,
+ * el contenido a escribir y la dirección física en memoria donde se almacenará el contenido.
+ * Internamente parsea el buffer recibido y actualiza los punteros provistos.
  *
- * La función extrae y almacena el ID del proceso en la variable apuntada por `id_process`, 
- * y guarda las entradas por nivel en el arreglo apuntado por `physical_memory`.
- * Además, si se requiere procesar datos adicionales, se utiliza el puntero `extra_data` junto
- * con la función `parse_fn` proporcionada, permitiendo flexibilidad para distintos tipos 
- * de operaciones.
- *
- * @param client_socket Descriptor del socket desde el cual se recibe el paquete.
- * @param id_process Puntero a la variable donde se almacenará el ID del proceso recibido.
- * @param physical_memory Puntero al arreglo donde se guardarán las entradas por nivel parseadas.
- * @param extra_data Puntero a la estructura donde se almacenarán datos adicionales parseados.
- * @param parse_fn Función encargada de parsear los datos adicionales contenidos en el paquete.
- *
- * @return void
+ * @param client_socket Socket desde el cual se recibe el buffer.
+ * @param id_process Puntero donde se almacenará el ID del proceso recibido.
+ * @param physical_memory Puntero donde se almacenará la dirección física de memoria recibida.
+ * @param content_to_write Puntero donde se almacenará el contenido a escribir recibido (string).
  */
-void rcv_physical_memory_and_parse_memory_access(int client_socket, int *id_process, int *physical_memory, void* extra_data, parse_func_t parse_fn);
+void rcv_physical_memory_and_content_to_write(int client_socket, int *id_process, int *physical_memory, char **content_to_write);
+
+/**
+ * @brief Recibe y parsea información enviada por el cliente para una operación de lectura en memoria.
+ *
+ * Esta función se encarga de recibir un buffer desde el socket del cliente, extraer el ID del proceso,
+ * la cantidad de bytes a leer y la dirección física en memoria desde la cual se realizará la lectura.
+ * Internamente parsea el buffer recibido y actualiza los punteros provistos.
+ *
+ * @param client_socket Socket desde el cual se recibe el buffer.
+ * @param id_process Puntero donde se almacenará el ID del proceso recibido.
+ * @param physical_memory Puntero donde se almacenará la dirección física de memoria recibida.
+ * @param quantity_bytes Puntero donde se almacenará la cantidad de bytes a leer recibida.
+ */
+void rcv_physical_memory_and_quantity_bytes(int client_socket, int *id_process, int *physical_memory, int *quantity_bytes);
 
 /**
  * Envía al cliente un paquete de respuesta que contiene el código de estado 

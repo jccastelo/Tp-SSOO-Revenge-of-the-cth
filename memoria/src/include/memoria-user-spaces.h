@@ -66,22 +66,22 @@ void mark_frames_as_busy(t_list *free_frames);
  * @details En caso de error (por ejemplo, overflow de memoria), se envía una respuesta con ERROR.
  * Si la operación se completa exitosamente, se envía una respuesta con OK.
  */
-void write_memory(int client_socket, int id_process, void *extra_data, int physical_address);
+void write_memory(int client_socket, int id_process, char *content_to_write, int physical_address);
 
 /**
- * @brief Lee datos desde el espacio de memoria de usuario en una posición física específica.
+ * @brief Lee datos desde el espacio de memoria de usuario en una dirección física específica.
  *
  * Esta función copia un bloque de datos desde la memoria de usuario, comenzando en la dirección
- * física indicada, y luego envía el contenido leído al cliente a través del socket especificado.
+ * física especificada, y envía el contenido leído al cliente a través del socket indicado.
  *
- * @param client_socket Descriptor del socket del cliente al cual se enviará la respuesta con los datos leídos.
- * @param id_process Identificador del proceso que solicita la lectura.
- * @param extra_data Puntero a un entero que indica el tamaño (en bytes) de los datos a leer.
- * @param physical_address Dirección física absoluta desde donde se debe comenzar la lectura.
+ * @param client_socket Descriptor del socket del cliente al que se enviará la respuesta con los datos leídos.
+ * @param id_process Identificador del proceso que solicita la operación de lectura.
+ * @param quantity_bytes Cantidad de bytes a leer desde la memoria de usuario.
+ * @param physical_address Dirección física absoluta desde donde se inicia la lectura.
  *
- * @details En caso de error (por ejemplo, si la dirección excede los límites de la memoria),
- * se responde con ERROR. Si la operación es exitosa, se copia el contenido y se responde con OK.
+ * @details En caso de error (por ejemplo, si la dirección solicitada excede los límites de la memoria),
+ * se responde con ERROR. Si la operación se realiza exitosamente, se copia el contenido solicitado y se responde con OK.
  */
-void read_memory(int client_socket, int id_process, void *extra_data, int physical_address);
+void read_memory(int client_socket, int id_process, int quantity_bytes, int physical_address);
 
 #endif

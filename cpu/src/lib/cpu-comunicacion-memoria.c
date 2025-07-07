@@ -62,8 +62,10 @@ int pedir_marco_a_memoria(t_traduccion *traduccion) {
 }
 
 char* conseguir_contenido_frame(int frame) {
-    t_paquete* paquete = crear_paquete(GET_CONTENT);
+    t_paquete* paquete = crear_paquete(READ_MEM);
+    agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
     agregar_a_paquete(paquete, &frame, sizeof(int));
+    agregar_a_paquete(paquete, &TAM_PAGINA, sizeof(int));
     enviar_paquete(paquete, socket_memoria);
 
     t_buffer* new_buffer = malloc(sizeof(t_buffer));
@@ -88,8 +90,8 @@ char* conseguir_contenido_frame(int frame) {
 void escribir_pagina_en_memoria(int frame, char* contenido) {
     t_paquete* paquete = crear_paquete(WRITE_MEM);
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
+    agregar_a_paquete_string(paquete, contenido, string_length(contenido));
     agregar_a_paquete(paquete, &frame, sizeof(int));
-    agregar_a_paquete(paquete, contenido, TAM_PAGINA);
     enviar_paquete(paquete, socket_memoria);
 
     int respuesta;

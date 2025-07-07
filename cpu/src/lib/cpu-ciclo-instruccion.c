@@ -45,6 +45,7 @@ t_instruccion* decode(char* instruccion) {
 void excecute(t_instruccion* instruccion) {
     char* parametros = concatenar_parametros(instruccion->argv, instruccion->argc);
     log_info(logger, "## PID: %d - Ejecutando: %s - %s", contexto->pid, instruccion->argv[0], parametros);
+    log_info(logger, "Instruccion:")
     free(parametros);
     switch (instruccion->tipo)
     {

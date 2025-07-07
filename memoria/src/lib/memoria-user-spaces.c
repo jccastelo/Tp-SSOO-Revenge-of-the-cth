@@ -20,6 +20,7 @@ t_list *is_memory_sufficient(int size_process) {
     // Recorremos todos los frames hasta encontrar los suficientes para el proceso
     while (index_frames < quantity_frames && added_frames < quantity_frames_process) {
         if (!bitarray_test_bit(frames_bitmap, index_frames)) {
+            log_info(logger, "Free Frame: %d", index_frames);
             list_add(free_frames, (void*)(intptr_t)index_frames);
             added_frames++;
         }
@@ -39,18 +40,17 @@ t_list *is_memory_sufficient(int size_process) {
 void mark_frames_as_busy(t_list *free_frames) {
     // Función auxiliar que marca un único marco como ocupado en el bitmap
     void set_frame_as_busy(void *frame) {
-        int value_frame = (int) frame;  
+        int value_frame = (int)(intptr_t)frame;  
         bitarray_set_bit(frames_bitmap, value_frame - 1);
     }
-
+    
     // Itera sobre todos los marcos de la lista y los marca como ocupados
     list_iterate(free_frames, set_frame_as_busy); 
 }
 
-void write_memory(int client_socket, int id_process, void *extra_data, int physical_address) {
+void write_memory(int client_socket, int id_process, char *content_to_write, int physical_address) {
     // Preparamos el contenido a escribir en memoria
-    char *data = (char *)extra_data;
-    int data_size = string_length(data);
+    int data_size = string_length(content_to_write);
 
     // Inicializamos variable para manejar la respuesta al cliente:
     int response;
@@ -60,7 +60,7 @@ void write_memory(int client_socket, int id_process, void *extra_data, int physi
         process_status = "ERROR";
         response = ERROR;
     } else {
-        memcpy(espacio_usuario + physical_address, data, data_size);
+        memcpy(espacio_usuario + physical_address, content_to_write, data_size);
         process_status = "OK";
         response = OK;
     }
@@ -70,25 +70,24 @@ void write_memory(int client_socket, int id_process, void *extra_data, int physi
     send(client_socket, &response, sizeof(int), 0);
 }
 
-void read_memory(int client_socket, int id_process, void *extra_data, int physical_address) {
+void read_memory(int client_socket, int id_process, int quantity_bytes, int physical_address) {
     // Preparamos el contenido a leer de memoria:
-    int data_size = *((int *)extra_data);
-    void *buffer = malloc(data_size); 
+    void *buffer = malloc(quantity_bytes); 
 
     // Inicializamos variable para manejar la respuesta al cliente:
     int response;
     char *process_status;
 
-    if ((physical_address + data_size > config_memoria->TAM_MEMORIA) || (physical_address > config_memoria->TAM_PAGINA)) {
+    if ((physical_address + quantity_bytes > config_memoria->TAM_MEMORIA) || (physical_address > config_memoria->TAM_PAGINA)) {
         process_status = "ERROR";
         response = ERROR;
     } else {
-        memcpy(buffer, espacio_usuario + physical_address, data_size);
+        memcpy(buffer, espacio_usuario + physical_address, quantity_bytes);
         process_status = "OK";
         response = OK;
     }
 
     // Informamos situacion:
-    log_info(logger, "Process %d: Read from memory (physical_address: %d, size: %d bytes) - Status: %s", id_process, physical_address, data_size, process_status);
+    log_info(logger, "Process %d: Read from memory (physical_address: %d, size: %d bytes) - Status: %s", id_process, physical_address, quantity_bytes, process_status);
     send_read_content(client_socket, buffer, response);
 }

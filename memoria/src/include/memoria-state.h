@@ -16,9 +16,9 @@ extern t_memoria_servers *memoria_servers;
 extern t_dictionary *instrucciones_por_procesos;
 extern t_dictionary *metricas_por_procesos;
 extern t_dictionary *all_process_page_tables;
+extern t_bitarray *frames_bitmap;
 extern void *espacio_usuario;
 extern void *frames_memory;
-extern void *frames_bitmap;
 extern int quantity_frames;
 
 /**
