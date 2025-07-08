@@ -248,6 +248,7 @@ void queue_SJF(t_pcb *process, t_list *lista) {
         process->estimaciones_SJF->rafagaEstimada = process->estimaciones_SJF->ultimaEstimacion; 
         process->estimaciones_SJF->rafagaTotalReal = 0;
     } else {
+        // esto funciona solo para cuando viene de execute, si viene
         process->estimaciones_SJF->rafagaEstimada = max(0,process->estimaciones_SJF->rafagaEstimada - temporal_gettime(process->estimaciones_SJF->rafagaReal)); // Al desalojar, la rafaga estimada pasa a ser la rafaga restante
         process->estimaciones_SJF->rafagaTotalReal += temporal_gettime(process->estimaciones_SJF->rafagaReal);
     }
@@ -272,7 +273,7 @@ void queue_SJF(t_pcb *process, t_list *lista) {
     return;
 }
 
-int max(int64_t a, int64_t b) {
+int64_t max(int64_t a, int64_t b) {
     return (a > b) ? a : b;
 }
 

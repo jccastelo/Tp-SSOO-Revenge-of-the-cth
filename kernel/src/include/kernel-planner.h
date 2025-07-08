@@ -20,6 +20,6 @@ void desalojo_SJF(t_pcb *process);
 void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc);
 void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU);
 void mandar_procesos_a_execute();
-int max(int64_t a, int64_t b);
+int64_t max(int64_t a, int64_t b);
 
 #endif //KERNEL_PLANNER_H
