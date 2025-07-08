@@ -89,7 +89,7 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer){
 
     if(desplazamiento < buffer->size) 
     {log_error(logger,"Hay informacion sin deserializar en INIC_PROC"); }
-    else{ log_error(logger,"Se inicializo proceso PID: %d ",process->pid ); }
+    else{ log_info(logger,"Se inicializo proceso PID: %d ",process->pid ); }
     sleep(1);
 
 }

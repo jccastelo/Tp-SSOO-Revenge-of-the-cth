@@ -17,7 +17,7 @@ void* timer_de_blockeo(void* arg)
 
     int esperaDeBLockeo = config_kernel->TIEMPO_SUSPENSION;
 
-    sleep(esperaDeBLockeo);
+    usleep(esperaDeBLockeo*1000);
     procesoBuscado = process;
     if(list_any_satisfy(planner->long_term->queue_BLOCKED->cola,condicionProcesoEnLista))
     {

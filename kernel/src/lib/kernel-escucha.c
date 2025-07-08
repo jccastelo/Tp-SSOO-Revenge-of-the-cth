@@ -3,9 +3,9 @@
 void kernel_server_io_handler(int io_socket, int operation, const char *server_name) {
 
     if (operation == HANDSHAKE) {
-        log_info(logger,"LLego op handssake");
+        
         recibir_handshake(io_socket);
-        log_info(logger,"Coonexion IO lista");
+        log_info(logger,"Conexion IO lista");
         return;
     }
 
@@ -69,9 +69,9 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
 void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *server_name) {
    
     if (operation == HANDSHAKE) {
-        log_info(logger,"LLego op handssake");
+        
         recibir_handshake(cpu_socket);
-        log_info(logger,"Coonexion interrupt lista");
+        log_info(logger,"Conexion interrupt lista");
         return;
     }
 
@@ -101,10 +101,9 @@ void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *
 
 void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *server_name) {
 
-    log_info(logger, "LLEGO OPERACION A KERNEL DISPATCH %d", operation);
 
     if (operation == HANDSHAKE) {
-        log_info(logger,"LLego op handssake");
+        
         recibir_handshake(cpu_socket);
         log_info(logger,"Coonexion disptach lista ");
         return;
@@ -119,8 +118,8 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
     
     switch(operation) {
         case CPU_ID:
-            log_info(logger, "Llego cpu para identificarse" );
-            log_info(logger, "CPU SOCKET %d ", cpu_socket);
+            //log_info(logger, "Llego cpu para identificarse" );
+            //log_info(logger, "CPU SOCKET %d ", cpu_socket);
             iniciar_cpu(new_buffer,cpu_socket, 1);
             log_info(logger,"Se recibio la ID de la CPU desde el server %s",server_name);
             break;

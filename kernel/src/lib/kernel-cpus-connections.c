@@ -27,7 +27,7 @@ void iniciar_cpu(t_buffer *buffer,int socket_cliente, int dispatch_o_interrupt)
             memcpy(&cpu->socket_interrupt, &socket_cliente, sizeof(int));            
         }
 
-        log_info(logger, "Llego cpu. ID: %d", cpu->id);
+        //log_info(logger, "Llego cpu. ID: %d", cpu->id);
         list_add(list_cpus->cola, cpu);
     }
 }
@@ -69,7 +69,7 @@ t_cpu* buscar_cpu_disponible(){
 
         if(cpu->estado == DISPONIBLE)
         {
-            log_info(logger,"CPu asignada a proceso");
+            //log_info(logger,"CPu asignada a proceso");
             return cpu;
         }
     }
@@ -85,7 +85,7 @@ t_cpu* buscar_cpu_con_id(int id){
 
         if(cpu->id == id)
         {
-            log_info(logger,"CPu asignada a proceso");
+            //log_info(logger,"CPu asignada a proceso");
             return cpu;
         }
     }

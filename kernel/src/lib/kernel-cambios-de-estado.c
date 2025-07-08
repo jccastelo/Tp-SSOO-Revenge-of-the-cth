@@ -8,7 +8,7 @@ void queue_process(t_pcb* process, int estado){
     {
     case NEW:
        
-        log_info(logger,"## PID: %d Se crea el proceso - Estado: NEW", process->pid);
+        log_info(logger,"## PID: %d,Tamnio %d - Se crea el proceso - Estado: NEW", process->pid,process->tamanio_proceso);
         
         process->metricas_de_estado->new += 1;
         temporal_resume(process->metricas_de_tiempo->NEW);
@@ -20,8 +20,8 @@ void queue_process(t_pcb* process, int estado){
            (list_size(planner->long_term->queue_NEW->cola) == 1 || // Si es el unico en la cola => se le pregunta a memoria si puede entrar
            (get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP && list_get(planner->long_term->queue_NEW->cola,0) == process))) // Sino, en el caso de PMCP => si esta primero le pregunta a memoria
             {
-              
-                if(solicitar_a_memoria(memoria_init_proc, process))
+        
+                if(solicitar_a_memoria(memoria_init_proc, process) != -1)
                 {
                     queue_process(process, READY);
                 }
@@ -64,7 +64,6 @@ void queue_process(t_pcb* process, int estado){
         if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
         {
             enviar_proceso_cpu(cpu_a_ocupar->socket_dispatch, process);
-            log_info(logger, "Socket de CPU %d ocupado por el proceso %d", cpu_a_ocupar->socket_dispatch, process->pid);
             log_info(logger, "Se envio proceso a cpu %d", cpu_a_ocupar->id);
             
         } else {
@@ -86,7 +85,7 @@ void queue_process(t_pcb* process, int estado){
 
     case BLOCKED_SUSPENDED:
         
-        log_info(logger,"## PID: %d Pasa del estado %s al estado BLOCKED_SUSPENDED",process->pid,estadoActual);
+        log_warning(logger,"## PID: %d Pasa del estado %s al estado BLOCKED_SUSPENDED",process->pid,estadoActual);
 
         process->metricas_de_estado->blocked_suspended += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED_SUSPENDED));

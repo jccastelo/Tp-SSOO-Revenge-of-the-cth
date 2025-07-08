@@ -227,7 +227,7 @@ void desencolarProcesosEsperando(t_IO *ios_estructura)
         int pid_a_remover;
         memcpy(&pid_a_remover, pid_milisegundos->stream, sizeof(int));
 
-        log_info(logger, "PID A ELIMINAR: %d, ELEMENTOS RESTANTES: %d",pid_a_remover, tamano_lista > i);
+        //log_info(logger, "PID A ELIMINAR: %d, ELEMENTOS RESTANTES: %d",pid_a_remover, tamano_lista > i);
 
         free(pid_milisegundos);
         
@@ -253,7 +253,7 @@ void recibir_io(t_buffer* buffer, int socket) {
     ioNombre[tamanio_nombre] = '\0';
     desplazamiento += tamanio_nombre;
 
-    log_info(logger ,"Llego IO a kernel de nombre: %s",ioNombre);
+    //log_info(logger ,"Llego IO a kernel de nombre: %s",ioNombre);
 
     t_IO *ioBuscada = buscar_io(ioNombre);
     

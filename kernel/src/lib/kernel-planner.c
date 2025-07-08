@@ -163,7 +163,7 @@ void traer_proceso_a_MP(){
 
     while(!list_is_empty(planner->long_term->queue_NEW->cola)){ 
 
-        if(solicitar_a_memoria(memoria_init_proc, list_get(planner->long_term->queue_NEW->cola,0)))
+        if(solicitar_a_memoria(memoria_init_proc, list_get(planner->long_term->queue_NEW->cola,0))!=-1)
         {
             queue_process(list_remove(planner->long_term->queue_NEW->cola,0), READY);
         } else { break; }
