@@ -13,6 +13,7 @@ void bloquearProceso(t_pcb *process)
 
 void* timer_de_blockeo(void* arg)
 {
+    //COMPARAR METRICAS DE BLOCK PARA VER SI SIGUE AHI
     t_pcb* process = (t_pcb*) arg;
 
     int esperaDeBLockeo = config_kernel->TIEMPO_SUSPENSION;

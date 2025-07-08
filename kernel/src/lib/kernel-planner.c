@@ -154,18 +154,27 @@ void traer_proceso_a_MP(){
 
     while(!list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola)){
      
-       if(solicitar_a_memoria(desuspender_proceso, list_get(planner->long_term->queue_NEW->cola,0)))
-      {
-           queue_process(list_remove(planner->medium_term->queue_READY_SUSPENDED->cola,0), READY);
-       } else { break; }
+        if(solicitar_a_memoria(desuspender_proceso, list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0)))
+        {
+            pthread_mutex_lock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
+            t_pcb* procesoAux = list_remove(planner->medium_term->queue_READY_SUSPENDED->cola,0);
+            pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
+
+            queue_process(procesoAux, READY);
+            
+        } else { break; }
 
     }
 
     while(!list_is_empty(planner->long_term->queue_NEW->cola)){ 
 
-        if(solicitar_a_memoria(memoria_init_proc, list_get(planner->long_term->queue_NEW->cola,0))!=-1)
+        if(solicitar_a_memoria(memoria_init_proc, list_get(planner->long_term->queue_NEW->cola,0)))
         {
-            queue_process(list_remove(planner->long_term->queue_NEW->cola,0), READY);
+            pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
+            t_pcb* procesoAux = list_remove(planner->long_term->queue_NEW->cola,0);
+            pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
+
+            queue_process(procesoAux, READY);
         } else { break; }
     }
 
@@ -176,12 +185,14 @@ void mandar_procesos_a_execute()
 {
     while(!list_is_empty(planner->short_term->queue_READY->cola))
     {
-       if(buscar_cpu_disponible() != NULL)
+        if(buscar_cpu_disponible() != NULL)
         {
-            queue_process(list_remove(planner->short_term->queue_READY->cola,0), EXECUTE);
-           
-        } else { break; }
+            pthread_mutex_lock(&planner->short_term->queue_READY->mutex);
+            t_pcb* procesoAux = list_remove(planner->short_term->queue_READY->cola,0);
+            pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
 
+            queue_process(procesoAux, EXECUTE);
+        } else { break; }
     }
 
     return;
@@ -233,7 +244,7 @@ void queue_SJF(t_pcb *process, t_list *lista) {
     
     if(process->estimaciones_SJF->rafagaEstimada == 0 ) {
 
-        process->estimaciones_SJF->ultimaEstimacion = process->estimaciones_SJF->ultimaEstimacion * config_kernel->ALFA + temporal_gettime(process->estimaciones_SJF->rafagaReal) * (1-config_kernel->ALFA);
+        process->estimaciones_SJF->ultimaEstimacion = process->estimaciones_SJF->ultimaEstimacion * (1-config_kernel->ALFA) + temporal_gettime(process->estimaciones_SJF->rafagaReal) * config_kernel->ALFA;
         process->estimaciones_SJF->rafagaEstimada = process->estimaciones_SJF->ultimaEstimacion; 
         process->estimaciones_SJF->rafagaTotalReal = 0;
     } else {
@@ -270,18 +281,30 @@ int max(int a, int b) {
 void sin_desalojo(t_pcb* primer_proceso) {} // null patern nos permite simplificar el codigo en cambios-de-estado eliminando la verificacion de algoritmo_desalojo!=NULL
 
 void desalojo_SJF(t_pcb* primer_proceso) {
-
+    
+    pthread_mutex_lock(&list_cpus->mutex);
     t_cpu* cpu = list_get_maximum(list_cpus->cola, cpu_mayor_rafaga);
+    pthread_mutex_unlock(&list_procesos->mutex);
+
+    pthread_mutex_lock(&list_procesos->mutex);    
     t_pcb* proceso_cpu = list_get(list_procesos->cola, cpu->pid);
+    pthread_mutex_unlock(&list_procesos->mutex);
+    
     if(proceso_cpu->estimaciones_SJF->rafagaEstimada - temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal) > primer_proceso->estimaciones_SJF->rafagaEstimada) {
+        log_warning(logger,"DESALOJANDO PROCESO %d EN CPU %d ",cpu->pid,cpu->id);
         desalojar_proceso(cpu);
     }
 }
 
 void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU) {
+    
     t_cpu* cpu_a = (t_cpu*) unaCPU;
     t_cpu* cpu_b = (t_cpu*) otraCPU;
+   
+    pthread_mutex_lock(&list_procesos->mutex);
     t_pcb* proceso_a = list_get(list_procesos->cola, cpu_a->pid);
     t_pcb* proceso_b = list_get(list_procesos->cola, cpu_b->pid);
+    pthread_mutex_unlock(&list_procesos->mutex);
+    
     return (void*) proceso_a->estimaciones_SJF->rafagaEstimada <= (void*) proceso_b->estimaciones_SJF->rafagaEstimada ? (void*) proceso_a->estimaciones_SJF->rafagaEstimada : (void*) proceso_b->estimaciones_SJF->rafagaEstimada;
 }

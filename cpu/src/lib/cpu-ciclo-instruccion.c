@@ -96,7 +96,7 @@ bool es_syscall_que_frena(t_tipo_instruccion tipo) {
 bool check_interrupt() {
     bool finaliza = false;
     if (recibir_interrupciones()) {
-        log_info(logger, "## Llega interrupción al puerto Interrupt");
+        log_warning(logger, "## Llega interrupción al puerto Interrupt");
         enviar_contexto_desalojo();
         finaliza = true;
     }

@@ -121,7 +121,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             //log_info(logger, "Llego cpu para identificarse" );
             //log_info(logger, "CPU SOCKET %d ", cpu_socket);
             iniciar_cpu(new_buffer,cpu_socket, 1);
-            log_info(logger,"Se recibio la ID de la CPU desde el server %s",server_name);
+            
             break;
         case CONTEXTO_DESALOJO:
             t_pcb* proceso = recibir_proceso(new_buffer);
@@ -132,19 +132,19 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
 
             queue_process(proceso, READY);
 
-            set_cpu(cpu_socket, DISPONIBLE); // Por consigna, la cpu tiene que quedarse esperando
+            set_cpu(cpu_socket, DISPONIBLE,-1); // Por consigna, la cpu tiene que quedarse esperando
             mandar_procesos_a_execute();
         break;
         case INIT_PROC:
-            log_info(logger,"Se recibio la syscall INIC_PROC desde el server %s",server_name);
+            
             recibir_y_crear_proceso(new_buffer);
             break;
         case DUMP_MEMORY:
             t_pcb* process = recibir_proceso(new_buffer);
             temporal_stop(process->estimaciones_SJF->rafagaReal);
 
-            log_info(logger,"Se recibio la syscall DUMP MEMORY desde el server %s",server_name);
-            set_cpu(cpu_socket, DISPONIBLE);
+            
+            set_cpu(cpu_socket, DISPONIBLE,-1);
             queue_process(process, BLOCKED);
             mandar_procesos_a_execute();
 
@@ -154,14 +154,14 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
                 queue_process(process, EXIT);
             break;
         case IO:
-            log_info(logger,"Se recibio la syscall IO desde el server %s",server_name);
-            set_cpu(cpu_socket, DISPONIBLE);
+          
+            set_cpu(cpu_socket, DISPONIBLE,-1);
             gestionar_io(new_buffer);
             mandar_procesos_a_execute();
             break;
         case EXIT_SYS:
             delate_process(new_buffer);
-            set_cpu(cpu_socket, DISPONIBLE);
+            set_cpu(cpu_socket, DISPONIBLE,-1);
             log_info(logger,"Se recibio la syscall EXIT_Sys desde el server %s",server_name);
             mandar_procesos_a_execute();
             break;

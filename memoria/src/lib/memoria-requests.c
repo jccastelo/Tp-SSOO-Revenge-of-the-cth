@@ -85,20 +85,20 @@ void send_process_instruction(int cliente_socket) {
 void finish_process(int client_socket) {
     // Inicializamos las variables necesaria para el proceso:
     int id_process;
-    int resquest;
+    int resquest = OK;
 
     // Llamos a la función que recibe y configura los valores necesarios para el proceso.
     rcv_process_to_end(client_socket, &id_process);
     log_info(logger, "Finalizar proceso: ## PID: %d", id_process);
 
-    // // Verificamos si el proceso ya ha finalizado o no:
-    // if (is_process_end(id_process)) { // To Do: Verificar si el proceso ya ha finalizado, funcion que mezcla consulta y estado del proceso
-    //     log_info(logger, "El proceso %d ya ha finalizado", id_process);
-    //     resquest = OK;
-    // } else {
-    //     log_info(logger, "El proceso %d no ha finalizado", id_process);
-    //     resquest = ERROR;     
-    // }
+    //// Verificamos si el proceso ya ha finalizado o no:
+    //if (is_process_end(id_process)) { // To Do: Verificar si el proceso ya ha finalizado, funcion que mezcla consulta y estado del proceso
+    //    log_info(logger, "El proceso %d ya ha finalizado", id_process);
+    //    resquest = OK;
+    //} else {
+    //    log_info(logger, "El proceso %d no ha finalizado", id_process);
+    //    resquest = ERROR;     
+    //}
 
     // Enviamos la respuesta al cliente:
     log_info(logger, "Enviando respuesta al cliente: %d", resquest);

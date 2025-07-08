@@ -44,7 +44,7 @@ t_cpu *cpu_init(){
     return new_cpu;
 }
 
-void set_cpu(int cpu_socket_buscado,int estado_nuevo)
+void set_cpu(int cpu_socket_buscado,int estado_nuevo,int pid_ejecutando)
 {
     int socket_actual = -1;
 
@@ -56,6 +56,7 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo)
         if(socket_actual == cpu_socket_buscado)
         {
             cpu->estado = estado_nuevo;
+            cpu->pid =pid_ejecutando;
             return;
         }
     }
@@ -69,7 +70,6 @@ t_cpu* buscar_cpu_disponible(){
 
         if(cpu->estado == DISPONIBLE)
         {
-            //log_info(logger,"CPu asignada a proceso");
             return cpu;
         }
     }
@@ -85,7 +85,6 @@ t_cpu* buscar_cpu_con_id(int id){
 
         if(cpu->id == id)
         {
-            //log_info(logger,"CPu asignada a proceso");
             return cpu;
         }
     }
@@ -104,19 +103,14 @@ void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
     enviar_paquete(paquete, cpu_socket);
 
     eliminar_paquete(paquete);
-    //int cod_op = CONTEXT_PROCESS;
-    //send(cpu_socket, &cod_op, sizeof(int), 0);
-    //send(cpu_socket, &process->pid, sizeof(int), 0);
-    //send(cpu_socket, &process->pc, sizeof(int), 0);
 
-    set_cpu(cpu_socket, EJECUTANDO);
+    set_cpu(cpu_socket, EJECUTANDO,process->pid);
 }
 
 void desalojar_proceso(t_cpu* cpu){
     
     t_paquete* paquete = crear_paquete(INTERRUPT); // NO SE SI ESTE CODIGO DE OPERACION ESTA BIEN
     
-
     enviar_paquete(paquete, cpu->socket_interrupt);
 }
 

@@ -41,7 +41,7 @@ typedef enum {
 
 typedef enum {
 	OK = 2,
-	ERROR = -1,
+	ERROR = 0,
 	HANDSHAKE_OK = 1,
 	HANDSHAKE_ERROR = -2
 } response_code;

@@ -21,7 +21,7 @@ void queue_process(t_pcb* process, int estado){
            (get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP && list_get(planner->long_term->queue_NEW->cola,0) == process))) // Sino, en el caso de PMCP => si esta primero le pregunta a memoria
             {
         
-                if(solicitar_a_memoria(memoria_init_proc, process) != -1)
+                if(solicitar_a_memoria(memoria_init_proc, process))
                 {
                     queue_process(process, READY);
                 }
@@ -45,8 +45,7 @@ void queue_process(t_pcb* process, int estado){
         } else if(list_get(planner->short_term->queue_READY->cola,0) == process) { // Si el proceso que entro esta primero ahi se fija si desaloja
             planner->short_term->algoritmo_desalojo(process); // Si tiene desalojo ejecuta, sino null pattern 
         }
-
-
+        
         break;
 
     case EXECUTE:
@@ -64,7 +63,6 @@ void queue_process(t_pcb* process, int estado){
         if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
         {
             enviar_proceso_cpu(cpu_a_ocupar->socket_dispatch, process);
-            log_info(logger, "Se envio proceso a cpu %d", cpu_a_ocupar->id);
             
         } else {
              queue_process(process,READY);//NO puede haber procesos en EXECUTE que no estan ejecutando
@@ -143,6 +141,12 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
         list_remove_element(process->queue_ESTADO_ACTUAL->cola, process);
         pthread_mutex_unlock(&process->queue_ESTADO_ACTUAL->mutex);
     }
+
+    // if viene de execute => frenamos el timer sjf
+    if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"EXECUTE")){} // ToDo
+
+    // if viene de blocked => matamos el hilo
+    if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"BLOCKED")){} // ToDo
 
     // Cerramos el mutex y replanificamos la cola del estado al que pasamos agregando el pcb
     pthread_mutex_lock(&sgteEstado->mutex);
