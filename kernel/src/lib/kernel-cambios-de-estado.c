@@ -36,11 +36,10 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->ready += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY));
         
-        cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->short_term->queue_READY);
+        cambiar_estado(planner->short_term->algoritmo_planificador, process, planner->short_term->queue_READY);
 
         if(buscar_cpu_disponible() != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
-        {
-            
+        { 
             queue_process(process, EXECUTE);
             
         } else if(list_get(planner->short_term->queue_READY->cola,0) == process) { // Si el proceso que entro esta primero ahi se fija si desaloja
@@ -57,7 +56,7 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_estado->execute += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->EXECUTE));
         
-        cambiar_estado(planner->short_term->algoritmo_planificador, process, planner->queue_EXECUTE);
+        cambiar_estado(queue_FIFO, process, planner->queue_EXECUTE);
 
         temporal_resume(process->estimaciones_SJF->rafagaReal);
 

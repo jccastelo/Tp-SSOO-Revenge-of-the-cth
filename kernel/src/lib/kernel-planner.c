@@ -237,7 +237,7 @@ void queue_SJF(t_pcb *process, t_list *lista) {
         process->estimaciones_SJF->rafagaEstimada = process->estimaciones_SJF->ultimaEstimacion; 
         process->estimaciones_SJF->rafagaTotalReal = 0;
     } else {
-        process->estimaciones_SJF->rafagaEstimada -= temporal_gettime(process->estimaciones_SJF->rafagaReal); // Al desalojar, la rafaga estimada pasa a ser la rafaga restante
+        process->estimaciones_SJF->rafagaEstimada  = max(0,process->estimaciones_SJF->rafagaEstimada - temporal_gettime(process->estimaciones_SJF->rafagaReal)); // Al desalojar, la rafaga estimada pasa a ser la rafaga restante
         process->estimaciones_SJF->rafagaTotalReal += temporal_gettime(process->estimaciones_SJF->rafagaReal);
     }
 
@@ -247,10 +247,11 @@ void queue_SJF(t_pcb *process, t_list *lista) {
         return;
     }
 
-    for(int i = 0; !list_is_empty(lista); i++) {
+    int tamanio_actual = list_size(lista);
+    for(int i = 0; i < tamanio_actual; i++) {
         t_pcb* proceso_a_desplazar = list_get(lista,i);
 
-        if(process->estimaciones_SJF->rafagaEstimada< proceso_a_desplazar->estimaciones_SJF->rafagaEstimada) {
+        if(process->estimaciones_SJF->rafagaEstimada < proceso_a_desplazar->estimaciones_SJF->rafagaEstimada) {
             list_add_in_index(lista,i,process);
             return;
         } 
@@ -258,6 +259,10 @@ void queue_SJF(t_pcb *process, t_list *lista) {
 
     list_add(lista,process); //Al final si no entr en ningun lado
     return;
+}
+
+int max(int a, int b) {
+    return (a > b) ? a : b;
 }
 
 // desalojo_X
