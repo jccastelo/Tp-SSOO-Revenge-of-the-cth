@@ -34,8 +34,7 @@ void gestionar_io(t_buffer *buffer)
 
     t_pcb* process = list_get(list_procesos->cola,pid_a_io);
 
-    process->pc =pc_PID;
-    temporal_stop(process->estimaciones_SJF->rafagaReal);
+    process->pc = pc_PID;
 
     log_info(logger,"## PID: %d - Bloqueado por IO: %s", process->pid,ioNombre);
     queue_process(process, BLOCKED);

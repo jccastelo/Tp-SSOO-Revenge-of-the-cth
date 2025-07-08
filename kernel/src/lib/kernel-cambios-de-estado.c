@@ -1,8 +1,9 @@
 #include "../include/kernel-cambios-de-estado.h"
 
+
 void queue_process(t_pcb* process, int estado){
 
-    char *estadoActual = get_NombreDeEstado(process->queue_ESTADO_ACTUAL);
+     char *estadoActual= get_NombreDeEstado(process->queue_ESTADO_ACTUAL);
 
     switch(estado)
     {
@@ -20,11 +21,11 @@ void queue_process(t_pcb* process, int estado){
            (list_size(planner->long_term->queue_NEW->cola) == 1 || // Si es el unico en la cola => se le pregunta a memoria si puede entrar
            (get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP && list_get(planner->long_term->queue_NEW->cola,0) == process))) // Sino, en el caso de PMCP => si esta primero le pregunta a memoria
             {
-        
                 if(solicitar_a_memoria(memoria_init_proc, process))
                 {
                     queue_process(process, READY);
                 }
+                
             }
 
         break;
@@ -135,18 +136,22 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
         return; // O manejar error adecuadamente
     }
 
+        // if viene de execute => frenamos el timer sjf
+    if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"EXECUTE") && planner->short_term->algoritmo_desalojo == desalojo_SJF){
+        temporal_stop(process->estimaciones_SJF->rafagaReal);
+    } 
+    // if viene de blocked => matamos el hilo
+    if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"BLOCKED")){
+        pthread_cancel(process->hilo_block);
+        pthread_join(process->hilo_block, NULL);
+    }
+
     if(process->queue_ESTADO_ACTUAL != NULL){
         // Cerramos el mutex y sacamos el pcb de la cola del estado en el que estaba el proceso (que esta primero)
         pthread_mutex_lock(&process->queue_ESTADO_ACTUAL->mutex);
         list_remove_element(process->queue_ESTADO_ACTUAL->cola, process);
         pthread_mutex_unlock(&process->queue_ESTADO_ACTUAL->mutex);
     }
-
-    // if viene de execute => frenamos el timer sjf
-    if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"EXECUTE")){} // ToDo
-
-    // if viene de blocked => matamos el hilo
-    if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"BLOCKED")){} // ToDo
 
     // Cerramos el mutex y replanificamos la cola del estado al que pasamos agregando el pcb
     pthread_mutex_lock(&sgteEstado->mutex);

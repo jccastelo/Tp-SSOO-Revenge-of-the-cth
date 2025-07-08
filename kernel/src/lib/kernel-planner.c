@@ -242,23 +242,23 @@ void queue_PMCP(t_pcb *process, t_list *lista)
 
 void queue_SJF(t_pcb *process, t_list *lista) {
     
-    if(process->estimaciones_SJF->rafagaEstimada == 0 ) {
+    if(process->estimaciones_SJF->rafagaEstimada == 0) {
 
-        process->estimaciones_SJF->ultimaEstimacion = process->estimaciones_SJF->ultimaEstimacion * (1-config_kernel->ALFA) + temporal_gettime(process->estimaciones_SJF->rafagaReal) * config_kernel->ALFA;
+        process->estimaciones_SJF->ultimaEstimacion = process->estimaciones_SJF->ultimaEstimacion * (1-config_kernel->ALFA) + process->estimaciones_SJF->rafagaTotalReal * config_kernel->ALFA;
         process->estimaciones_SJF->rafagaEstimada = process->estimaciones_SJF->ultimaEstimacion; 
         process->estimaciones_SJF->rafagaTotalReal = 0;
     } else {
-        process->estimaciones_SJF->rafagaEstimada  = max(0,process->estimaciones_SJF->rafagaEstimada - temporal_gettime(process->estimaciones_SJF->rafagaReal)); // Al desalojar, la rafaga estimada pasa a ser la rafaga restante
+        process->estimaciones_SJF->rafagaEstimada = max(0,process->estimaciones_SJF->rafagaEstimada - temporal_gettime(process->estimaciones_SJF->rafagaReal)); // Al desalojar, la rafaga estimada pasa a ser la rafaga restante
         process->estimaciones_SJF->rafagaTotalReal += temporal_gettime(process->estimaciones_SJF->rafagaReal);
     }
 
-    if(list_size(lista) == 0) //Lista vacia?
+    int tamanio_actual = list_size(lista);
+    if(tamanio_actual == 0) //Lista vacia?
     {
         list_add(lista,process);
         return;
     }
 
-    int tamanio_actual = list_size(lista);
     for(int i = 0; i < tamanio_actual; i++) {
         t_pcb* proceso_a_desplazar = list_get(lista,i);
 
@@ -272,7 +272,7 @@ void queue_SJF(t_pcb *process, t_list *lista) {
     return;
 }
 
-int max(int a, int b) {
+int max(int64_t a, int64_t b) {
     return (a > b) ? a : b;
 }
 
@@ -284,16 +284,21 @@ void desalojo_SJF(t_pcb* primer_proceso) {
     
     pthread_mutex_lock(&list_cpus->mutex);
     t_cpu* cpu = list_get_maximum(list_cpus->cola, cpu_mayor_rafaga);
-    pthread_mutex_unlock(&list_procesos->mutex);
+    pthread_mutex_unlock(&list_cpus->mutex);
 
     pthread_mutex_lock(&list_procesos->mutex);    
     t_pcb* proceso_cpu = list_get(list_procesos->cola, cpu->pid);
     pthread_mutex_unlock(&list_procesos->mutex);
     
+    temporal_stop(proceso_cpu->estimaciones_SJF->rafagaReal);
+    log_warning(logger,"RAFAGA CPU: %"PRId64 ": \n RAFAGA PROCESO:%"PRId64 ":", temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal), primer_proceso->estimaciones_SJF->rafagaEstimada);
     if(proceso_cpu->estimaciones_SJF->rafagaEstimada - temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal) > primer_proceso->estimaciones_SJF->rafagaEstimada) {
         log_warning(logger,"DESALOJANDO PROCESO %d EN CPU %d ",cpu->pid,cpu->id);
         desalojar_proceso(cpu);
+        return;
     }
+    temporal_resume(proceso_cpu->estimaciones_SJF->rafagaReal);
+    return;
 }
 
 void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU) {

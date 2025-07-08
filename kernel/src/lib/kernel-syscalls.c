@@ -103,7 +103,5 @@ void delate_process(t_buffer *buffer){
 
     t_pcb *process = list_get(list_procesos->cola, pid_delate); //Obtengo el proceso a eliminar de la lista global
 
-    temporal_stop(process->estimaciones_SJF->rafagaReal);
-
     queue_process(process,EXIT); 
 }

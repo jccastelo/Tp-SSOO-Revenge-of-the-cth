@@ -9,5 +9,5 @@
 
 void bloquearProceso(t_pcb *process);
 void* timer_de_blockeo(void* arg);
-bool condicionProcesoEnLista(void* elemento);
+bool proceso_esta_en_lista(t_list* lista, t_pcb* proceso);
 #endif // KERNEL_BLOCKED_H

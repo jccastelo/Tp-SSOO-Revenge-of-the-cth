@@ -29,7 +29,7 @@ void init_process(int client_socket) {
     }
 
     // Enviamos la respuesta indicando si el proceso fue creado correctamente o no
-    log_info(logger, "PID: %d - Proceso %s para crearse", id_process, status_process);
+    log_warning(logger, "PID: %d - Proceso %s para crearse", id_process, status_process);
     send(client_socket, &request, sizeof(request), 0);
 }
 

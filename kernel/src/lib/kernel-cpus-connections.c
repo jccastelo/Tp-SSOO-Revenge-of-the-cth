@@ -27,8 +27,9 @@ void iniciar_cpu(t_buffer *buffer,int socket_cliente, int dispatch_o_interrupt)
             memcpy(&cpu->socket_interrupt, &socket_cliente, sizeof(int));            
         }
 
-        //log_info(logger, "Llego cpu. ID: %d", cpu->id);
+        pthread_mutex_lock(&list_cpus->mutex);
         list_add(list_cpus->cola, cpu);
+        pthread_mutex_unlock(&list_cpus->mutex);
     }
 }
 
@@ -48,9 +49,15 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo,int pid_ejecutando)
 {
     int socket_actual = -1;
 
-    for(int i = 0; i< list_size(list_cpus->cola) ; i++)
+    pthread_mutex_lock(&list_cpus->mutex);
+    int cantidad_cpus = list_size(list_cpus->cola);
+    pthread_mutex_unlock(&list_cpus->mutex);
+    for(int i = 0; i < cantidad_cpus ; i++)
     {   
+        pthread_mutex_lock(&list_cpus->mutex);
         t_cpu *cpu =list_get(list_cpus->cola,i);
+        pthread_mutex_unlock(&list_cpus->mutex);
+
         socket_actual = cpu->socket_dispatch;
 
         if(socket_actual == cpu_socket_buscado)
@@ -64,9 +71,14 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo,int pid_ejecutando)
 
 t_cpu* buscar_cpu_disponible(){
 
-    for(int i = 0; i< list_size(list_cpus->cola) ; i++)
+    pthread_mutex_lock(&list_cpus->mutex);
+    int cantidad_cpus = list_size(list_cpus->cola);
+    pthread_mutex_unlock(&list_cpus->mutex);
+    for(int i = 0; i < cantidad_cpus ; i++)
     {   
-        t_cpu* cpu =list_get(list_cpus->cola,i);
+        pthread_mutex_lock(&list_cpus->mutex);
+        t_cpu *cpu =list_get(list_cpus->cola,i);
+        pthread_mutex_unlock(&list_cpus->mutex);
 
         if(cpu->estado == DISPONIBLE)
         {
@@ -79,9 +91,14 @@ t_cpu* buscar_cpu_disponible(){
 
 t_cpu* buscar_cpu_con_id(int id){
     
-    for(int i = 0; i< list_size(list_cpus->cola) ; i++)
+    pthread_mutex_lock(&list_cpus->mutex);
+    int cantidad_cpus = list_size(list_cpus->cola);
+    pthread_mutex_unlock(&list_cpus->mutex);
+    for(int i = 0; i < cantidad_cpus ; i++)
     {   
-        t_cpu* cpu =list_get(list_cpus->cola,i);
+        pthread_mutex_lock(&list_cpus->mutex);
+        t_cpu *cpu =list_get(list_cpus->cola,i);
+        pthread_mutex_unlock(&list_cpus->mutex);
 
         if(cpu->id == id)
         {
@@ -125,7 +142,10 @@ t_pcb* recibir_proceso(t_buffer* buffer){
     free(buffer->stream);
     free(buffer);
 
+    pthread_mutex_lock(&list_procesos->mutex);
     t_pcb *proceso_buscado = list_get(list_procesos->cola,pid_recibido);
+    pthread_mutex_unlock(&list_procesos->mutex);
+
     proceso_buscado->pc = pc_recibido;
 
     return proceso_buscado;

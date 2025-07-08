@@ -141,9 +141,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             break;
         case DUMP_MEMORY:
             t_pcb* process = recibir_proceso(new_buffer);
-            temporal_stop(process->estimaciones_SJF->rafagaReal);
 
-            
             set_cpu(cpu_socket, DISPONIBLE,-1);
             queue_process(process, BLOCKED);
             mandar_procesos_a_execute();
