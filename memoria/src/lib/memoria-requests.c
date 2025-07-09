@@ -45,6 +45,8 @@ void access_to_page_tables(int client_socket) {
 
     // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
     int searched_frame = find_frame_from_entries(id_process, entries_per_levels);
+
+    aumentar_contador(metricas_por_procesos, TABLAS_REQUESTS, string_itoa(id_process));
     log_info(logger, "PID: %d - Frame encontrado: %d", id_process, searched_frame);
 
     // Enviar el frame encontrado al cliente que lo solicitó, y liberamos memoria
@@ -63,6 +65,7 @@ void write_in_user_spaces(int client_socket) {
 
     // Logueamos el contenido del espacio de usuario después de la escritura:
     log_info(logger, "user space after write: %s", mem_hexstring(espacio_usuario, config_memoria->TAM_MEMORIA));
+    aumentar_contador(metricas_por_procesos, MEM_WRITE_REQUESTS, string_itoa(id_process));
 }
 
 void read_in_user_spaces(int client_socket) {
@@ -73,6 +76,7 @@ void read_in_user_spaces(int client_socket) {
     // Inicializamos el espacio de usuario para el proceso:
     rcv_physical_memory_and_quantity_bytes(client_socket, &id_process, &physical_address, &quantity_bytes);
     read_memory(client_socket, id_process, quantity_bytes, physical_address);
+    aumentar_contador(metricas_por_procesos, MEM_READ_REQUESTS, string_itoa(id_process));
 }
 
 void send_process_instruction(int cliente_socket) {
@@ -88,6 +92,7 @@ void send_process_instruction(int cliente_socket) {
     // Obtenemos la instrucción del proceso y la enviamos al consumidor:
     get_instruction(cliente_socket, id_process, program_counter, &instruction);
     send_instruction_consumer(cliente_socket, id_process, program_counter, instruction);
+    aumentar_contador(metricas_por_procesos, INSTRS_REQUESTS, string_itoa(id_process));
 }
 
 

@@ -72,5 +72,6 @@ int required_frames_for_process(int size_process);
 
 void aumentar_contador(t_dictionary* , t_campo , char*);
 
-void imprimir_contadores_del_proceso(t_dictionary* , char*);
+void imprimir_contadores_del_proceso(int id_process, t_process_in_memory* estructura);
+
 #endif
