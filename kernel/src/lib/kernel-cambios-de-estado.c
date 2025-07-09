@@ -61,8 +61,12 @@ void queue_process(t_pcb* process, int estado){
         if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
         {
             enviar_proceso_cpu(cpu_a_ocupar->socket_dispatch, process);
-            process->estimaciones_SJF->rafagaReal = temporal_create();
-            temporal_resume(process->estimaciones_SJF->rafagaReal);
+            
+            if(planner->short_term->algoritmo_planificador == queue_SJF){
+                process->estimaciones_SJF->rafagaReal = temporal_create();
+                temporal_resume(process->estimaciones_SJF->rafagaReal);
+            }
+
         } else {
              queue_process(process,READY); //NO puede haber procesos en EXECUTE que no estan ejecutando
              log_warning(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
@@ -150,11 +154,8 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
         return; // O manejar error adecuadamente
     }
 
-
-
-
         // if viene de execute => frenamos el timer sjf
-    if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"EXECUTE") && planner->short_term->algoritmo_desalojo == desalojo_SJF && process->estimaciones_SJF->rafagaReal != NULL){
+    if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"EXECUTE") && planner->short_term->algoritmo_planificador == queue_SJF && process->estimaciones_SJF->rafagaReal != NULL){
         
         temporal_stop(process->estimaciones_SJF->rafagaReal);
         actualizar_rafagas_sjf(process);
