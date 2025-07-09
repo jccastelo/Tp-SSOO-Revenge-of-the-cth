@@ -23,7 +23,6 @@ void init_swap() {
 t_list* get_marcos_list_of_proc(char* pid_key, t_dictionary *tabla_de_paginas) {
     
     t_list* lista_de_marcos = dictionary_get(tabla_de_paginas, pid_key);
-    free(pid_key);
 
     if (lista_de_marcos == NULL) {
         log_warning(logger, "No se encontraron marcos para el proceso PID %d", atoi(pid_key));
@@ -37,7 +36,6 @@ t_list* remove_marcos_list_of_proc(char* pid_key , t_dictionary *diccionario_swa
 
     if (!metadata_swap) {
         log_error(logger, "No hay metadata de swap para el proceso %d", atoi(pid_key));
-        free(pid_key);
         return NULL;
     }
     return metadata_swap;
@@ -67,7 +65,6 @@ void swap_in(char* pid_key, int pid){
     if (!marcos_libres) {
         log_error(logger, "No hay memoria suficiente para reanudar proceso %d", pid);
         list_destroy(metadata_swap);
-        free(pid_key);
         return;
     }
 

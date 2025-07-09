@@ -40,7 +40,7 @@ void recorrer_arbol_paginas(t_list* raiz, accion_sobre_nodo_t accion);
  * @param frame_id Identificador del marco a eliminar.
  * @param pid Identificador del proceso cuya tabla de páginas se va a modificar.
  */
-void eliminar_marco(int frame_id, int pid);
+void eliminar_marco(int frame_id, char* pid_key);
 
 /**
  * @brief Destruye recursivamente un nodo del árbol de páginas liberando su memoria.
@@ -57,4 +57,4 @@ void destruir_nodo(t_list* nodo);
  * 
  * @param pid Identificador del proceso cuya tabla de páginas se quiere eliminar.
  */
-void destruir_tabla_de_paginas(int pid);
+void destruir_tabla_de_paginas(char* pid_key);
