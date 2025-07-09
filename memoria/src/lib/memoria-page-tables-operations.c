@@ -15,15 +15,13 @@ void recorrer_arbol_paginas(t_list* raiz, accion_sobre_nodo_t accion) {
 }
 
 
-void eliminar_marco(int frame_id, int pid) {
+void eliminar_marco(int frame_id, char* pid_key) {
     int total_levels = config_memoria->CANTIDAD_NIVELES;
     int entries_per_level = config_memoria->ENTRADAS_POR_TABLA;
     int divisors[total_levels];
     precompute_divisors(total_levels, entries_per_level, divisors);
 
-    char* pid_key = string_itoa(pid);
     t_list* current_node = dictionary_get(all_process_page_tables, pid_key);
-    free(pid_key);
 
     if (!current_node) return;
 
@@ -53,10 +51,8 @@ void destruir_nodo(t_list* nodo) {
     list_destroy(nodo);
 }
 
-void destruir_tabla_de_paginas(int pid) {
-    char* pid_key = string_itoa(pid);
+void destruir_tabla_de_paginas(char *pid_key) {
     t_list* tabla = dictionary_remove(all_process_page_tables, pid_key);
-    free(pid_key);
 
     if (tabla != NULL) {
         destruir_nodo(tabla);

@@ -112,10 +112,10 @@ void suspend_process(int client_socket) {
         list_add(swap_metadata_proceso, entrada);
 
         bitarray_clean_bit(frames_bitmap, frame_id);
-        eliminar_marco(frame_id,pid);
+        eliminar_marco(frame_id,pid_key);
     }
     dictionary_put(diccionario_swap_metadata, pid_key, swap_metadata_proceso);
-    destruir_tabla_de_paginas(pid);
+    destruir_tabla_de_paginas(pid_key);
     free(pid_key);
 }
 
@@ -168,40 +168,34 @@ void finish_process(int client_socket) {
 
     int pid = rcv_only_pid(client_socket);
     char* pid_key = string_itoa(pid);
-    
-    
+    log_info(logger, "Finalizar proceso: ## PID: %d", pid);
+
     if(estaEn(all_process_page_tables,pid_key)){   
         t_list* lista_de_marcos = dictionary_get(all_process_page_tables, pid_key);
         for (int i = 0; i < list_size(lista_de_marcos); i++) {
             int frame_id = (int)(intptr_t)list_get(lista_de_marcos, i);
             bitarray_clean_bit(frames_bitmap, frame_id);
-            eliminar_marco(frame_id, pid);
+            eliminar_marco(frame_id, pid_key);
         }
-        destruir_tabla_de_paginas(pid);
+        destruir_tabla_de_paginas(pid_key);
     }
     vaciar_swap_del_proceso(pid , pid_key);
    
     imprimir_contadores_del_proceso( metricas_por_procesos , pid_key);
     free(pid_key);
-  /*  // Inicializamos las variables necesaria para el proceso:
-    int id_process;
-    int resquest = OK;
-
-    // Llamos a la función que recibe y configura los valores necesarios para el proceso.
-    rcv_process_to_end(client_socket, &id_process);
-    log_info(logger, "Finalizar proceso: ## PID: %d", id_process);
+   
+    int resquest;
 
     // Verificamos si el proceso ya ha finalizado o no:
-    if (is_process_end(id_process)) { // To Do: Verificar si el proceso ya ha finalizado, funcion que mezcla consulta y estado del proceso
-       log_info(logger, "El proceso %d ya ha finalizado", id_process);
+    if (is_process_end(pid)) { // To Do: Verificar si el proceso ya ha finalizado, funcion que mezcla consulta y estado del proceso
+       log_info(logger, "El proceso %d ya ha finalizado", pid);
        resquest = OK;
     } else {
-       log_info(logger, "El proceso %d no ha finalizado", id_process);
+       log_info(logger, "El proceso %d no ha finalizado", pid);
        resquest = ERROR;     
     }
 
     // Enviamos la respuesta al cliente:
-  //  log_info(logger, "Enviando respuesta al cliente: %d", resquest);
-//    send(client_socket, &resquest, sizeof(resquest), 0);
-*/
+    log_info(logger, "Enviando respuesta al cliente: %d", resquest);
+    send(client_socket, &resquest, sizeof(resquest), 0);
 }
