@@ -138,9 +138,6 @@ t_pcb* recibir_proceso(t_buffer* buffer){
 
     int pc_recibido;
     memcpy(&pc_recibido, buffer->stream + sizeof(int), sizeof(int));
-    
-    free(buffer->stream);
-    free(buffer);
 
     pthread_mutex_lock(&list_procesos->mutex);
     t_pcb *proceso_buscado = list_get(list_procesos->cola,pid_recibido);
