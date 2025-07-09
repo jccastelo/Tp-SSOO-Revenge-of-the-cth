@@ -180,26 +180,8 @@ void dump_process(int client_socket){
 }
 
 void finish_process(int client_socket) {
-
-    int pid = rcv_only_pid(client_socket);
-    char* pid_key = string_itoa(pid);
-    log_info(logger, "Finalizar proceso: ## PID: %d", pid);
-
-    if(estaEn(all_process_page_tables,pid_key)){   
-        t_list* lista_de_marcos = dictionary_get(all_process_page_tables, pid_key);
-        for (int i = 0; i < list_size(lista_de_marcos); i++) {
-            int frame_id = (int)(intptr_t)list_get(lista_de_marcos, i);
-            bitarray_clean_bit(frames_bitmap, frame_id);
-            eliminar_marco(frame_id, pid_key);
-        }
-        destruir_tabla_de_paginas(pid_key);
-    }
-    vaciar_swap_del_proceso(pid , pid_key);
-   
-    imprimir_contadores_del_proceso( metricas_por_procesos , pid_key);
-    free(pid_key);
-   
     int resquest;
+    int pid = rcv_only_pid(client_socket);
 
     // Verificamos si el proceso ya ha finalizado o no:
     if (is_process_end(pid)) { // To Do: Verificar si el proceso ya ha finalizado, funcion que mezcla consulta y estado del proceso
