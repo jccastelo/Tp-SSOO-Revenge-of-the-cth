@@ -36,11 +36,15 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             t_pcb *process = list_get(list_procesos->cola, pid_desbloqueo);
 
             //Si esta en block va a ready, sino a readysuspended
+            pthread_mutex_lock(&process->mutex_estado);
             if(process->queue_ESTADO_ACTUAL->cola == planner->long_term->queue_BLOCKED->cola) 
             {   log_info(logger,"## PID: %d finalizó IO y pasa a READY",process->pid);
+                 pthread_mutex_unlock(&process->mutex_estado);
                 queue_process(process, READY);}
 
-            else {log_info(logger,"## PID: %d finalizó IO y pasa a READY_SUSPENDED",process->pid);
+            else {
+                log_info(logger,"## PID: %d finalizó IO y pasa a READY_SUSPENDED",process->pid );
+                pthread_mutex_unlock(&process->mutex_estado);
                 queue_process(process, READY_SUSPENDED); }
         break;
         case FIN_CONEXION_DE_IO:
@@ -62,7 +66,9 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             log_error(logger, "Operación no válida para el servidor IO: %d", operation);
             break;
     }
-    free(new_buffer);
+    if(new_buffer != NULL){
+        free(new_buffer);
+    }
     return;
 }
 
@@ -95,7 +101,9 @@ void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *
             break;
     }
 
-    free(new_buffer);
+    if(new_buffer != NULL){
+        free(new_buffer);
+    }
     return;
 }
 
@@ -167,8 +175,10 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             log_error(logger, "Operación no válida para el servidor HANDLER: %d", operation);
             break;
     }
-
-    free(new_buffer);
+    if(new_buffer != NULL){
+        free(new_buffer);
+    }
+    
     
     return;
 }
