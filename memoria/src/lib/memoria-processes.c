@@ -35,7 +35,9 @@ int is_process_end(int id_process) {
     // Obtenemos los frames ocupados por el proceso y los marcamos como libres
     frames_as_busy = get_frames_from_entries(id_process);
     mark_frames_as_free(frames_as_busy);
-    // list_destroy(frames_as_busy);
+
+    // Mostramos los contadores del proceso:
+    imprimir_contadores_del_proceso(id_process, process);
 
     return OK;
 }
@@ -43,7 +45,8 @@ int is_process_end(int id_process) {
 int required_frames_for_process(int size_process) {
     int tam_pagina = config_memoria->TAM_PAGINA;
     return (size_process + tam_pagina - 1) / tam_pagina;
-} 
+}
+
 bool estaEn(t_dictionary* diccionario , char* pid_key){
     t_list* lista_de_marcos = get_marcos_list_of_proc(pid_key, diccionario);
     if(list_size(lista_de_marcos) > 0){
@@ -73,7 +76,7 @@ void aumentar_contador(t_dictionary* dictionary, t_campo campo, char* pid_key) {
             estructura->swap_in_requests++;
             break;
         case MEM_READ_REQUESTS: 
-            estructura->swap_out_requests++;
+            estructura->mem_read_requests++;
             break;
         case MEM_WRITE_REQUESTS:
             estructura->mem_write_requests++;
@@ -81,15 +84,16 @@ void aumentar_contador(t_dictionary* dictionary, t_campo campo, char* pid_key) {
     }
 }
 
-void imprimir_contadores_del_proceso(t_dictionary* dictionary, char* pid_key) {
-    t_process_in_memory* estructura = dictionary_get(dictionary, pid_key);
+void imprimir_contadores_del_proceso(int id_process, t_process_in_memory* estructura) {
     if (!estructura) return;
 
-    log_info(logger, "=== Contadores del proceso PID %s ===", pid_key);
-    log_info(logger, "TABLAS_REQUESTS:      %d", estructura->tablas_requests);
-    log_info(logger, "INSTRS_REQUESTS:      %d", estructura->instrs_requests);
-    log_info(logger, "SWAP_OUT_REQUESTS:    %d", estructura->swap_out_requests);
-    log_info(logger, "SWAP_IN_REQUESTS:     %d", estructura->swap_in_requests);
-    log_info(logger, "MEM_READ_REQUESTS:    %d", estructura->mem_read_requests);
-    log_info(logger, "MEM_WRITE_REQUESTS:   %d", estructura->mem_write_requests);
+    log_info(logger, "Contadores del proceso:");
+    log_info(logger, "Tablas Requests: %d", estructura->tablas_requests);
+    log_info(logger, "Instrucciones Requests: %d", estructura->instrs_requests);
+    log_info(logger, "Swap Out Requests: %d", estructura->swap_out_requests);
+    log_info(logger, "Swap In Requests: %d", estructura->swap_in_requests);
+    log_info(logger, "Memoria Read Requests: %d", estructura->mem_read_requests);
+    log_info(logger, "Memoria Write Requests: %d", estructura->mem_write_requests);
+    log_info(logger, "-----------------------------------");
+    log_info(logger, "PID: %d - Contadores del proceso finalizados", id_process);
 }

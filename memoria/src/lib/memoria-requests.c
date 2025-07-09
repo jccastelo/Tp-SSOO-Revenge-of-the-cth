@@ -45,6 +45,8 @@ void access_to_page_tables(int client_socket) {
 
     // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
     int searched_frame = find_frame_from_entries(id_process, entries_per_levels);
+
+    aumentar_contador(metricas_por_procesos, TABLAS_REQUESTS, string_itoa(id_process));
     log_info(logger, "PID: %d - Frame encontrado: %d", id_process, searched_frame);
 
     // Enviar el frame encontrado al cliente que lo solicitó, y liberamos memoria
@@ -63,6 +65,7 @@ void write_in_user_spaces(int client_socket) {
 
     // Logueamos el contenido del espacio de usuario después de la escritura:
     log_info(logger, "user space after write: %s", mem_hexstring(espacio_usuario, config_memoria->TAM_MEMORIA));
+    aumentar_contador(metricas_por_procesos, MEM_WRITE_REQUESTS, string_itoa(id_process));
 }
 
 void read_in_user_spaces(int client_socket) {
@@ -73,6 +76,7 @@ void read_in_user_spaces(int client_socket) {
     // Inicializamos el espacio de usuario para el proceso:
     rcv_physical_memory_and_quantity_bytes(client_socket, &id_process, &physical_address, &quantity_bytes);
     read_memory(client_socket, id_process, quantity_bytes, physical_address);
+    aumentar_contador(metricas_por_procesos, MEM_READ_REQUESTS, string_itoa(id_process));
 }
 
 void send_process_instruction(int cliente_socket) {
@@ -88,6 +92,7 @@ void send_process_instruction(int cliente_socket) {
     // Obtenemos la instrucción del proceso y la enviamos al consumidor:
     get_instruction(cliente_socket, id_process, program_counter, &instruction);
     send_instruction_consumer(cliente_socket, id_process, program_counter, instruction);
+    aumentar_contador(metricas_por_procesos, INSTRS_REQUESTS, string_itoa(id_process));
 }
 
 
@@ -180,26 +185,8 @@ void dump_process(int client_socket){
 }
 
 void finish_process(int client_socket) {
-
-    int pid = rcv_only_pid(client_socket);
-    char* pid_key = string_itoa(pid);
-    log_info(logger, "Finalizar proceso: ## PID: %d", pid);
-
-    if(estaEn(all_process_page_tables,pid_key)){   
-        t_list* lista_de_marcos = dictionary_get(all_process_page_tables, pid_key);
-        for (int i = 0; i < list_size(lista_de_marcos); i++) {
-            int frame_id = (int)(intptr_t)list_get(lista_de_marcos, i);
-            bitarray_clean_bit(frames_bitmap, frame_id);
-            eliminar_marco(frame_id, pid_key);
-        }
-        destruir_tabla_de_paginas(pid_key);
-    }
-    vaciar_swap_del_proceso(pid , pid_key);
-   
-    imprimir_contadores_del_proceso( metricas_por_procesos , pid_key);
-    free(pid_key);
-   
     int resquest;
+    int pid = rcv_only_pid(client_socket);
 
     // Verificamos si el proceso ya ha finalizado o no:
     if (is_process_end(pid)) { // To Do: Verificar si el proceso ya ha finalizado, funcion que mezcla consulta y estado del proceso

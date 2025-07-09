@@ -140,8 +140,7 @@ void escribir_en_memoria_desde(int dir_fisica, char* contenido) {
     int respuesta;
     recv(socket_memoria, &respuesta, sizeof(int), 0);
     
-    int cod_op = recibir_operacion(socket_memoria);
-    if (cod_op != OK) {
+    if (respuesta != OK) {
         log_error(logger, "Error al escribir en memoria.");
     }
 }
