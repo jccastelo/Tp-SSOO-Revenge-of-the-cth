@@ -3,6 +3,11 @@
 
 void bloquearProceso(t_pcb *process)
 {   
+    if (process->hilo_activo) {
+        pthread_cancel(process->hilo_block);
+        pthread_join(process->hilo_block, NULL);
+    }
+
     pthread_create(&process->hilo_block, NULL, timer_de_blockeo, (void*) process);
 }
 
@@ -30,13 +35,14 @@ void* timer_de_blockeo(void* arg)
 
     int esperaDeBLockeo = config_kernel->TIEMPO_SUSPENSION;
 
-    
+
     usleep(esperaDeBLockeo*1000);
-    pthread_mutex_lock(&process->mutex_estado);
+    pthread_testcancel();  
+    //pthread_mutex_lock(&process->mutex_estado);
     
     pthread_cleanup_push(liberar_mutex, (void*)&process->mutex_estado);
 
-    if (proceso_esta_en_lista(planner->long_term->queue_BLOCKED->cola, process)) {
+    if (proceso_esta_en_lista(planner->long_term->queue_BLOCKED->cola, process)&& process->hilo_activo) {
         queue_process(process, BLOCKED_SUSPENDED);
         
     }

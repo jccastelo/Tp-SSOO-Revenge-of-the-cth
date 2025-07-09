@@ -81,7 +81,7 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case BLOCKED_SUSPENDED:
-        
+        pthread_mutex_lock(&process->mutex_estado);
         log_warning(logger,"## PID: %d Pasa del estado %s al estado BLOCKED_SUSPENDED",process->pid,estadoActual);
 
         process->metricas_de_estado->blocked_suspended += 1;
@@ -89,19 +89,18 @@ void queue_process(t_pcb* process, int estado){
         
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
         log_warning(logger,"SOLICITANDO SUSP A MEMORIA");
+
         if(solicitar_a_memoria(suspender_proceso, process))
         {
         log_warning(logger,"SUSP A MEMORIA ACEPTADO");
         traer_proceso_a_MP();
 
         if(process->hilo_activo){
-        {
-            pthread_cancel(process->hilo_block);
-        }
-            pthread_join(process->hilo_block, NULL);
-        }
             
-        }
+            pthread_cancel(process->hilo_block);
+            }
+          pthread_join(process->hilo_block, NULL);
+        }    
         else{ log_error(logger,"Error al suspender proceso");}
 
         
@@ -150,7 +149,8 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
     if (process == NULL || sgteEstado == NULL ) {
         return; // O manejar error adecuadamente
     }
-    
+
+
 
 
         // if viene de execute => frenamos el timer sjf
