@@ -55,7 +55,7 @@ void add_process_to_memory(int id_process);
  * @param key_pid es el char del proceso 
  * @param diccionario es la fuente donde busca el pid
  */
-bool estaEn(t_list* diccionario, char* key_pid);
+bool estaEn(t_dictionary* diccionario, char* pid_key);
 
 /**
  * @brief Calcula la cantidad de frames necesarios para alojar un proceso en memoria.
@@ -71,4 +71,5 @@ int required_frames_for_process(int size_process);
 
 void aumentar_contador(t_dictionary* , t_campo , char*);
 
+void imprimir_contadores_del_proceso(t_dictionary* , char*);
 #endif

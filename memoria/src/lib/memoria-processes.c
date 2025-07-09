@@ -28,9 +28,9 @@ int required_frames_for_process(int size_process) {
     int tam_pagina = config_memoria->TAM_PAGINA;
     return (size_process + tam_pagina - 1) / tam_pagina;
 } 
-bool estaEn(t_list* diccionario , char* pid_key){
+bool estaEn(t_dictionary* diccionario , char* pid_key){
     t_list* lista_de_marcos = get_marcos_list_of_proc(pid_key, diccionario);
-    if(size(lista_de_marcos) == NULL){
+    if(list_size(lista_de_marcos) == 0){
         list_destroy(lista_de_marcos);
         return true;
     }
@@ -63,4 +63,17 @@ void aumentar_contador(t_dictionary* dictionary, t_campo campo, char* pid_key) {
             estructura->mem_write_requests++;
             break;
     }
+}
+
+void imprimir_contadores_del_proceso(t_dictionary* dictionary, char* pid_key) {
+    t_process_in_memory* estructura = dictionary_get(dictionary, pid_key);
+    if (!estructura) return;
+
+    log_info(logger, "=== Contadores del proceso PID %s ===", pid_key);
+    log_info(logger, "TABLAS_REQUESTS:      %d", estructura->tablas_requests);
+    log_info(logger, "INSTRS_REQUESTS:      %d", estructura->instrs_requests);
+    log_info(logger, "SWAP_OUT_REQUESTS:    %d", estructura->swap_out_requests);
+    log_info(logger, "SWAP_IN_REQUESTS:     %d", estructura->swap_in_requests);
+    log_info(logger, "MEM_READ_REQUESTS:    %d", estructura->mem_read_requests);
+    log_info(logger, "MEM_WRITE_REQUESTS:   %d", estructura->mem_write_requests);
 }

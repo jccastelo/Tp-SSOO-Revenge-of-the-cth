@@ -56,11 +56,9 @@ void finalizar_swap() {
 
 }
 
-void swap_in(char* pid_key){
-    aumentar_contador(metricas_por_procesos,SWAP_IN_REQUESTS,pid_key) ;
-    aumentar_contador(metricas_por_procesos,SWAP_OUT_REQUESTS, pid_key);
-    aumentar_contador(metricas_por_procesos, MEM_WRITE_REQUESTS,pid_key);
+void swap_in(char* pid_key, int pid){
     
+
     t_list* metadata_swap = remove_marcos_list_of_proc(pid_key , diccionario_swap_metadata);
 
     int cant_paginas = list_size(metadata_swap);
@@ -90,4 +88,27 @@ void swap_in(char* pid_key){
 
     list_destroy(metadata_swap);
     list_destroy(marcos_libres);
+    aumentar_contador(metricas_por_procesos,SWAP_IN_REQUESTS,pid_key) ;
+    aumentar_contador(metricas_por_procesos,SWAP_OUT_REQUESTS, pid_key);
+    aumentar_contador(metricas_por_procesos, MEM_WRITE_REQUESTS,pid_key);
+} 
+
+void vaciar_swap_del_proceso(int pid ,char * pid_key) {
+
+    if (!dictionary_has_key(diccionario_swap_metadata, pid_key)) {
+        log_info(logger, "El proceso %d no tenía entradas en swap", pid);
+        free(pid_key);
+        return;
+    }
+
+    t_list* swap_metadata = dictionary_remove(diccionario_swap_metadata, pid_key);
+
+    for (int i = 0; i < list_size(swap_metadata); i++) {
+        swap_entry_t* entrada = list_get(swap_metadata, i);
+        free(entrada); // solo liberás la estructura, no tocás el archivo
+    }
+
+    list_destroy(swap_metadata);
+    log_info(logger, "Swap del proceso %d vaciado (fragmentación lógica generada)", pid);
+    free(pid_key);
 }

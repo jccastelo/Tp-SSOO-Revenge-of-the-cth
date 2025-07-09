@@ -17,7 +17,7 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
 
             //Es importante siempre gacer el recv del buffer aunque no haga nada porque sino,
             // cuando haga otro recv lo voy a agarrar a este
-
+            finish_process(client_socket);
             int ELIMINALO = 1;
             send(client_socket,&ELIMINALO,sizeof(int),0);
         break;
@@ -34,10 +34,7 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
         case DUMP_MEMORY:
             dump_process(client_socket);
         break;
-        //case FINALIZAR:
-          //  finish_process(client_socket);
-        //break;
-
+      
 
         // Otros casos de operaciones pueden ir aquí.
         default:

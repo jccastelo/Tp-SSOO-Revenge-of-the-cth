@@ -74,4 +74,20 @@ void finalizar_swap();
  * @note En caso de no haber suficiente memoria disponible, se aborta el swap in
  *       y se libera la metadata asociada al intento.
  */
-void swap_in(char* pid_key)
+void swap_in(char* pid_key, int pid); 
+
+
+
+
+/**
+ * @brief Vacía las entradas de swap de un proceso en el diccionario de metadatos.
+ * 
+ * Esta función libera toda la memoria asociada a las entradas de swap de un proceso
+ * identificado por `pid_key` dentro del diccionario `diccionario_swap_metadata`.
+ * No modifica el archivo de swap, por lo que puede generar fragmentación lógica.
+ * 
+ * @param pid Identificador numérico del proceso (usado solo para logging).
+ * @param pid_key Clave string del proceso usada para acceder y eliminar sus metadatos.
+ *                Esta cadena se libera dentro de la función.
+ */
+void vaciar_swap_del_proceso(int pid, char* pid_key);

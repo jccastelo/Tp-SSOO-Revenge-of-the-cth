@@ -56,7 +56,7 @@ void suspend_process(int client_socket);
  * @param client_socket Socket del cliente que solicita la reanudación (usado para recibir el PID).
  */
 void remove_suspend_process(int client_socket);
-
+void dump_process(int client_socket);
 /**
  * @brief Finaliza un proceso, liberando todos sus recursos tanto en memoria real como en swap.
  *
@@ -65,6 +65,9 @@ void remove_suspend_process(int client_socket);
  *
  * @param client_socket Socket del cliente que solicita la finalización (usado para recibir el PID).
  */
-void finish_process(int client_socket);
+void finish_process(int client_socket); 
+
+
+
 
 #endif // MEMORIA_REQUESTS_H
