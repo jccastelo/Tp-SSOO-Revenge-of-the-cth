@@ -109,13 +109,14 @@ void terminar_kernel(){
     close(socket_memoria);
     //liberar lo que haya quedado
 
+    exponer_las_propiedades();
 }   
 
 void liberar_monitor(t_monitor* monitor) {
     if (!monitor) return;
 
-    if (monitor->lista) {
-        list_destroy_and_destroy_elements(monitor->lista, free);
+    if (monitor->cola) {
+        list_destroy_and_destroy_elements(monitor->cola, free);
     }
 
     pthread_mutex_destroy(&monitor->mutex);
