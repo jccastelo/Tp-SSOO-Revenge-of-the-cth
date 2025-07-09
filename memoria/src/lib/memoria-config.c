@@ -51,6 +51,7 @@ void configurar_valores_de_tamanios(t_config_memoria* config_io , t_config* conf
     config_memoria-> ENTRADAS_POR_TABLA = config_get_int_value(config,"ENTRADAS_POR_TABLA");
     config_memoria-> CANTIDAD_NIVELES = config_get_int_value(config, "CANTIDAD_NIVELES");
     config_memoria-> RETARDO_SWAP = config_get_int_value(config, "RETARDO_SWAP"); 
+    config_memoria-> RETARDO_MEMORIA = config_get_int_value(config, "RETARDO_MEMORIA");
 }
 
 void configurar_valores_de_paths(t_config_memoria* config_io, t_config* config) {

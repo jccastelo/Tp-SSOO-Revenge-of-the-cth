@@ -84,4 +84,44 @@ void write_memory(int client_socket, int id_process, char *content_to_write, int
  */
 void read_memory(int client_socket, int id_process, int quantity_bytes, int physical_address);
 
+/**
+ * @brief Marca como libres los marcos indicados en una lista.
+ *
+ * Esta función recorre una lista de marcos (frames) y, para cada uno,
+ * limpia el bit correspondiente en el bitmap global `frames_bitmap`,
+ * indicando que ese marco queda disponible para futuros usos.
+ *
+ * @param free_frames Lista (`t_list *`) que contiene punteros a marcos (frames) que se deben marcar como libres.
+ *
+ * @details Internamente, se define una función auxiliar que se encarga de convertir cada puntero
+ * de la lista a un entero (número de marco) y limpiar su bit asociado en el bitmap.
+ * 
+ * Esta función es útil, por ejemplo, al finalizar un proceso o al liberar páginas
+ * que ya no se necesitan en memoria, permitiendo que los marcos se puedan reutilizar.
+ */
+void mark_frames_as_free(t_list *free_frames);
+
+/**
+ * @brief Finaliza un proceso en memoria liberando todos sus recursos asociados.
+ *
+ * Esta función recibe el identificador de un proceso, lo elimina del diccionario
+ * de métricas, obtiene y libera los frames ocupados en memoria, y finalmente
+ * marca dichos frames como libres. Una vez completado, devuelve OK para indicar
+ * que el proceso fue finalizado correctamente.
+ *
+ * @param id_process Identificador único del proceso a finalizar.
+ * @return OK si el proceso fue finalizado correctamente.
+ */
+int is_process_end(int id_process);
+
+/**
+ * @brief Inicializa un bitmap de frames marcando todos los bits como libres.
+ *
+ * Esta función recorre todos los bits del bitmap recibido y los limpia (pone en 0),
+ * indicando que todos los frames están disponibles (libres) para ser asignados.
+ *
+ * @param frames_bitmap Puntero al bitmap de frames a inicializar.
+ */
+void inicializar_bitmap(t_bitarray *frames_bitmap);
+
 #endif

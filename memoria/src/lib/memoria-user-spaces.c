@@ -3,10 +3,20 @@
 void init_free_frames_bitmap() {
     // Inicializamos el tamaño del bitarray:
     int size_bitarray = (quantity_frames + 7) / 8;
+    log_info(logger, "Size bitarray: %d", size_bitarray);
 
     // Creamos las variables correspondientes:
     frames_memory = malloc(size_bitarray);
     frames_bitmap = bitarray_create_with_mode(frames_memory, size_bitarray, LSB_FIRST);
+    inicializar_bitmap(frames_bitmap);
+}
+
+// Funcion para inicializar un bitmap:
+void inicializar_bitmap(t_bitarray *frames_bitmap) {
+    int size = bitarray_get_max_bit(frames_bitmap);
+
+    for(int i = 0; i < size; i++)
+        bitarray_clean_bit(frames_bitmap, i);
 }
 
 t_list *is_memory_sufficient(int size_process) {
@@ -40,13 +50,26 @@ t_list *is_memory_sufficient(int size_process) {
 void mark_frames_as_busy(t_list *free_frames) {
     // Función auxiliar que marca un único marco como ocupado en el bitmap
     void set_frame_as_busy(void *frame) {
-        int value_frame = (int)(intptr_t)frame;  
-        bitarray_set_bit(frames_bitmap, value_frame - 1);
+        int value_frame = (int)(intptr_t)frame;
+        log_info(logger, "Frame marcado como ocupado: %d", value_frame);
+        bitarray_set_bit(frames_bitmap, value_frame);
     }
     
     // Itera sobre todos los marcos de la lista y los marca como ocupados
     list_iterate(free_frames, set_frame_as_busy); 
 }
+
+void mark_frames_as_free(t_list *free_frames) {
+    // Función auxiliar que marca un único marco como ocupado en el bitmap
+    void set_frame_as_busy(void *frame) {
+        int value_frame = (int)(intptr_t)frame;
+        log_info(logger, "Frame marcado como libre: %d", value_frame);
+        bitarray_clean_bit(frames_bitmap, value_frame);
+    }
+    
+    // Itera sobre todos los marcos de la lista y los marca como ocupados
+    list_iterate(free_frames, set_frame_as_busy); 
+} 
 
 void write_memory(int client_socket, int id_process, char *content_to_write, int physical_address) {
     // Preparamos el contenido a escribir en memoria

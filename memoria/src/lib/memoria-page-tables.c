@@ -86,6 +86,7 @@ int find_frame_from_entries(int id_process, t_list *entries_per_level) {
     int frame = -1;
     int current_level = 1;
     int total_levels = config_memoria->CANTIDAD_NIVELES;
+    int retardo_memoria = config_memoria->RETARDO_MEMORIA;
     t_list *current_table = get_root_table(id_process);
 
     void closure(void *entry_index_ptr) {
@@ -100,12 +101,40 @@ int find_frame_from_entries(int id_process, t_list *entries_per_level) {
         else 
             current_table = (t_list *) entry;
 
+        usleep(retardo_memoria);
         current_level++;
     }
 
     list_iterate(entries_per_level, closure);
-
     return frame;
+}
+
+t_list *get_frames_from_entries(int id_process) {
+    // Inicializamos variables para el seguimiento de niveles de la tabla de páginas
+    int current_level = 1;
+    int total_levels = config_memoria->CANTIDAD_NIVELES;
+    
+    // Inicializamos estructuras administrativas:
+    t_list *current_table = get_root_table(id_process);
+    t_list *frame_as_busy = list_create();
+
+    void closure(void *entry_index_ptr) {
+        int entry_index = (int)(intptr_t) entry_index_ptr;
+
+        // Obtener la entrada de la tabla actual
+        void *entry = list_get(current_table, entry_index);
+
+        // Si estamos en el último nivel, asignamos el frame correspondiente, de lo contrario, seguimos recorriendo.
+        if (current_level == total_levels)  
+            list_add(frame_as_busy, entry);
+        else 
+            current_table = (t_list *) entry;
+
+        current_level++;
+    }
+
+    list_iterate(current_table, closure);
+    return frame_as_busy;
 }
 
 t_list *get_root_table(int id_process) {
