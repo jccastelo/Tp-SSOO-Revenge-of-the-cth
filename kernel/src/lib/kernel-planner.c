@@ -293,10 +293,6 @@ void desalojo_SJF(t_pcb* primer_proceso) {
     pthread_mutex_lock(&list_procesos->mutex);    
     t_pcb* proceso_cpu = list_get(list_procesos->cola, cpu->pid);
     pthread_mutex_unlock(&list_procesos->mutex);
-    
-    temporal_stop(proceso_cpu->estimaciones_SJF->rafagaReal);
-
-    temporal_stop(proceso_cpu->estimaciones_SJF->rafagaReal);
 
     int64_t tiempo = temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal);
     int64_t restante = max(proceso_cpu->estimaciones_SJF->rafagaEstimada - tiempo,(int64_t)0);
