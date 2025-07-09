@@ -12,8 +12,8 @@ int main(int argc, char *argv[]) {
         //fprintf(stderr, "Uso: %s <archivoProceso> <Tamanio_prco>\n", argv[0]);
         //return 1;
         log_warning(logger, "INICIALIZADO EN MODO DEFAULT");
-        archivo_pseudocodigo = "test_simple_bloqueo.txt"; //PARA DEBUG O POR DEFAULT
-        Tamanio_proc = 0;
+        archivo_pseudocodigo = "MEMORIA_IO.txt"; //PARA DEBUG O POR DEFAULT
+        Tamanio_proc = 90;
     } else {
         archivo_pseudocodigo = argv[1];
         Tamanio_proc = atoi(argv[2]);

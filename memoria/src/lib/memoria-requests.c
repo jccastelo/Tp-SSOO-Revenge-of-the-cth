@@ -136,12 +136,9 @@ void suspend_process(int client_socket) {
 
     destruir_tabla_de_paginas(pid_key);
     free(pid_key);
-
 }
 
-
 void remove_suspend_process(int client_socket) {
-    
     int pid = rcv_only_pid(client_socket);
     char* pid_key = string_itoa(pid);
     swap_in(pid_key, pid, client_socket);
@@ -149,39 +146,49 @@ void remove_suspend_process(int client_socket) {
     log_info(logger, "OK");
 }
 
-void dump_process(int client_socket){
-    int pid = rcv_only_pid(client_socket);
-    char* pid_key = string_itoa(pid);
+void dump_process(int client_socket) {
+    // Se recibe el PID del proceso que se quiere hacer dump:
+    int resquest = OK;
+    int id_process = rcv_only_pid(client_socket);
     
-    
-    if(!estaEn(all_process_page_tables,pid_key)){
-        log_info(logger , "el proceso %d no está en memoria", pid);
-        log_info(logger, "buscando el proceso %d en swap", pid);
-        if(!estaEn(diccionario_swap_metadata, pid_key)){
-            log_error(logger, "el proceso pid %d no existe", pid);
-            return;
-        }
-        swap_in(pid_key, pid, client_socket); 
+    // Creamos el archivo de dump con el nombre del PID:
+    char *filename = string_from_format("%sdump_%d.bin", config_memoria->DUMP_PATH, id_process);
+    FILE *archivo_dump = fopen(filename, "wb");
+
+    // Obtenemos el lista de marcos ocupados por el proceso:
+    t_list *frames_as_busy = get_frames_from_entries(id_process);
+    log_info(logger, "PID: %d - Se han obtenido %d marcos ocupados", id_process, list_size(frames_as_busy));
+
+    if(!archivo_dump) {
+        log_error(logger, "Error al crear el archivo de dump: %s", filename);
+        resquest = ERROR;
+        send(client_socket, &resquest, sizeof(resquest), 0);
+        return;
+    }
+
+    void closure_dump(void *frame) {
+        log_info(logger, "Escribiendo en el archivo de dump: Frame %d", (int)(intptr_t)frame);
+        int frame_id = (int)(intptr_t)frame;
+        char *buffer = malloc(config_memoria->TAM_PAGINA);
+
+        memcpy(buffer, espacio_usuario + frame_id * config_memoria->TAM_PAGINA, config_memoria->TAM_PAGINA);
         
+        // Logueamos el contenido del marco que se está escribiendo en el archivo de dump:
+        log_warning(logger, "Escribiendo en el archivo de dump: Frame %d", frame_id);
+        log_warning(logger, "Contenido: %s", buffer);
+
+        fwrite(buffer, config_memoria->TAM_PAGINA, 1, archivo_dump);
     }
 
-    char filename[64];
-    sprintf(filename, "proceso_%d.dump", pid);
-    FILE* archivo_dump = fopen(filename, "wb");
-    
-    t_list* lista_de_marcos = get_marcos_list_of_proc(pid_key, all_process_page_tables);
-
-    for (int i = 0; i < list_size(lista_de_marcos); i++) {
-        int frame_id = (int)(intptr_t)list_get(lista_de_marcos, i);
-        void* contenido = espacio_usuario + frame_id * config_memoria->TAM_PAGINA;
-        fwrite(contenido, config_memoria->TAM_PAGINA, 1, archivo_dump);
-    }
-
+    // Iteramos sobre los marcos ocupados y escribimos su contenido en el archivo de dump:
+    list_iterate(frames_as_busy, closure_dump);
     fclose(archivo_dump);
-    free(pid_key);
-    free(lista_de_marcos);
-    log_info(logger, "## PID: %d - Memory Dump solicitado", pid);
 
+    // Liberamos la lista de marcos ocupados:
+    log_info(logger, "Se ha creado el archivo de dump: %s", filename);
+    list_destroy(frames_as_busy);
+
+    send(client_socket, &resquest, sizeof(resquest), 0);
 }
 
 void finish_process(int client_socket) {

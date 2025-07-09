@@ -38,6 +38,7 @@ void* timer_de_blockeo(void* arg)
 
     usleep(esperaDeBLockeo*1000);
     pthread_testcancel();  
+    
     //pthread_mutex_lock(&process->mutex_estado);
     
     pthread_cleanup_push(liberar_mutex, (void*)&process->mutex_estado);

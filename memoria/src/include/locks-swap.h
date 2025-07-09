@@ -2,6 +2,7 @@
 #define LOCKS_SWAP_H
 
 #include <pthread.h>
+#include <bits/pthreadtypes.h>
 
 /**
 *@brief Mutex para acceso exclusivo al archivo swap

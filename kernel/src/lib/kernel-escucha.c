@@ -142,16 +142,37 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             recibir_y_crear_proceso(new_buffer);
             break;
         case DUMP_MEMORY:
+
+            log_warning(logger,"LLEGO DUMP");
+
             t_pcb* process = recibir_proceso(new_buffer);
 
             set_cpu(cpu_socket, DISPONIBLE,-1);
             queue_process(process, BLOCKED);
             mandar_procesos_a_execute();
-
+            
+            log_warning(logger,"SOLITO DUMP");
             if(solicitar_a_memoria(avisar_dump_memory, process))
+            {
+                if(process->hilo_activo){
+                    pthread_cancel(process->hilo_block);
+                    }
+
+                pthread_join(process->hilo_block, NULL);
+                
+                log_warning(logger," DUMP CORRECTO");
                 queue_process(process, READY);
-            else
+            }
+            else{
+                if(process->hilo_activo){
+                    pthread_cancel(process->hilo_block);
+                    }
+
+                pthread_join(process->hilo_block, NULL);
+                
+                log_error(logger," DUMP ERROR");
                 queue_process(process, EXIT);
+                }
             break;
         case IO:
           

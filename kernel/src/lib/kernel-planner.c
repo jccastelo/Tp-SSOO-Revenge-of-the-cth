@@ -177,7 +177,7 @@ void traer_proceso_a_MP(){
             queue_process(procesoAux, READY);
         } else { break; }
     }
-
+    log_info(logger,"NO rompi acaAAAAAAA");
     return;
 }
 
