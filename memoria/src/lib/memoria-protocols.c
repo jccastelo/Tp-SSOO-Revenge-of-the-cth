@@ -105,13 +105,13 @@ t_list *rcv_entries_per_levels(int client_socket, int *id_process) {
 
     parsear_int(buffer, &desplazamiento, id_process);
 
-    int entrie;
     t_list *entries_per_level = list_create();
     
     while(desplazamiento < size) {
-        parsear_int(entries_per_level, &desplazamiento, &entrie);
-        log_info(logger, "Entrada por nivel: %d", entrie);
-        list_add(entries_per_level, &entrie);
+        int *entrada_ptr = malloc(sizeof(int));
+        parsear_int(buffer, &desplazamiento, entrada_ptr);
+        log_info(logger, "Entrada por nivel: %d", *entrada_ptr);
+        list_add(entries_per_level, entrada_ptr);
     }
 
     return entries_per_level;

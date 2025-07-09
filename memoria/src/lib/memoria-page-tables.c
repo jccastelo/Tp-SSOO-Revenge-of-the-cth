@@ -90,7 +90,10 @@ int find_frame_from_entries(int id_process, t_list *entries_per_level) {
     t_list *current_table = get_root_table(id_process);
 
     void closure(void *entry_index_ptr) {
-        int entry_index = (int)(intptr_t) entry_index_ptr;
+        int entry_index = *(int *)entry_index_ptr;
+
+        log_warning(logger, "ARRANCO A BUSCAR EN NIVEL: %d", current_level);
+        log_warning(logger, "ENTRY INDEX: %d", entry_index);
 
         // Obtener la entrada de la tabla actual
         void *entry = list_get(current_table, entry_index);
@@ -103,6 +106,11 @@ int find_frame_from_entries(int id_process, t_list *entries_per_level) {
 
         usleep(retardo_memoria);
         current_level++;
+    }
+
+    for (int i = 0; i < list_size(entries_per_level); i++) {
+        int *val = list_get(entries_per_level, i);
+        printf("entries[%d] = %d\n", i, *val);
     }
 
     list_iterate(entries_per_level, closure);

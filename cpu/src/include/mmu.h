@@ -2,7 +2,7 @@
 #define MMU_H
 
 //Librerias externas
-
+#include <utils/logger.h>
 
 //Librerias internas
 #include "cpu-state.h"
