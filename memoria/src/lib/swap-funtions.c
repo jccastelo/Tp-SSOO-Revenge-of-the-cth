@@ -54,8 +54,8 @@ void finalizar_swap() {
 
 }
 
-void swap_in(char* pid_key, int pid){
-    
+void swap_in(char* pid_key, int pid, int client_socket){
+    int resquest ;
 
     t_list* metadata_swap = remove_marcos_list_of_proc(pid_key , diccionario_swap_metadata);
 
@@ -65,6 +65,8 @@ void swap_in(char* pid_key, int pid){
     if (!marcos_libres) {
         log_error(logger, "No hay memoria suficiente para reanudar proceso %d", pid);
         list_destroy(metadata_swap);
+        resquest = ERROR;
+        send(client_socket, &resquest, sizeof(resquest), 0);
         return;
     }
 
@@ -82,6 +84,9 @@ void swap_in(char* pid_key, int pid){
     t_list* tabla_paginas = list_create();
     populate_page_table(marcos_libres, tabla_paginas);
     dictionary_put(all_process_page_tables, pid_key, tabla_paginas);
+    
+    resquest = OK;
+    send(client_socket, &resquest, sizeof(resquest), 0);
 
     list_destroy(metadata_swap);
     list_destroy(marcos_libres);

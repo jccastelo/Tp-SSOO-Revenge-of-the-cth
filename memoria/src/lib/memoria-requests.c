@@ -86,7 +86,7 @@ void send_process_instruction(int cliente_socket) {
 void suspend_process(int client_socket) {
     
     int pid = rcv_only_pid(client_socket);
-    log_info(logger, "supendiendoProc %d", pid);
+    log_warning(logger, "supendiendoProc %d", pid);
     char* pid_key = string_itoa(pid);
 
     aumentar_contador(metricas_por_procesos,SWAP_IN_REQUESTS,pid_key);
@@ -115,8 +115,15 @@ void suspend_process(int client_socket) {
         eliminar_marco(frame_id,pid_key);
     }
     dictionary_put(diccionario_swap_metadata, pid_key, swap_metadata_proceso);
+    
+   
+    
+    int resquest = OK;
+    send(client_socket, &resquest, sizeof(resquest), 0);
+
     destruir_tabla_de_paginas(pid_key);
     free(pid_key);
+
 }
 
 
@@ -124,7 +131,7 @@ void remove_suspend_process(int client_socket) {
     
     int pid = rcv_only_pid(client_socket);
     char* pid_key = string_itoa(pid);
-    swap_in(pid_key, pid);
+    swap_in(pid_key, pid, client_socket);
     free(pid_key);
     log_info(logger, "OK");
 }
@@ -141,7 +148,7 @@ void dump_process(int client_socket){
             log_error(logger, "el proceso pid %d no existe", pid);
             return;
         }
-        swap_in(pid_key, pid); 
+        swap_in(pid_key, pid, client_socket); 
         
     }
 

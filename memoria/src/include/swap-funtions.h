@@ -74,7 +74,7 @@ void finalizar_swap();
  * @note En caso de no haber suficiente memoria disponible, se aborta el swap in
  *       y se libera la metadata asociada al intento.
  */
-void swap_in(char* pid_key, int pid); 
+void swap_in(char* pid_key, int pid, int socket_client); 
 
 
 

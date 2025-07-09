@@ -88,11 +88,10 @@ void queue_process(t_pcb* process, int estado){
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED_SUSPENDED));
         
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
-        log_warning(logger,"## PID: %d ESta en estado %s ",process->pid,get_NombreDeEstado(process->queue_ESTADO_ACTUAL));
-
+        log_warning(logger,"SOLICITANDO SUSP A MEMORIA");
         if(solicitar_a_memoria(suspender_proceso, process))
         {
-
+        log_warning(logger,"SUSP A MEMORIA ACEPTADO");
         traer_proceso_a_MP();
 
         if(process->hilo_activo){
@@ -115,6 +114,11 @@ void queue_process(t_pcb* process, int estado){
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY_SUSPENDED));
         
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_READY_SUSPENDED);
+
+        if(list_size(planner->medium_term->queue_READY_SUSPENDED->cola)==1){
+            traer_proceso_a_MP();
+        }
+        
         break;
 
     case EXIT:
