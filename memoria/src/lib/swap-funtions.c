@@ -97,7 +97,6 @@ void vaciar_swap_del_proceso(int pid ,char * pid_key) {
 
     if (!dictionary_has_key(diccionario_swap_metadata, pid_key)) {
         log_info(logger, "El proceso %d no tenía entradas en swap", pid);
-        free(pid_key);
         return;
     }
 
@@ -110,5 +109,4 @@ void vaciar_swap_del_proceso(int pid ,char * pid_key) {
 
     list_destroy(swap_metadata);
     log_info(logger, "Swap del proceso %d vaciado (fragmentación lógica generada)", pid);
-    free(pid_key);
 }
