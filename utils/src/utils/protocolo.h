@@ -10,6 +10,7 @@
 #include <utils/logger.h>
 #include <string.h>
 #include <commons/string.h>
+#include <commons/collections/list.h>
 
 typedef enum {
     MENSAJE, 
@@ -28,12 +29,19 @@ typedef enum {
 	INTERRUPT,
 	CONTEXTO_DESALOJO,
 	GET_INSTRUCTION,
-	RETURN_INSTRUCCION
+	RETURN_INSTRUCCION,
+	MEMORY_CONFIG,
+	GET_FRAME,
+	RETURN_FRAME,
+	GET_CONTENT,
+	RETURN_CONTENT,
+	WRITE_MEM,
+	READ_MEM
 } op_code;
 
 typedef enum {
-	OK = 0,
-	ERROR = -1,
+	OK = 2,
+	ERROR = 0,
 	HANDSHAKE_OK = 1,
 	HANDSHAKE_ERROR = -2
 } response_code;
@@ -47,6 +55,20 @@ typedef struct {
 	op_code codigo_operacion;
 	t_buffer* buffer;
 } t_paquete;
+
+/**
+ * Tipo de función para parsear datos desde un buffer.
+ * 
+ * Esta función recibe:
+ * - `buffer`: Puntero al buffer de datos a parsear.
+ * - `offset`: Puntero al desplazamiento actual dentro del buffer; se actualiza
+ *             conforme se avanzan bytes al parsear.
+ * - `dest`: Puntero al destino donde se almacenará el dato parseado.
+ * 
+ * Se utiliza como callback para interpretar distintos tipos de datos desde un
+ * buffer de forma flexible y genérica.
+ */
+typedef void (*parse_func_t)(void *buffer, int *offset, void *dest);
 
 /**
  * @brief Crea un nuevo paquete con la operación indicada.
@@ -181,7 +203,7 @@ void generar_handshake(int socket, char *server_name);
  * @param desplazamiento Puntero al desplazamiento actual dentro del buffer (en bytes). Se actualiza tras la lectura.
  * @param destino Puntero a la variable donde se almacenará el valor entero parseado.
  */
-void parsear_int(void* buffer, int* desplazamiento, int* destino);
+void parsear_int(void* buffer, int* desplazamiento, void* destino);
 
 /**
  * @brief Parsea una cadena de caracteres desde un buffer.
@@ -194,6 +216,53 @@ void parsear_int(void* buffer, int* desplazamiento, int* destino);
  * @param desplazamiento Puntero al desplazamiento actual dentro del buffer (en bytes). Se actualiza tras la lectura.
  * @param destino Puntero donde se almacenará el puntero a la cadena parseada (se reserva memoria internamente).
  */
-void parsear_string(void* buffer, int* desplazamiento, char** destino);
+void parsear_string(void* buffer, int* desplazamiento, void* destino);
+
+/**
+ * @brief Parsea una cantidad fija de enteros desde un buffer y los almacena en una lista.
+ *
+ * Esta función utiliza un desplazamiento (`offset`) dentro de un buffer binario para
+ * extraer `size` enteros consecutivos. Cada entero es leído mediante la función `parsear_int`,
+ * almacenado dinámicamente y agregado a una lista.
+ *
+ * @param buffer Puntero al buffer que contiene los datos.
+ * @param desplazamiento Puntero al desplazamiento actual dentro del buffer (en bytes). Se actualiza durante el parseo.
+ * @param size Cantidad de enteros a parsear desde el buffer.
+ * @return Una lista (`t_list*`) que contiene punteros a enteros parseados.
+ */
+t_list *parsear_ints(void *buffer, int *desplazamiento, int size);
+
+/**
+ * @brief Parsea múltiples valores desde un buffer y los agrega a una lista.
+ *
+ * Esta función permite parsear elementos genéricos (por ejemplo, enteros o cadenas)
+ * desde un buffer binario, utilizando una función de parseo provista. Cada elemento
+ * es almacenado dinámicamente y agregado a la lista destino. El proceso se repite
+ * hasta que el desplazamiento alcance el tamaño total del buffer.
+ *
+ * @param list Lista en la que se agregarán los elementos parseados.
+ * @param parse_func Función que se usará para parsear cada elemento desde el buffer.
+ * @param buffer Puntero al buffer de entrada.
+ * @param offset Puntero al desplazamiento actual dentro del buffer (en bytes). Se actualiza durante el parseo.
+ * @param buffer_size Tamaño total del buffer (en bytes).
+ * @param elem_size Tamaño en bytes de cada elemento a parsear (usado para `malloc`).
+ */
+void parse_values_and_add_to_list(t_list *list, parse_func_t parse_func, void *buffer, int *offset, int buffer_size, size_t elem_size);
+
+/**
+ * @brief Función de parseo vacía que no realiza ninguna acción sobre el buffer.
+ *
+ * Esta función cumple con la firma requerida para funciones de parseo (`t_parse_fn`),
+ * pero no ejecuta ninguna operación. Es útil como valor por defecto cuando no se 
+ * requiere procesar datos adicionales desde el buffer.
+ *
+ * Se espera que esta función sea pasada como argumento a funciones que aceptan un 
+ * parser genérico, permitiendo omitir condicionales internos mediante una interfaz uniforme.
+ *
+ * @param buffer Puntero al buffer de entrada (no utilizado).
+ * @param desplazamiento Puntero al desplazamiento actual dentro del buffer (no modificado).
+ * @param extra_data Puntero a datos adicionales (no utilizado).
+ */
+void noop_parse_entry(void *buffer, int *desplazamiento, void *extra_data);
  
 #endif /* PROTOCOL_H */

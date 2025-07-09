@@ -108,5 +108,48 @@ t_list* get_or_create_child(t_list *parent, int index);
  */
 void precompute_divisors(int total_levels, int entries_per_level, int *divisors);
 
+/**
+ * @brief Busca el frame correspondiente dado un proceso y una lista de índices por nivel.
+ *
+ * Recorre la tabla multinivel desde la raíz, navegando por las entradas indicadas en 'entries_per_level'.
+ * Al llegar al último nivel, devuelve el frame asociado.
+ *
+ * @param id_process Identificador del proceso.
+ * @param entries_per_level Lista de índices para cada nivel de la tabla de páginas.
+ * @return El número de frame encontrado, o -1 si no se encuentra.
+ */
+int find_frame_from_entries(int id_process, t_list *entries_per_level);
+
+/**
+ * @brief Obtiene la tabla raíz de páginas de un proceso dado su ID.
+ *
+ * Convierte el ID del proceso a cadena para usarlo como clave en el diccionario
+ * global de tablas de páginas y devuelve la tabla raíz asociada.
+ *
+ * @param id_process Identificador del proceso.
+ * @return Puntero a la lista que representa la tabla raíz de páginas, o NULL si no existe.
+ */
+t_list *get_root_table(int id_process);
+
+/**
+ * @brief Obtiene la lista de marcos (frames) asociados a las entradas de tablas de páginas de un proceso.
+ *
+ * Esta función recorre las entradas de la tabla de páginas de un proceso determinado (identificado por `id_process`)
+ * y devuelve una lista con los marcos correspondientes que se encuentran en el último nivel de la estructura jerárquica.
+ *
+ * @param id_process Identificador del proceso del cual se quieren obtener los marcos.
+ * @return Lista (`t_list *`) que contiene los marcos (frames) asociados a las entradas en el último nivel.
+ *
+ * @details
+ * La función utiliza una variable `current_level` para seguir el nivel actual en la estructura de tablas,
+ * avanzando desde la tabla raíz hasta el último nivel.  
+ * Se recurre a una función auxiliar interna (`closure`) que procesa cada entrada:
+ * - Si se alcanza el último nivel, se agrega el frame a la lista `frame_as_busy`.
+ * - Si no, se avanza a la siguiente tabla de nivel inferior.
+ *
+ * Finalmente, devuelve la lista completa de marcos encontrados, que pueden usarse para marcar ocupados,
+ * liberar o realizar otras operaciones de gestión de memoria.
+ */
+t_list *get_frames_from_entries(int id_process);
 
 #endif

@@ -18,12 +18,12 @@ void recibir_contexto_de_kernel() {
 
     new_buffer->stream = recibir_buffer(&new_buffer->size, socket_dispatch);
 
-    log_info(logger, "recibi el buffer");
+    // log_info(logger, "recibi el buffer");
 
     if (cod_op == CONTEXT_PROCESS) {
-        log_info(logger, "DESERIALIZANDO BUFFER");
+        // log_info(logger, "DESERIALIZANDO BUFFER");
         deserializar_contexto(new_buffer);
-        log_info(logger, "PID: %d - Programa a ejecutar - Program Counter: %d", contexto->pid, contexto->pc);
+        // log_info(logger, "PID: %d - Programa a ejecutar - Program Counter: %d", contexto->pid, contexto->pc);
     }
     else
         log_info(logger,"ERROR RECIBIENDO PROCESO DE KERNEL");
@@ -60,7 +60,10 @@ void enviar_contexto_desalojo() {
 
 void syscall_io(char* dispositivo, int tiempo) {
     t_paquete* paquete = crear_paquete(IO);
-    agregar_a_paquete(paquete, dispositivo, strlen(dispositivo) + 1);
+
+    int longitudNombre = strlen(dispositivo) +1;
+    agregar_a_paquete(paquete, &longitudNombre, sizeof(int));
+    agregar_a_paquete(paquete, dispositivo, longitudNombre);
     agregar_a_paquete(paquete, &tiempo, sizeof(int));
     agregar_contexto_al_paquete(paquete);
     enviar_paquete(paquete, socket_dispatch);
@@ -68,9 +71,12 @@ void syscall_io(char* dispositivo, int tiempo) {
 
 void syscall_init_proc(char* archivo, int tamanio) {
     t_paquete* paquete = crear_paquete(INIT_PROC);
-    agregar_a_paquete(paquete, archivo, strlen(archivo) + 1);
+
+    int longitudNombre = strlen(archivo) +1;
+    agregar_a_paquete(paquete, &longitudNombre, sizeof(int));
+    agregar_a_paquete(paquete, archivo, longitudNombre);
     agregar_a_paquete(paquete, &tamanio, sizeof(int));
-    agregar_contexto_al_paquete(paquete);
+    // agregar_contexto_al_paquete(paquete);
     enviar_paquete(paquete, socket_dispatch);
 }
 

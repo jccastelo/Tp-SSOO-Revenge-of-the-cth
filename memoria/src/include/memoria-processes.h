@@ -8,6 +8,7 @@
 
 // Incluyo las bibliotecas externas necesarias:
 #include "memoria-state.h"
+#include "memoria-pages-tables.h"
 
 typedef struct {
     int tablas_requests;         

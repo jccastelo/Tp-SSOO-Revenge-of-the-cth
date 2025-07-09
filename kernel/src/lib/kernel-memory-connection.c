@@ -28,7 +28,7 @@ int enviar_pid_memoria(t_pcb* proceso, int codigo_operacion) {
 
     int resultado;
 
-    log_info(logger, "Proceso en Consultando: %i", codigo_operacion);
+    //log_info(logger, "Proceso en Consultando: %i", codigo_operacion);
     int bytes_recibidos = recv(socket_memoria, &resultado, sizeof(int), MSG_WAITALL); // Espero una respuesta de OK
 
      if (bytes_recibidos <= 0) {
@@ -36,8 +36,8 @@ int enviar_pid_memoria(t_pcb* proceso, int codigo_operacion) {
     log_error(logger, "No se pudo recibir respuesta de memoria para %i proceso", codigo_operacion);
     }
 
-    if(resultado == 1)
-    {log_info(logger,"Memoria confirma %i %i:", codigo_operacion, proceso->pid);}
+    //if(resultado == 1)
+    //{log_info(logger,"Memoria confirma %i %i:", codigo_operacion, proceso->pid);}
 
     return resultado;
 }

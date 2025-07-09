@@ -1,7 +1,7 @@
 #include "../include/cpu-comunicacion-memoria.h"
 
 void conseguir_siguiente_instruccion() {
-    log_info(logger, "pidiendo la instruccion a memoria");
+    // log_info(logger, "pidiendo la instruccion a memoria");
     t_paquete* paquete = crear_paquete(GET_INSTRUCTION);
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
     agregar_a_paquete(paquete, &contexto->pc, sizeof(int));
@@ -23,9 +23,9 @@ char* devolver_instruccion_a_ejecutar() {
     if (cod_op == RETURN_INSTRUCCION)
     {
         new_buffer->stream = recibir_buffer(&new_buffer->size, socket_memoria);
-        log_info(logger, "deserializando la instruccion..");
+        // log_info(logger, "deserializando la instruccion..");
         parsear_string(new_buffer->stream, &desplazamiento , &instruccion);
-        log_info(logger, "Instruccion: %s", instruccion);
+        // log_info(logger, "Instruccion: %s", instruccion);
     }
     else
         log_error(logger, "error deserializando la instruccion que viene de memoria.");
@@ -34,8 +34,108 @@ char* devolver_instruccion_a_ejecutar() {
     return instruccion;
 }
 
-// char* deserializar_instruccion(t_buffer *buffer) {
-//     int desplazamiento + 0;
-//     int size;
-//     return instr;
-// }
+int pedir_marco_a_memoria(t_traduccion *traduccion) {
+    t_paquete* paquete = crear_paquete(GET_FRAME);
+    agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
+    agregar_a_paquete(paquete, traduccion->entradas, sizeof(int) * CANTIDAD_NIVELES);
+    enviar_paquete(paquete, socket_memoria);
+
+    // int cod_op;
+    int frame;
+    // int desplazamiento = 0;
+
+
+    // t_buffer* new_buffer = malloc(sizeof(t_buffer));
+    // new_buffer->size = 0;
+    // new_buffer->stream = NULL;
+
+    recv(socket_memoria, &frame, sizeof(int), 0);
+    // new_buffer->stream = recibir_buffer(&new_buffer->size, socket_memoria);
+    // memcpy(&(frame), new_buffer->stream + desplazamiento, sizeof(int));
+
+    // else
+    //     log_error(logger, "error deserializando el frame proveniente de memoria.");
+
+    // free(new_buffer);
+    log_info(logger, "PID: %d - OBTENER MARCO - Página: %d - Marco: %d", contexto->pid, traduccion->nro_pagina, frame);
+    return frame;
+}
+
+char* conseguir_contenido_frame(int frame) {
+    t_paquete* paquete = crear_paquete(READ_MEM);
+    agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
+    agregar_a_paquete(paquete, &frame, sizeof(int));
+    agregar_a_paquete(paquete, &TAM_PAGINA, sizeof(int));
+    enviar_paquete(paquete, socket_memoria);
+
+    t_buffer* new_buffer = malloc(sizeof(t_buffer));
+    new_buffer->size = 0;
+    new_buffer->stream = NULL;
+
+    int cod_op = recibir_operacion(socket_memoria);
+    if (cod_op != OK) {
+        log_error(logger, "Error al recibir el contenido del frame desde Memoria.");
+        return NULL;
+    }
+
+    char* contenido = malloc(TAM_PAGINA);
+
+    new_buffer->stream = recibir_buffer(&new_buffer->size, socket_memoria);
+    memcpy(contenido, new_buffer->stream, TAM_PAGINA);
+
+    free(new_buffer);
+    return contenido;
+}
+
+void escribir_pagina_en_memoria(int frame, char* contenido) {
+    t_paquete* paquete = crear_paquete(WRITE_MEM);
+    agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
+    agregar_a_paquete_string(paquete, contenido, string_length(contenido));
+    agregar_a_paquete(paquete, &frame, sizeof(int));
+    enviar_paquete(paquete, socket_memoria);
+
+    int respuesta;
+    recv(socket_memoria, &respuesta, sizeof(int), 0);
+}
+
+char* leer_en_memoria_desde(int dir_fisica, int tamanio) {
+    t_paquete* paquete = crear_paquete(READ_MEM);
+    agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
+    agregar_a_paquete(paquete, &tamanio, sizeof(int));
+    agregar_a_paquete(paquete, &dir_fisica, sizeof(int));
+    enviar_paquete(paquete, socket_memoria);
+
+    int cod_op = recibir_operacion(socket_memoria);
+    if (cod_op != OK) {
+        log_error(logger, "Error al recibir contenido parcial de memoria.");
+    }
+
+
+    //TODO -> hacer igual q el otro?
+    t_buffer* buffer = malloc(sizeof(t_buffer));
+    buffer->stream = recibir_buffer(&buffer->size, socket_memoria);
+    char* resultado = malloc(tamanio + 1);
+    memcpy(resultado, buffer->stream, tamanio);
+    resultado[tamanio] = '\0';
+
+    free(buffer);
+    log_info(logger, "PID: %d - Acción: LEER - Dirección Física: %d - Valor: %s", contexto->pid, dir_fisica, resultado);
+    return resultado;
+}
+
+void escribir_en_memoria_desde(int dir_fisica, char* contenido) {
+    log_info(logger, "PID: %d - Acción: ESCRIBIR - Dirección Física: %d - Valor: %s", contexto->pid, dir_fisica, contenido);
+    t_paquete* paquete = crear_paquete(WRITE_MEM);
+    agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
+    agregar_a_paquete_string(paquete, contenido, string_length(contenido));
+    agregar_a_paquete(paquete, &dir_fisica, sizeof(int));
+    enviar_paquete(paquete, socket_memoria);
+
+    int respuesta;
+    recv(socket_memoria, &respuesta, sizeof(int), 0);
+    
+    int cod_op = recibir_operacion(socket_memoria);
+    if (cod_op != OK) {
+        log_error(logger, "Error al escribir en memoria.");
+    }
+}

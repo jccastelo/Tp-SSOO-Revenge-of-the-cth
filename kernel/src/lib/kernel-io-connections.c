@@ -26,9 +26,17 @@ void gestionar_io(t_buffer *buffer)
     int pid_a_io; // Solo necesito el pid del proces
 
     memcpy(&pid_a_io, buffer->stream + desplazamiento, sizeof(int));
+    desplazamiento += sizeof(int);
+
+    //Busco el PC
+    int pc_PID;
+    memcpy(&pc_PID, buffer->stream + desplazamiento, sizeof(int));
 
     t_pcb* process = list_get(list_procesos->cola,pid_a_io);
-    temporal_stop(process->estimaciones_SJF->rafagaReal);
+
+    process->pc = pc_PID;
+
+    log_info(logger,"## PID: %d - Bloqueado por IO: %s", process->pid,ioNombre);
     queue_process(process, BLOCKED);
 
 
@@ -152,6 +160,9 @@ void enviar_proceso_io(int io_socket)
 
                     send(io_socket, &pid_y_milisegundos->size, sizeof(int), 0);
                     send(io_socket, pid_y_milisegundos->stream, pid_y_milisegundos->size, 0);
+                    
+                    memcpy(&(io->proceso), pid_y_milisegundos->stream, sizeof(int));
+                    
                     free(pid_y_milisegundos);
                 }
 
@@ -165,7 +176,7 @@ void enviar_proceso_io(int io_socket)
 
 void eliminar_instancia(int io_socket)
 {
-
+    
     for (int i = 0; i < list_size(list_ios->cola); i++)
     {
         t_IO *ios = list_get(list_ios->cola, i);
@@ -176,33 +187,51 @@ void eliminar_instancia(int io_socket)
 
             if (io->socket == io_socket)
             {
+                list_remove(ios->instancias_IO->cola,j);
                 carnicero_de_instancias_io(io);
 
                 if (list_is_empty(ios->instancias_IO->cola))
                 {
                     desencolarProcesosEsperando(ios);
                     carnicero_de_io(ios);
+
+                    pthread_mutex_lock(&list_ios->mutex);
+                    list_remove(list_ios->cola,i);
+                    pthread_mutex_unlock(&list_ios->mutex);
+                    
                 }
 
                 return;
             }
         }
     }
-
+    
     
 }
 
 void desencolarProcesosEsperando(t_IO *ios_estructura)
 {
-    t_list* colaProcesosEsperando = ios_estructura->procesos_esperando->cola;
+    int tamano_lista = list_size(ios_estructura->procesos_esperando->cola);
+    int i = 0;
+    
+    while(tamano_lista > i && tamano_lista > 0)
+    {   
+        pthread_mutex_lock(&ios_estructura->procesos_esperando->mutex);
+        t_buffer *pid_milisegundos  = list_remove(ios_estructura->procesos_esperando->cola,0);
+        
+        if(i != tamano_lista - 1){
+            pthread_mutex_unlock(&ios_estructura->procesos_esperando->mutex);
+        }
 
-    int tamano_lista = list_size(colaProcesosEsperando);
-    int i =0;
+        int pid_a_remover;
+        memcpy(&pid_a_remover, pid_milisegundos->stream, sizeof(int));
 
-    while(tamano_lista > i )
-    {
-        t_pcb *procesoEncolado = list_remove(colaProcesosEsperando,i);
-        queue_process(procesoEncolado,EXIT);
+        //log_info(logger, "PID A ELIMINAR: %d, ELEMENTOS RESTANTES: %d",pid_a_remover, tamano_lista > i);
+
+        free(pid_milisegundos);
+        
+        queue_process(list_get(list_procesos->cola,pid_a_remover), EXIT);
+        
         i++;
     }
 }
@@ -223,7 +252,7 @@ void recibir_io(t_buffer* buffer, int socket) {
     ioNombre[tamanio_nombre] = '\0';
     desplazamiento += tamanio_nombre;
 
-    log_info(logger ,"Llego IO a kernel de nombre: %s",ioNombre);
+    //log_info(logger ,"Llego IO a kernel de nombre: %s",ioNombre);
 
     t_IO *ioBuscada = buscar_io(ioNombre);
     
@@ -270,4 +299,23 @@ void recibir_io(t_buffer* buffer, int socket) {
 
         log_info(logger, "Llego una Nueva IO de nombre %s Y SOCKET: %d ", ioNueva->nombre,nueva_instancia_io->socket );
     }   
+}
+
+void actualizarIO_a_libre(int pid_desbloqueo) {
+
+    for (int i = 0; i < list_size(list_ios->cola); i++)
+    {
+        t_IO *ios = list_get(list_ios->cola, i);
+
+        for (int j = 0; j < list_size(ios->instancias_IO->cola); j++)
+        {
+            t_IO_instancia *io = list_get(ios->instancias_IO->cola, j);
+
+            if (io->proceso == pid_desbloqueo)
+            {
+                io->proceso = -1;
+                return;
+            }
+        }
+    }
 }

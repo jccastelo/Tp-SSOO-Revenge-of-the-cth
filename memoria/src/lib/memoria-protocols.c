@@ -27,6 +27,30 @@ void rcv_instruction_consumer(int client_socket, int *id_process, int *program_c
     free(buffer);
 }
 
+void rcv_physical_memory_and_content_to_write(int client_socket, int *id_process, int *physical_memory, char **content_to_write) {
+    // Inicializamos las variables necessarias:
+    int size;
+    int desplazamiento = 0;
+    void *buffer = recibir_buffer(&size, client_socket);
+
+    // Parseamos los primeros valores enteros del buffer, actualizando el desplazamiento en cada paso:
+    parsear_int(buffer, &desplazamiento, id_process);
+    parsear_string(buffer, &desplazamiento, content_to_write);
+    parsear_int(buffer, &desplazamiento, physical_memory);
+}
+
+void rcv_physical_memory_and_quantity_bytes(int client_socket, int *id_process, int *physical_memory, int *quantity_bytes) {
+    // Inicializamos las variables necessarias:
+    int size;
+    int desplazamiento = 0;
+    void *buffer = recibir_buffer(&size, client_socket);
+
+    // Parseamos los primeros valores enteros del buffer, actualizando el desplazamiento en cada paso:
+    parsear_int(buffer, &desplazamiento, id_process);
+    parsear_int(buffer, &desplazamiento, quantity_bytes);
+    parsear_int(buffer, &desplazamiento, physical_memory);
+}
+
 void send_instruction_consumer(int cliente_socket, int id_process, int program_counter, char *instruction) {
     // Verificamos que haya instruccion para enviar al cliente.
     // Si no hay instruccion valida, registramos un error y salimos. 
@@ -62,4 +86,51 @@ int rcv_only_pid(int socket_cliente) {
     free(buffer); 
 
     return pid;
+
+void send_read_content(int client_socket, char *buffer, int response) {
+    t_paquete *response_package = crear_paquete(response);
+
+    if(response == OK)
+        agregar_a_paquete_string(response_package, buffer, string_length(buffer));
+    
+    enviar_paquete(response_package, client_socket);
+    eliminar_paquete(response_package);
+}
+
+t_list *rcv_entries_per_levels(int client_socket, int *id_process) {
+    // Inicializamos las variables necessarias:
+    int size;
+    int desplazamiento = 0;
+    void *buffer = recibir_buffer(&size, client_socket);
+
+    parsear_int(buffer, &desplazamiento, id_process);
+
+    int entrie;
+    t_list *entries_per_level = list_create();
+    
+    while(desplazamiento < size) {
+        parsear_int(entries_per_level, &desplazamiento, &entrie);
+        log_info(logger, "Entrada por nivel: %d", entrie);
+        list_add(entries_per_level, entrie);
+    }
+
+    return entries_per_level;
+}
+
+void send_values_memory(int client_socket) {
+    // Enviamos la configuración de memoria al cliente.
+    t_paquete *values_packages = crear_paquete(MEMORY_CONFIG);
+
+    // Agregamos los valores de configuración de memoria al paquete.
+    agregar_a_paquete(values_packages, &config_memoria->TAM_PAGINA, sizeof(int));
+    agregar_a_paquete(values_packages, &config_memoria->ENTRADAS_POR_TABLA, sizeof(int));
+    agregar_a_paquete(values_packages, &config_memoria->CANTIDAD_NIVELES, sizeof(int));
+
+    log_info(logger, "Enviando configuración de memoria al cliente: Tamaño de página: %d, Entradas por tabla: %d, Cantidad de niveles: %d",
+             config_memoria->TAM_PAGINA, config_memoria->ENTRADAS_POR_TABLA, config_memoria->CANTIDAD_NIVELES);
+
+    // Enviamos el paquete con los valores de configuración de memoria al cliente.
+    enviar_paquete(values_packages, client_socket);
+    eliminar_paquete(values_packages);
+
 }

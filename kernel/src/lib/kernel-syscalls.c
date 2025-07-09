@@ -7,10 +7,10 @@ t_pcb *process_init(){
     new_process->metricas_de_tiempo = malloc(sizeof(t_metricas_de_tiempo));
     new_process->estimaciones_SJF = malloc(sizeof(t_SJF));
 
-    new_process->estimaciones_SJF->rafagaRestante = 0;
-    new_process->estimaciones_SJF->rafagaEstimada = config_kernel->ESTIMACION_INICIAL;
-    new_process->estimaciones_SJF->ultimaEstimacion = 0;
+    new_process->estimaciones_SJF->rafagaEstimada = (int64_t)config_kernel->ESTIMACION_INICIAL;
+    new_process->estimaciones_SJF->ultimaEstimacion = (int64_t)config_kernel->ESTIMACION_INICIAL;
     new_process->estimaciones_SJF->rafagaReal = NULL;
+    new_process->estimaciones_SJF->rafagaTotalReal = 0;
     
     new_process->archivo = NULL;
     new_process->tamanio_proceso = 0;
@@ -49,8 +49,7 @@ t_pcb *process_init(){
     new_process->metricas_de_tiempo->metrica_actual = temporal_create(); 
     temporal_stop(new_process->metricas_de_tiempo->metrica_actual);
 
-    new_process->estimaciones_SJF->rafagaReal = temporal_create(); 
-    temporal_stop(new_process->estimaciones_SJF->rafagaReal);
+    new_process->estimaciones_SJF->rafagaReal = NULL;
     
     return new_process;
 }
@@ -66,10 +65,11 @@ void recibir_y_crear_proceso(t_buffer *buffer){
 
 void cargar_proceso(t_pcb* process, t_buffer* buffer){
     
+    log_warning(logger, "CARGANDO PROCESO");
 	int desplazamiento = 0;
     // Copiamos el tamanio del nombre
     int tamanio_nombre=0;
-    memcpy(&tamanio_nombre, buffer->stream+ desplazamiento, sizeof(int));
+    memcpy(&tamanio_nombre, buffer->stream + desplazamiento, sizeof(int));
     desplazamiento += sizeof(int);
 
     // Copiamos el nombre del archivo
@@ -87,9 +87,9 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer){
     pthread_mutex_unlock(&list_procesos->mutex);
 
     if(desplazamiento < buffer->size) 
-    {log_info(logger,"Hay informacion sin deserializar en INIC_PROC"); }
+    {log_error(logger,"Hay informacion sin deserializar en INIC_PROC"); }
     else{ log_info(logger,"Se inicializo proceso PID: %d ",process->pid ); }
-    sleep(1);
+    //sleep(1);
 
 }
 
@@ -101,9 +101,6 @@ void delate_process(t_buffer *buffer){
     memcpy(&pid_delate, buffer->stream, sizeof(int)); 
 
     t_pcb *process = list_get(list_procesos->cola, pid_delate); //Obtengo el proceso a eliminar de la lista global
-
-    log_info(logger,"Proceso a eliminar : %d",process->pid);
-    temporal_stop(process->estimaciones_SJF->rafagaReal);
 
     queue_process(process,EXIT); 
 }

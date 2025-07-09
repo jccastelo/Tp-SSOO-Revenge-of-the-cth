@@ -1,6 +1,8 @@
 #ifndef CPU_TYPES_H_
 #define CPU_TYPES_H_
 
+#include <commons/temporal.h>
+
 typedef struct {
     char *IP_MEMORIA;
     char *IP_KERNEL;
@@ -36,6 +38,39 @@ typedef struct {
     char** argv;
     int argc;
 } t_instruccion;
+
+typedef struct {
+    int nro_pagina;
+    int *entradas;
+    int desplazamiento;
+} t_traduccion;
+
+typedef struct {
+    int pagina;
+    int marco;
+    int timestamp;
+    int bit_presencia;
+    int bit_modificado;
+    int libre;
+} t_entrada_tlb;
+
+typedef enum {
+    FIFO,
+    LRU
+} t_algoritmo_tlb;
+
+typedef struct {
+    int pagina;
+    char* contenido;
+    int bit_uso;
+    int bit_modificado;
+    int libre;
+} t_entrada_cache;
+
+typedef enum {
+    CLOCK,
+    CLOCK_M
+} t_algoritmo_cache;
 
 
 #endif // CPU_TYPES_H_ 

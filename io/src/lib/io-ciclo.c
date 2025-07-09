@@ -6,8 +6,8 @@ void ciclo_de_io(){
 
     pid_proceso_Actual = proceso->pid;
 
-    usleep(proceso->milisegundos);
-
+    usleep(proceso->milisegundos * 1000);
+    //sleep(3);
     notificar_liberacion(proceso);
 
     free(proceso);
@@ -20,7 +20,7 @@ t_proceso* recibir_proceso(){
     buffer->stream = NULL;
 
     // Leer el tamaño del buffer
-    recv(socket_kernel, &buffer->size, sizeof(int), 0);
+    recv(socket_kernel, &buffer->size, sizeof(int), MSG_WAITALL);
 
     // Reservar memoria para el stream y recibirlo
     buffer->stream = malloc(buffer->size);
@@ -33,6 +33,8 @@ t_proceso* recibir_proceso(){
 
     free(buffer->stream);
     free(buffer);
+
+    log_info(logger, "Llego PID %d con MILISEGUNDOS %d ",proceso->pid,proceso->milisegundos);
 
     return proceso;
 }

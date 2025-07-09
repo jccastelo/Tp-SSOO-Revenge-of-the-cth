@@ -6,6 +6,9 @@
 #include <utils/logger.h>
 
 
+// Incluyo las bibliotecas internas necesarias:
+#include "memoria-state.h"
+
 
 /**
  * @brief Recibe y deserializa los datos necesarios para iniciar el procesamiento de un archivo enviado por un cliente.
@@ -67,5 +70,92 @@ void rcv_process_to_end(int client_socket, int *id_process);
  */
 int rcv_only_pid(int client_socket);
 
+/**
+ * @brief Recibe y parsea información enviada por el cliente para una operación de escritura en memoria.
+ *
+ * Esta función se encarga de recibir un buffer desde el socket del cliente, extraer el ID del proceso,
+ * el contenido a escribir y la dirección física en memoria donde se almacenará el contenido.
+ * Internamente parsea el buffer recibido y actualiza los punteros provistos.
+ *
+ * @param client_socket Socket desde el cual se recibe el buffer.
+ * @param id_process Puntero donde se almacenará el ID del proceso recibido.
+ * @param physical_memory Puntero donde se almacenará la dirección física de memoria recibida.
+ * @param content_to_write Puntero donde se almacenará el contenido a escribir recibido (string).
+ */
+void rcv_physical_memory_and_content_to_write(int client_socket, int *id_process, int *physical_memory, char **content_to_write);
+
+/**
+ * @brief Recibe y parsea información enviada por el cliente para una operación de lectura en memoria.
+ *
+ * Esta función se encarga de recibir un buffer desde el socket del cliente, extraer el ID del proceso,
+ * la cantidad de bytes a leer y la dirección física en memoria desde la cual se realizará la lectura.
+ * Internamente parsea el buffer recibido y actualiza los punteros provistos.
+ *
+ * @param client_socket Socket desde el cual se recibe el buffer.
+ * @param id_process Puntero donde se almacenará el ID del proceso recibido.
+ * @param physical_memory Puntero donde se almacenará la dirección física de memoria recibida.
+ * @param quantity_bytes Puntero donde se almacenará la cantidad de bytes a leer recibida.
+ */
+void rcv_physical_memory_and_quantity_bytes(int client_socket, int *id_process, int *physical_memory, int *quantity_bytes);
+
+/**
+ * Envía al cliente un paquete de respuesta que contiene el código de estado 
+ * y, en caso exitoso, el contenido leído desde la memoria.
+ *
+ * Esta función crea un paquete utilizando el código de respuesta recibido. 
+ * Si el estado es OK, también se agrega el buffer con el contenido leído (interpretado como string).
+ * Finalmente, el paquete se envía al cliente y se elimina para liberar recursos.
+ *
+ * Parámetros:
+ * - client_socket: Socket del cliente al cual se enviará el paquete.
+ * - buffer: Puntero al contenido leído desde memoria (interpretado como string).
+ * - response: Código de estado de la operación (por ejemplo, OK o ERROR).
+ *
+ * Notas:
+ * - Si el contenido leído no es textual (binario), se recomienda adaptar la función
+ *   para enviar datos binarios en lugar de strings.
+ */
+
+void send_read_content(int client_socket, char *buffer, int response);
+
+/**
+ * @brief Recibe y parsea las entradas por nivel para un acceso a memoria desde un socket.
+ *
+ * Esta función se encarga de recibir un paquete enviado por un cliente a través del socket 
+ * especificado, el cual contiene el identificador del proceso que realiza la operación 
+ * y una lista de índices que representan las entradas correspondientes a cada nivel de 
+ * la tabla de páginas en un esquema de paginación multinivel.
+ *
+ * La función extrae y almacena el ID del proceso en la variable apuntada por `id_process`, 
+ * y devuelve una lista dinámica (`t_list*`) que contiene las entradas por nivel necesarias 
+ * para realizar la traducción de la dirección.
+ *
+ * @param client_socket Descriptor del socket desde el cual se recibe el paquete.
+ * @param id_process Puntero a la variable donde se almacenará el ID del proceso recibido.
+ *
+ * @return t_list* Lista de enteros que representa las entradas por nivel a recorrer en 
+ *                 la estructura de paginación.
+ */
+t_list *rcv_entries_per_levels(int client_socket, int *id_process);
+
+/**
+ * @brief Envía al cliente los valores de configuración actuales de la memoria.
+ *
+ * Esta función construye y envía un paquete al cliente a través del socket especificado,
+ * conteniendo los parámetros principales de configuración de la memoria: tamaño de página,
+ * cantidad de entradas por tabla y cantidad de niveles en el esquema de paginación multinivel.
+ *
+ * @param client_socket Descriptor del socket del cliente al cual se enviarán los datos.
+ *
+ * @details
+ * El paquete enviado tiene el código de operación `MEMORY_CONFIG` e incluye:
+ * - Tamaño de página (`TAM_PAGINA`)
+ * - Cantidad de entradas por tabla de páginas (`ENTRADAS_POR_TABLA`)
+ * - Cantidad de niveles de paginación (`CANTIDAD_NIVELES`)
+ *
+ * Esta información permite al cliente conocer la estructura y límites de la memoria
+ * administrada por el sistema.
+ */
+void send_values_memory(int client_socket);
 
 #endif // MEMORIA_PROTOCOLS_H

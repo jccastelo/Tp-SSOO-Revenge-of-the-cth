@@ -34,7 +34,6 @@ char* fetch_instruction() {
 
 t_instruccion* decode(char* instruccion) {
     t_instruccion* instr = malloc(sizeof(t_instruccion));
-    log_info(logger, "Decodificando la siguiente instruccion.");
     char** palabras_instr = string_split(instruccion, " ");
     instr->argv = palabras_instr;
     instr->argc = string_array_size(palabras_instr);
@@ -46,21 +45,24 @@ void excecute(t_instruccion* instruccion) {
     char* parametros = concatenar_parametros(instruccion->argv, instruccion->argc);
     log_info(logger, "## PID: %d - Ejecutando: %s - %s", contexto->pid, instruccion->argv[0], parametros);
     free(parametros);
+
+    if (instruccion->tipo != INSTR_GOTO)
+        contexto->pc++;
+
     switch (instruccion->tipo)
     {
     case INSTR_NOOP:
-        log_info(logger, "ESTOY EJECUTANDO UN NOOP :)");
         usleep(500000);
         break;
     case INSTR_WRITE: 
-        int direccion_wr = atoi(instruccion->argv[1]);
+        int direccion_logica_wr = atoi(instruccion->argv[1]);
         char* mensaje = instruccion->argv[2];
-        //TODO con traduccion lógica a física
+        escribir(direccion_logica_wr, mensaje);
         break;
     case INSTR_READ:
-        int direccion_rd = atoi(instruccion->argv[1]);
+        int direccion_logica_rd = atoi(instruccion->argv[1]);
         int tamanio_rd = atoi(instruccion->argv[2]);
-        //TODO con traduccion lógica a física
+        leer(direccion_logica_rd, tamanio_rd);
         break;
     case INSTR_GOTO:
         contexto->pc = atoi(instruccion->argv[1]);
@@ -84,8 +86,6 @@ void excecute(t_instruccion* instruccion) {
     default:
         break;
     }
-    if (instruccion->tipo != INSTR_GOTO)
-        contexto->pc++;
 }
 
 bool es_syscall_que_frena(t_tipo_instruccion tipo) {
@@ -96,7 +96,7 @@ bool es_syscall_que_frena(t_tipo_instruccion tipo) {
 bool check_interrupt() {
     bool finaliza = false;
     if (recibir_interrupciones()) {
-        log_info(logger, "## Llega interrupción al puerto Interrupt");
+        log_warning(logger, "## Llega interrupción al puerto Interrupt");
         enviar_contexto_desalojo();
         finaliza = true;
     }

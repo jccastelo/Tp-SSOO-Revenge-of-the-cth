@@ -20,9 +20,9 @@ int main(void) {
     SRunner *sr = srunner_create(suite_instructions());
 
     
-    srunner_add_suite(sr,suite_page_tables());
+    srunner_add_suite(sr, suite_page_tables());
     srunner_add_suite(sr, suite_protocols());
-    srunner_add_suite(sr,suite_user_spaces());
+    srunner_add_suite(sr, suite_user_spaces());
     
     logger = log_create("tests.log", "Tests", true, LOG_LEVEL_INFO);
     srunner_run_all(sr, CK_NORMAL);
@@ -68,7 +68,7 @@ Suite *suite_user_spaces(void){
     Suite *s = suite_create("User spaces");
     TCase *tc_core = tcase_create("Core"); 
 
-    agregar_tests_page_tables(tc_core);
+    agregar_tests_user_spaces(tc_core);
     suite_add_tcase(s, tc_core); 
     return s;    
 }

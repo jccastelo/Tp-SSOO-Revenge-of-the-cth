@@ -1,0 +1,101 @@
+#include "include/cpu-tlb.h"
+
+int buscar_frame_tlb(int pagina) {
+    for (int i=0; i < config_cpu->ENTRADAS_TLB; i++) {
+        if (tlb[i].libre != 1 && tlb[i].pagina == pagina) {
+            actualizar_timestamp(i);
+            log_info(logger, "PID: %d - TLB HIT - Pagina: %d", contexto->pid, pagina);
+            return tlb[i].marco;
+        }
+    }
+    log_info(logger, "PID: %d - TLB MISS - Pagina: %d", contexto->pid, pagina);
+    return -1;
+}
+
+void actualizar_timestamp(int posicion) {
+    timestamp_global++; 
+    tlb[posicion].timestamp = timestamp_global;
+}
+
+void agregar_a_tlb(int pagina, int marco) {
+    int entrada_libre = -1;
+    for (int i = 0; i < config_cpu->ENTRADAS_TLB; i++) {
+        if (tlb[i].libre) {
+            entrada_libre = i;
+            break;
+        }
+    }
+
+    if (entrada_libre == -1) {
+        entrada_libre = elegir_victima_tlb();
+    }
+
+    agregar_en_entrada(entrada_libre, pagina, marco);
+}
+
+void agregar_en_entrada(int entrada, int pagina, int marco) {
+    tlb[entrada].pagina = pagina;
+    tlb[entrada].marco = marco;
+    tlb[entrada].bit_modificado = 0;
+    tlb[entrada].bit_presencia = 1;
+    tlb[entrada].libre = 0;
+    actualizar_timestamp(entrada);
+}
+
+int elegir_victima_tlb() {
+    int victima = -1;
+
+    switch (get_algoritmo(config_cpu->REEMPLAZO_TLB))
+    {
+    case FIFO:
+        victima = puntero_fifo;
+        puntero_fifo = (puntero_fifo + 1) % config_cpu->ENTRADAS_TLB;
+        break;
+    case LRU:
+        int menor = tlb[0].timestamp;
+        victima = 0;
+        for (int i=1; i < config_cpu->ENTRADAS_TLB; i++) {
+            if (tlb[i].timestamp < menor) {
+                menor = tlb[i].timestamp;
+                victima = i;
+            }
+        }
+    default:
+        //TODO ERROR
+        break;
+    }
+
+    return victima;
+}
+
+t_algoritmo_tlb get_algoritmo(char* algoritmo_str) {
+    if (string_equals_ignore_case(algoritmo_str, "FIFO")) return FIFO;
+    else if (string_equals_ignore_case(algoritmo_str, "LRU")) return LRU;
+    else return -1;
+}
+
+void inicializar_tlb() {
+    tlb = malloc(sizeof(t_entrada_tlb) * config_cpu->ENTRADAS_TLB);
+    for (int i = 0; i < config_cpu->ENTRADAS_TLB; i++) {
+        tlb[i].libre = 1;
+        tlb[i].bit_presencia = 0;
+        tlb[i].bit_modificado = 0;
+    };
+}
+
+void limpiar_tlb() {
+    for (int i = 0; i < config_cpu->ENTRADAS_TLB; i++) {
+        tlb[i].libre = 1;
+        tlb[i].pagina = -1;
+        tlb[i].marco = -1;
+        tlb[i].bit_presencia = 0;
+        tlb[i].bit_modificado = 0;
+        tlb[i].timestamp = 0;
+    }
+
+    puntero_fifo = 0;
+}
+
+bool tlb_habilitada() {
+    return config_cpu->ENTRADAS_TLB > 0;
+}

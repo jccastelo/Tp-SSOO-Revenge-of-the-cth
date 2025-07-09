@@ -58,10 +58,10 @@ typedef struct {
 }t_metricas_de_tiempo;
 
 typedef struct{
-    int64_t rafagaRestante;
     int64_t rafagaEstimada;
     t_temporal *rafagaReal;
     int64_t ultimaEstimacion;
+    int64_t rafagaTotalReal;
 }t_SJF;
 
 typedef struct {
@@ -73,6 +73,7 @@ typedef struct {
     t_metricas_de_estados *metricas_de_estado;
     t_metricas_de_tiempo *metricas_de_tiempo;
     t_SJF *estimaciones_SJF;
+    pthread_t hilo_block;
 }t_pcb;
 
 
