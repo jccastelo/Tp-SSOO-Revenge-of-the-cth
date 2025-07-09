@@ -49,8 +49,7 @@ t_pcb *process_init(){
     new_process->metricas_de_tiempo->metrica_actual = temporal_create(); 
     temporal_stop(new_process->metricas_de_tiempo->metrica_actual);
 
-    new_process->estimaciones_SJF->rafagaReal = temporal_create(); 
-    temporal_stop(new_process->estimaciones_SJF->rafagaReal);
+    new_process->estimaciones_SJF->rafagaReal = NULL;
     
     return new_process;
 }
@@ -90,7 +89,7 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer){
     if(desplazamiento < buffer->size) 
     {log_error(logger,"Hay informacion sin deserializar en INIC_PROC"); }
     else{ log_info(logger,"Se inicializo proceso PID: %d ",process->pid ); }
-    sleep(1);
+    //sleep(1);
 
 }
 

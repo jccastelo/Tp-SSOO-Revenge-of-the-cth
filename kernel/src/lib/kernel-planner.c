@@ -247,10 +247,6 @@ void queue_SJF(t_pcb *process, t_list *lista) {
         process->estimaciones_SJF->ultimaEstimacion = process->estimaciones_SJF->ultimaEstimacion * (1-config_kernel->ALFA) + process->estimaciones_SJF->rafagaTotalReal * config_kernel->ALFA;
         process->estimaciones_SJF->rafagaEstimada = process->estimaciones_SJF->ultimaEstimacion; 
         process->estimaciones_SJF->rafagaTotalReal = 0;
-    } else {
-        // esto funciona solo para cuando viene de execute, si viene
-        process->estimaciones_SJF->rafagaEstimada = max(0,process->estimaciones_SJF->rafagaEstimada - temporal_gettime(process->estimaciones_SJF->rafagaReal)); // Al desalojar, la rafaga estimada pasa a ser la rafaga restante
-        process->estimaciones_SJF->rafagaTotalReal += temporal_gettime(process->estimaciones_SJF->rafagaReal);
     }
 
     int tamanio_actual = list_size(lista);
@@ -273,6 +269,13 @@ void queue_SJF(t_pcb *process, t_list *lista) {
     return;
 }
 
+void actualizar_rafagas_sjf(t_pcb* proceso){
+
+    int64_t tiempoEnCPU = temporal_gettime(proceso->estimaciones_SJF->rafagaReal);
+    proceso->estimaciones_SJF->rafagaEstimada = max((int64_t) 0, proceso->estimaciones_SJF->rafagaEstimada - tiempoEnCPU);
+    proceso->estimaciones_SJF->rafagaTotalReal += tiempoEnCPU;
+}
+
 int64_t max(int64_t a, int64_t b) {
     return (a > b) ? a : b;
 }
@@ -292,13 +295,21 @@ void desalojo_SJF(t_pcb* primer_proceso) {
     pthread_mutex_unlock(&list_procesos->mutex);
     
     temporal_stop(proceso_cpu->estimaciones_SJF->rafagaReal);
-    log_warning(logger,"RAFAGA CPU: %"PRId64 ": \n RAFAGA PROCESO:%"PRId64 ":", temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal), primer_proceso->estimaciones_SJF->rafagaEstimada);
-    if(proceso_cpu->estimaciones_SJF->rafagaEstimada - temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal) > primer_proceso->estimaciones_SJF->rafagaEstimada) {
-        log_warning(logger,"DESALOJANDO PROCESO %d EN CPU %d ",cpu->pid,cpu->id);
+
+    temporal_stop(proceso_cpu->estimaciones_SJF->rafagaReal);
+
+    int64_t tiempo = temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal);
+    int64_t restante = max(proceso_cpu->estimaciones_SJF->rafagaEstimada - tiempo,(int64_t)0);
+
+    log_warning(logger, "TIEMPO CPU: %"PRId64, tiempo);
+    log_warning(logger, "RAFAGA RESTANTE: %" PRId64, proceso_cpu->estimaciones_SJF->rafagaEstimada);
+    log_warning(logger, "RAFAGA NUEVA   : %" PRId64, primer_proceso->estimaciones_SJF->rafagaEstimada);
+
+    if (restante > primer_proceso->estimaciones_SJF->rafagaEstimada) {
         desalojar_proceso(cpu);
         return;
     }
-    temporal_resume(proceso_cpu->estimaciones_SJF->rafagaReal);
+
     return;
 }
 
