@@ -35,14 +35,14 @@ void log_metricas(t_pcb* process){
 char buffer[1024];
 
     snprintf(buffer, 1024,
-        "\nFin de proceso (PID): %%d\n"
+        "\nFin de proceso (PID): %d\n"
         "Métricas por estado:\n"
-        "NEW: Ocurrencias %%d  Tiempo: %%" PRId64 "\n"
-        "READY: Ocurrencias %%d  Tiempo: %%" PRId64 "\n"
-        "EXECUTE: Ocurrencias %%d  Tiempo: %%" PRId64 "\n"
-        "BLOCKED: Ocurrencias %%d  Tiempo: %%" PRId64 "\n"
-        "READY SUSPENDED: Ocurrencias %%d  Tiempo: %%" PRId64 "\n"
-        "BLOCKED SUSPENDED: Ocurrencias %%d  Tiempo: %%" PRId64 "\n"
+        "NEW: Ocurrencias %d  Tiempo: %" PRId64 "\n"
+        "READY: Ocurrencias %d  Tiempo: %" PRId64 "\n"
+        "EXECUTE: Ocurrencias %d  Tiempo: %" PRId64 "\n"
+        "BLOCKED: Ocurrencias %d  Tiempo: %" PRId64 "\n"
+        "READY SUSPENDED: Ocurrencias %d  Tiempo: %" PRId64 "\n"
+        "BLOCKED SUSPENDED: Ocurrencias %d  Tiempo: %" PRId64 "\n"
         "------------------------------------------- \n",
         process->pid,
         process->metricas_de_estado->new,
@@ -59,7 +59,7 @@ char buffer[1024];
         process->metricas_de_tiempo->BLOCKED_SUSPENDED ? temporal_gettime(process->metricas_de_tiempo->BLOCKED_SUSPENDED) : 0
     );
 
-    log_info(logger, "%%s", buffer);
+    log_info(logger, "%s", buffer);
 }
 
 void carnicero_de_instancias_io(t_IO_instancia* instancia_io){
