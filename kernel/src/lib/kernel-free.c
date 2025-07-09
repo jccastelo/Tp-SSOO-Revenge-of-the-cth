@@ -109,7 +109,6 @@ void terminar_kernel(){
     close(socket_memoria);
     //liberar lo que haya quedado
 
-    exponer_las_propiedades();
 }   
 
 void liberar_monitor(t_monitor* monitor) {
