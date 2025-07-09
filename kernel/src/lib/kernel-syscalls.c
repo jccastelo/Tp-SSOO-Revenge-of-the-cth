@@ -11,13 +11,16 @@ t_pcb *process_init(){
     new_process->estimaciones_SJF->ultimaEstimacion = (int64_t)config_kernel->ESTIMACION_INICIAL;
     new_process->estimaciones_SJF->rafagaReal = NULL;
     new_process->estimaciones_SJF->rafagaTotalReal = 0;
+
+    pthread_mutex_init(&new_process->mutex_estado, NULL);
     
     new_process->archivo = NULL;
     new_process->tamanio_proceso = 0;
     new_process->pid = 0;
     new_process->pc = 0;
     new_process->queue_ESTADO_ACTUAL = NULL;
-    
+    new_process->hilo_activo = false;
+
     new_process->metricas_de_estado->new = 0;
     new_process->metricas_de_estado->ready = 0;
     new_process->metricas_de_estado->execute = 0;

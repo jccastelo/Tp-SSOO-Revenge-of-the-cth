@@ -69,11 +69,14 @@ typedef struct {
     int tamanio_proceso;
     int pid;
     int pc;
+    bool hilo_activo;
     t_monitor* queue_ESTADO_ACTUAL;
     t_metricas_de_estados *metricas_de_estado;
     t_metricas_de_tiempo *metricas_de_tiempo;
     t_SJF *estimaciones_SJF;
     pthread_t hilo_block;
+    pthread_mutex_t mutex_estado;
+    
 }t_pcb;
 
 

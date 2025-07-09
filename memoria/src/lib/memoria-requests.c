@@ -86,6 +86,7 @@ void send_process_instruction(int cliente_socket) {
 void suspend_process(int client_socket) {
     
     int pid = rcv_only_pid(client_socket);
+    log_info(logger, "supendiendoProc %d", pid);
     char* pid_key = string_itoa(pid);
 
     aumentar_contador(metricas_por_procesos,SWAP_IN_REQUESTS,pid_key);

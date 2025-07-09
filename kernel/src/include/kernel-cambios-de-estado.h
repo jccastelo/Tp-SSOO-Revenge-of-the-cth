@@ -1,6 +1,8 @@
 #ifndef KERNEL_CAMBIOS_DE_ESTADO_H
 #define KERNEL_CAMBIOS_DE_ESTADO_H
 
+#include <pthread.h>
+
 #include "kernel.h"
 #include "kernel-types.h"
 #include "kernel-syscalls.h"

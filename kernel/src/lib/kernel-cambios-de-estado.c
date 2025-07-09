@@ -88,10 +88,23 @@ void queue_process(t_pcb* process, int estado){
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED_SUSPENDED));
         
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
+        log_warning(logger,"## PID: %d ESta en estado %s ",process->pid,get_NombreDeEstado(process->queue_ESTADO_ACTUAL));
 
         if(solicitar_a_memoria(suspender_proceso, process))
-        {traer_proceso_a_MP();}
+        {
+
+        traer_proceso_a_MP();
+
+        if(process->hilo_activo){
+        {
+            pthread_cancel(process->hilo_block);
+        }
+            pthread_join(process->hilo_block, NULL);
+        }
+            
+        }
         else{ log_error(logger,"Error al suspender proceso");}
+
         
         break;
 
@@ -133,6 +146,8 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
     if (process == NULL || sgteEstado == NULL ) {
         return; // O manejar error adecuadamente
     }
+    
+
 
         // if viene de execute => frenamos el timer sjf
     if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"EXECUTE") && planner->short_term->algoritmo_desalojo == desalojo_SJF && process->estimaciones_SJF->rafagaReal != NULL){
@@ -141,11 +156,8 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
         actualizar_rafagas_sjf(process);
         temporal_destroy(process->estimaciones_SJF->rafagaReal);
     } 
-    // if viene de blocked => matamos el hilo
-    if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"BLOCKED")){
-        pthread_cancel(process->hilo_block);
-        pthread_join(process->hilo_block, NULL);
-    }
+  
+
 
     if(process->queue_ESTADO_ACTUAL != NULL){
         // Cerramos el mutex y sacamos el pcb de la cola del estado en el que estaba el proceso (que esta primero)
@@ -161,6 +173,8 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
 
     // Cambiamos el estado del pcb
     process->queue_ESTADO_ACTUAL = sgteEstado;
+
+    return;
 }
 
 void actualizarTiempo(t_temporal **metrica_actual,t_temporal **metricas_de_tiempo_estado) 
