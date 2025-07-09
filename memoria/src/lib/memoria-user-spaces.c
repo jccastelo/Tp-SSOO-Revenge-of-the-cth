@@ -79,7 +79,7 @@ void write_memory(int client_socket, int id_process, char *content_to_write, int
     int response;
     char *process_status;
 
-    if ((physical_address + data_size > config_memoria->TAM_MEMORIA) || (physical_address > config_memoria->TAM_PAGINA)) {
+    if ((physical_address + data_size > config_memoria->TAM_MEMORIA)) {
         process_status = "ERROR";
         response = ERROR;
     } else {
@@ -101,7 +101,7 @@ void read_memory(int client_socket, int id_process, int quantity_bytes, int phys
     int response;
     char *process_status;
 
-    if ((physical_address + quantity_bytes > config_memoria->TAM_MEMORIA) || (physical_address > config_memoria->TAM_PAGINA)) {
+    if ((physical_address + quantity_bytes > config_memoria->TAM_MEMORIA)) {
         process_status = "ERROR";
         response = ERROR;
     } else {
@@ -112,5 +112,6 @@ void read_memory(int client_socket, int id_process, int quantity_bytes, int phys
 
     // Informamos situacion:
     log_info(logger, "Process %d: Read from memory (physical_address: %d, size: %d bytes) - Status: %s", id_process, physical_address, quantity_bytes, process_status);
+    log_info(logger, "Read content: %s", (char *)buffer);
     send_read_content(client_socket, buffer, response);
 }

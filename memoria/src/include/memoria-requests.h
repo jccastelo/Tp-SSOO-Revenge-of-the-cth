@@ -1,6 +1,9 @@
 #ifndef MEMORIA_REQUESTS_H
 #define MEMORIA_REQUESTS_H
 
+// Incluimos las biblotecas externas:
+#include <commons/memory.h>
+
 // Incluimos las biblotecas internas:
 #include "memoria-protocols.h"
 #include "memoria-instructions.h"

@@ -38,7 +38,10 @@ void access_to_page_tables(int client_socket) {
     int id_process;
     t_list *entries_per_levels = rcv_entries_per_levels(client_socket, &id_process);
     int size_entries_per_levels = list_size(entries_per_levels);
-    log_info(logger, "PID: %d - Cantidad de entradas por nivel: %d", id_process, size_entries_per_levels);
+
+    // Logueamos la información del proceso y las entradas recibidas:
+    log_info(logger, "PID: %d - Entradas por niveles recibidas: %d", id_process, size_entries_per_levels);
+    log_info(logger, "PID: %d - Acceso a tablas de páginas", id_process);
 
     // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
     int searched_frame = find_frame_from_entries(id_process, entries_per_levels);
@@ -54,8 +57,12 @@ void write_in_user_spaces(int client_socket) {
     int physical_address;
     char* content_to_write;
 
+    // Inicializamos el espacio de usuario para el proceso:
     rcv_physical_memory_and_content_to_write(client_socket, &id_process, &physical_address, &content_to_write);
     write_memory(client_socket, id_process, content_to_write, physical_address);
+
+    // Logueamos el contenido del espacio de usuario después de la escritura:
+    log_info(logger, "user space after write: %s", mem_hexstring(espacio_usuario, config_memoria->TAM_MEMORIA));
 }
 
 void read_in_user_spaces(int client_socket) {
@@ -63,6 +70,7 @@ void read_in_user_spaces(int client_socket) {
     int physical_address;
     int quantity_bytes;
 
+    // Inicializamos el espacio de usuario para el proceso:
     rcv_physical_memory_and_quantity_bytes(client_socket, &id_process, &physical_address, &quantity_bytes);
     read_memory(client_socket, id_process, quantity_bytes, physical_address);
 }

@@ -99,13 +99,13 @@ int busqueda_cache(int nro_pagina) {
 }
 
 char* leer_frame_memoria(int nro_pagina) {
-    int dir_logica = nro_pagina * TAM_PAGINA;
+    int dir_logica = nro_pagina * TAM_PAGINA; //sin offset :)
     t_traduccion* traduccion = traducir_direccion_logica(dir_logica);
 
     int frame = pedir_marco_a_memoria(traduccion);
     free(traduccion);
 
-    char* contenido = conseguir_contenido_frame(frame);
+    char* contenido = leer_en_memoria_desde(frame * TAM_PAGINA, TAM_PAGINA);
     return contenido;
 }
 

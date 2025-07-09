@@ -110,15 +110,21 @@ char* leer_en_memoria_desde(int dir_fisica, int tamanio) {
         log_error(logger, "Error al recibir contenido parcial de memoria.");
     }
 
+    int size = 0;
+    int desplazamiento = 0;
+    void *buffer = recibir_buffer(&size, socket_memoria);
 
-    //TODO -> hacer igual q el otro?
-    t_buffer* buffer = malloc(sizeof(t_buffer));
-    buffer->stream = recibir_buffer(&buffer->size, socket_memoria);
+    int size_string;
     char* resultado = malloc(tamanio + 1);
-    memcpy(resultado, buffer->stream, tamanio);
-    resultado[tamanio] = '\0';
 
-    free(buffer);
+    memcpy(&size_string, buffer + desplazamiento, sizeof(int));
+    desplazamiento += sizeof(int);
+
+    memcpy(resultado, buffer + desplazamiento, size_string);
+    resultado[size_string] = '\0'; // Aseguramos que el string esté terminado
+
+    // parsear_string(buffer->stream, &tamanio, &resultado);
+
     log_info(logger, "PID: %d - Acción: LEER - Dirección Física: %d - Valor: %s", contexto->pid, dir_fisica, resultado);
     return resultado;
 }

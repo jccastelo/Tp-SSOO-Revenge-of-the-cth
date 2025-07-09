@@ -152,4 +152,22 @@ t_list *get_root_table(int id_process);
  */
 t_list *get_frames_from_entries(int id_process);
 
+/**
+ * @brief Obtiene todos los frames ocupados a partir de una tabla de páginas multinivel.
+ *
+ * Esta función recorre recursivamente una estructura de tabla de páginas con múltiples niveles,
+ * identificando todos los frames ocupados (asignados) y agregándolos a la lista frame_as_busy.
+ * 
+ * - Si se encuentra en el último nivel de la tabla, agrega directamente los frames presentes en
+ *   current_table a la lista destino.
+ * - Si no está en el último nivel, continúa descendiendo por cada entrada (subtabla) hasta llegar
+ *   al nivel final.
+ *
+ * @param current_level Nivel actual en la tabla de páginas (inicialmente 1).
+ * @param total_levels  Cantidad total de niveles que tiene la tabla de páginas.
+ * @param current_table Tabla de páginas actual a procesar (puede ser una subtabla).
+ * @param frame_as_busy Lista destino donde se acumulan los frames ocupados encontrados.
+ */
+void get_occupied_frames_from_page_table(int current_level, int total_levels, t_list *current_table, t_list *frame_as_busy);
+
 #endif

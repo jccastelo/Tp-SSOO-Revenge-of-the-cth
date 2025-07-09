@@ -126,23 +126,35 @@ t_list *get_frames_from_entries(int id_process) {
     t_list *current_table = get_root_table(id_process);
     t_list *frame_as_busy = list_create();
 
-    void closure(void *entry_index_ptr) {
-        int entry_index = (int)(intptr_t) entry_index_ptr;
+    // Iteramos sobre los niveles de la tabla de páginas:
+    get_occupied_frames_from_page_table(current_level, total_levels, current_table, frame_as_busy);
+    log_info(logger, "Se obtuvieron %d frames ocupados del proceso %d", list_size(frame_as_busy), id_process);
 
-        // Obtener la entrada de la tabla actual
-        void *entry = list_get(current_table, entry_index);
-
-        // Si estamos en el último nivel, asignamos el frame correspondiente, de lo contrario, seguimos recorriendo.
-        if (current_level == total_levels)  
-            list_add(frame_as_busy, entry);
-        else 
-            current_table = (t_list *) entry;
-
-        current_level++;
+    // Logueamos los frames ocupados:
+    void closure(void *frame_ptr) {
+        int frame = (int)(intptr_t)frame_ptr;
+        log_info(logger, "Frame ocupado: %d", frame);
     }
+    
+    list_iterate(frame_as_busy, closure);
 
-    list_iterate(current_table, closure);
     return frame_as_busy;
+}
+
+void get_occupied_frames_from_page_table(int current_level, int total_levels, t_list *current_table, t_list *frame_as_busy) {
+    if(current_level == total_levels) {
+        // Si estamos en el último nivel, agregamos los frames ocupados a la lista
+        for (int i = 0; i < list_size(current_table); i++) {
+            int frame = (int)(intptr_t)list_get(current_table, i);
+            list_add(frame_as_busy, (void *)(intptr_t)frame);
+        }
+    } else {
+        // Si no estamos en el último nivel, iteramos sobre las entradas de la tabla actual
+        for (int i = 0; i < list_size(current_table); i++) {
+            t_list *child_table = (t_list *)list_get(current_table, i);
+            get_occupied_frames_from_page_table(current_level + 1, total_levels, child_table, frame_as_busy);
+        }
+    }
 }
 
 t_list *get_root_table(int id_process) {

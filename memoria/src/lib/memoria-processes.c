@@ -35,7 +35,7 @@ int is_process_end(int id_process) {
     // Obtenemos los frames ocupados por el proceso y los marcamos como libres
     frames_as_busy = get_frames_from_entries(id_process);
     mark_frames_as_free(frames_as_busy);
-    list_destroy(frames_as_busy);
+    // list_destroy(frames_as_busy);
 
     return OK;
 }
