@@ -97,3 +97,5 @@ int desuspender_proceso(t_pcb* proceso){
 
     return enviar_pid_memoria(proceso, DESUSPENDER);
 }
+
+//faltaría finalizar proceso
