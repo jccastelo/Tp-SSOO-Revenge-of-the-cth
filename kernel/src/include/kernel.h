@@ -3,6 +3,7 @@
 
 // Incluye las bibliotecas necesarias externas:
 #include <utils/logger.h>
+#include <signal.h>
 
 // Incluyo las bibliotecas necesarias internas:
 #include "kernel-config.h"

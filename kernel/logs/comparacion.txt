@@ -1,0 +1,6 @@
+          | PROMEDIO READY FIFO | PROMEDIO READY SJFsD | PROMEDIO READY SJFcD| 
+PROCESO 1 |       19966         |        24125         |       939           | 
+PROCESO 2 |       21109         |        53872         |       980           | 
+PROCESO 3 |       15817         |        12070         |       1712          | 
+PROCESO 4 |       18907         |        12891         |       3547          | 
+PROCESO 5 |       23576         |        8436          |       4076          | 

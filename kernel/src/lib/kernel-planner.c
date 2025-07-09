@@ -297,10 +297,6 @@ void desalojo_SJF(t_pcb* primer_proceso) {
     int64_t tiempo = temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal);
     int64_t restante = max(proceso_cpu->estimaciones_SJF->rafagaEstimada - tiempo,(int64_t)0);
 
-    log_warning(logger, "TIEMPO CPU: %"PRId64, tiempo);
-    log_warning(logger, "RAFAGA RESTANTE: %" PRId64, proceso_cpu->estimaciones_SJF->rafagaEstimada);
-    log_warning(logger, "RAFAGA NUEVA   : %" PRId64, primer_proceso->estimaciones_SJF->rafagaEstimada);
-
     if (restante > primer_proceso->estimaciones_SJF->rafagaEstimada) {
         desalojar_proceso(cpu);
         return;

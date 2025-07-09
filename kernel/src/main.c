@@ -19,9 +19,9 @@ int main(int argc, char *argv[]) {
         Tamanio_proc = atoi(argv[2]);
     }
 
-    
     // Inicializamos la configuración del kernel y los servidores:
     kernel_config_init();
+
     planner_init();
 
     if (planner == NULL || planner->long_term == NULL) {
@@ -33,29 +33,22 @@ int main(int argc, char *argv[]) {
 
     // // Comenzamos a escuchar las conexiones de los clientes:
     kernel_servers_listening();
-    log_info(logger,"ESta escuchadno");
 
     // //Nos conectamos a la memoria como clientes
-
     kernel_memory_connection();
-
-    log_info(logger, "Esperando conexion de alguna CPU para iniciar primer proceso...");
    
     while(list_size(list_cpus->cola) == 0) {}
-    log_info(logger, "Primera Cpu conectada");
+    
+    signal(SIGINT, terminar_kernel);
 
-    log_info(logger, "Esperando CONFIRMACION para iniciar");
     getchar();
 
     // INICIO PRIMER PROCESO
     init_fist_process(archivo_pseudocodigo,Tamanio_proc);
 
-
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
     // Ya que detachamos los hilos, no podemos esperar a que terminen.
     while(list_size(list_cpus->cola) > 0) {}
- 
-    // terminar_kernel();
 
     return 0;
 }
