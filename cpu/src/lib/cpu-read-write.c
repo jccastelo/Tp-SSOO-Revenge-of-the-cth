@@ -44,10 +44,11 @@ void leer(int direccion_logica, int tamanio) {
     else {
         int dir_fisica = obtener_direccion_fisica(direccion_logica);
         char* contenido = leer_en_memoria_desde(dir_fisica, tamanio);
-        memcpy(resultado, &contenido, tamanio);
+        memcpy(resultado, contenido, tamanio);
         free(contenido);
     }
     
+    resultado[tamanio] = '\0';
     log_info(logger, "LEI %s", resultado); //TODO HACER ESTE LOG BIEN
 
     free(resultado);

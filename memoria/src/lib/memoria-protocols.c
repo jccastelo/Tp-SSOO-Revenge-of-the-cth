@@ -91,7 +91,7 @@ void send_read_content(int client_socket, char *buffer, int response) {
     t_paquete *response_package = crear_paquete(response);
 
     if(response == OK)
-        agregar_a_paquete_string(response_package, buffer, string_length(buffer));
+        agregar_a_paquete_string(response_package, buffer, string_length(buffer) + 1);
     
     enviar_paquete(response_package, client_socket);
     eliminar_paquete(response_package);

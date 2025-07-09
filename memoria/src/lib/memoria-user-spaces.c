@@ -95,7 +95,7 @@ void write_memory(int client_socket, int id_process, char *content_to_write, int
 
 void read_memory(int client_socket, int id_process, int quantity_bytes, int physical_address) {
     // Preparamos el contenido a leer de memoria:
-    void *buffer = malloc(quantity_bytes); 
+    char *buffer = malloc(quantity_bytes + 1); 
 
     // Inicializamos variable para manejar la respuesta al cliente:
     int response;
@@ -109,6 +109,9 @@ void read_memory(int client_socket, int id_process, int quantity_bytes, int phys
         process_status = "OK";
         response = OK;
     }
+
+    // Aseguramos que el buffer sea un string válido:
+    buffer[quantity_bytes] = '\0';
 
     // Informamos situacion:
     log_info(logger, "Process %d: Read from memory (physical_address: %d, size: %d bytes) - Status: %s", id_process, physical_address, quantity_bytes, process_status);
