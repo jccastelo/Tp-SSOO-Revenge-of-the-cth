@@ -126,17 +126,11 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
     
     switch(operation) {
         case CPU_ID:
-            //log_info(logger, "Llego cpu para identificarse" );
-            //log_info(logger, "CPU SOCKET %d ", cpu_socket);
             iniciar_cpu(new_buffer,cpu_socket, 1);
             
             break;
         case CONTEXTO_DESALOJO:
             t_pcb* proceso = recibir_proceso(new_buffer);
-            temporal_stop(proceso->estimaciones_SJF->rafagaReal);
-
-            // No hay que voler a estimar, unicamente hay que restarle el tiempo que estuvo en CPU
-            proceso->estimaciones_SJF->rafagaEstimada -= temporal_gettime(proceso->estimaciones_SJF->rafagaReal);
 
             queue_process(proceso, READY);
 
@@ -175,10 +169,8 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             log_error(logger, "Operación no válida para el servidor HANDLER: %d", operation);
             break;
     }
-    if(new_buffer != NULL){
-        free(new_buffer);
-    }
-    
-    
+
+    free(new_buffer);
+
     return;
 }
