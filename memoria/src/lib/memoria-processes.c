@@ -46,7 +46,7 @@ int required_frames_for_process(int size_process) {
 } 
 bool estaEn(t_dictionary* diccionario , char* pid_key){
     t_list* lista_de_marcos = get_marcos_list_of_proc(pid_key, diccionario);
-    if(list_size(lista_de_marcos) == 0){
+    if(list_size(lista_de_marcos) > 0){
         list_destroy(lista_de_marcos);
         return true;
     }
