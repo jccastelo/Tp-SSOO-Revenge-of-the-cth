@@ -56,7 +56,6 @@ void destruir_nodo(t_list* nodo) {
 void destruir_tabla_de_paginas(int pid) {
     char* pid_key = string_itoa(pid);
     t_list* tabla = dictionary_remove(all_process_page_tables, pid_key);
-    free(pid_key);
 
     if (tabla != NULL) {
         destruir_nodo(tabla);
