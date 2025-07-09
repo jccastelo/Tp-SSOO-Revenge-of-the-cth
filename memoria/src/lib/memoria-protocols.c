@@ -86,7 +86,7 @@ int rcv_only_pid(int socket_cliente) {
     free(buffer); 
 
     return pid;
-
+}
 void send_read_content(int client_socket, char *buffer, int response) {
     t_paquete *response_package = crear_paquete(response);
 
@@ -111,7 +111,7 @@ t_list *rcv_entries_per_levels(int client_socket, int *id_process) {
     while(desplazamiento < size) {
         parsear_int(entries_per_level, &desplazamiento, &entrie);
         log_info(logger, "Entrada por nivel: %d", entrie);
-        list_add(entries_per_level, entrie);
+        list_add(entries_per_level, &entrie);
     }
 
     return entries_per_level;
