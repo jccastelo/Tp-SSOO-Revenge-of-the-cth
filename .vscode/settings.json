@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "check.h": "c",
+        "memoria-state.h": "c",
+        "memoria-user-spaces.h": "c",
+        "list.h": "c",
+        "logger.h": "c",
+        "dictionary.h": "c",
+        "memoria-requests.h": "c",
+        "memoria-handlers.h": "c"
+    }
+}

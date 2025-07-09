@@ -21,7 +21,7 @@ void memoria_state_init() {
 
     // Inicializamos el bitmap que representa qué frames están libres u ocupados en memoria:
     init_free_frames_bitmap();
-
+    init_swap();
     if (!espacio_usuario) {
         log_error(logger, "No se pudo reservar espacio en memoria");
         exit(EXIT_FAILURE);

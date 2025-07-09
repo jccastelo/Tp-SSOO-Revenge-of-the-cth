@@ -5,8 +5,10 @@
 #include <utils/protocolo.h>
 #include <utils/logger.h>
 
+
 // Incluyo las bibliotecas internas necesarias:
 #include "memoria-state.h"
+
 
 /**
  * @brief Recibe y deserializa los datos necesarios para iniciar el procesamiento de un archivo enviado por un cliente.
@@ -62,6 +64,11 @@ void send_instruction_consumer(int cliente_socket, int id_process, int program_c
  * @param id_process Puntero a una variable donde se almacenará el ID del proceso finalizado.
  */
 void rcv_process_to_end(int client_socket, int *id_process);
+/**
+ * @brief recibo el buffer y solo retorno el pid del proceso
+ * @param client_socket Descriptor del socket donde se recibe el paquete. 
+ */
+int rcv_only_pid(int client_socket);
 
 /**
  * @brief Recibe y parsea información enviada por el cliente para una operación de escritura en memoria.
