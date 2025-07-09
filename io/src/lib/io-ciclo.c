@@ -4,11 +4,15 @@ void ciclo_de_io(){
 
     t_proceso* proceso = recibir_proceso();
 
+    log_info(logger, "## PID: %d - Inicio de IO - Tiempo: %d", proceso->pid, proceso->milisegundos);
+
     pid_proceso_Actual = proceso->pid;
 
     usleep(proceso->milisegundos * 1000);
-    //sleep(3);
+
     notificar_liberacion(proceso);
+    
+    log_info(logger, "## PID: %d - Fin de IO: %d", proceso->pid, proceso->milisegundos);
 
     free(proceso);
 }
@@ -33,8 +37,6 @@ t_proceso* recibir_proceso(){
 
     free(buffer->stream);
     free(buffer);
-
-    log_info(logger, "Llego PID %d con MILISEGUNDOS %d ",proceso->pid,proceso->milisegundos);
 
     return proceso;
 }

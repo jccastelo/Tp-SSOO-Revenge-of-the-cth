@@ -6,6 +6,5 @@ void cierre_de_io(){
     agregar_a_paquete(paquete, &pid_proceso_Actual, sizeof(int));
     enviar_paquete(paquete, socket_kernel);
     eliminar_paquete(paquete);
-    log_info(logger,"IO Se desconecta");
-     exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
 }

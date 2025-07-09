@@ -29,6 +29,4 @@ void enviar_nombre_kernel(char* nombre){
     enviar_paquete(paquete, socket_kernel); 
     
     eliminar_paquete(paquete);
-
-    log_info(logger,"Paquete de identificacion de IO enviado a Kernel");
 }

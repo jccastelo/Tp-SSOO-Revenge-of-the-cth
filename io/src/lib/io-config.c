@@ -26,9 +26,6 @@ void io_config_init() {
     configurar_valores_de_kernel(config_io, config);
     configurar_valores_de_log(config_io, config);
     config_destroy(config);
-
-    // Verificamos que la configuración de IO se haya inicializado correctamente:
-    log_info(logger, "Configuración de IO inicializada correctamente");
 }
 
 void configurar_valores_de_kernel(t_config_io *config_io, t_config *config) {

@@ -15,16 +15,13 @@ int main(int argc, char *argv[]) {
 
     // Inicializamos un logger
     logger = log_create("io.log", "IO", true, LOG_LEVEL_INFO);
-    log_info(logger,"IO inicializada con nombre: %s",nombre);
+
     // Inicializamos la configuración de IO y nos conectamos al servidor:
     io_config_init();
     io_connect(nombre);
-    
-
    
     while (1)
     {
         ciclo_de_io();
     }
-
  }
