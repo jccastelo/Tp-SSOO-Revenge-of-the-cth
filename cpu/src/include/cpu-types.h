@@ -3,8 +3,6 @@
 
 #include <commons/temporal.h>
 
-#define MAX_NIVELES 10
-
 typedef struct {
     char *IP_MEMORIA;
     char *IP_KERNEL;
@@ -43,7 +41,7 @@ typedef struct {
 
 typedef struct {
     int nro_pagina;
-    int entradas[MAX_NIVELES];
+    int *entradas;
     int desplazamiento;
 } t_traduccion;
 

@@ -20,6 +20,7 @@ int obtener_direccion_fisica(int direccion_logica) {
     }
 
     int dir_fisica = marco * TAM_PAGINA + traduccion->desplazamiento;
+    free(traduccion->entradas);
     free(traduccion);
     return dir_fisica;
 }
@@ -36,6 +37,7 @@ void leer(int direccion_logica, int tamanio) {
         int entrada = busqueda_cache(traduccion->nro_pagina);
 
         char* contenido = leer_pagina_cache_parcial(entrada, traduccion->desplazamiento, tamanio);
+        log_warning(logger, "CONTENIDO LEIDO: %s", contenido);
         memcpy(resultado, contenido, tamanio);
         free(contenido);
     }
@@ -46,10 +48,10 @@ void leer(int direccion_logica, int tamanio) {
         free(contenido);
     }
     
-    resultado[tamanio] = '\0';
     log_info(logger, "LEI %s", resultado); //TODO HACER ESTE LOG BIEN
 
     free(resultado);
+    free(traduccion->entradas);
     free(traduccion);
 }
 
@@ -69,6 +71,7 @@ void escribir(int direccion_logica, char* contenido) {
 
     log_info(logger, "escribí %s", contenido);
 
+    free(traduccion->entradas);
     free(traduccion);
 }
 

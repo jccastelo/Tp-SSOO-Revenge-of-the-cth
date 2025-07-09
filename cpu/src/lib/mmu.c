@@ -2,6 +2,7 @@
 
 t_traduccion* traducir_direccion_logica(int dir_logica) {
     t_traduccion *traduccion = malloc(sizeof(t_traduccion));
+    traduccion->entradas = malloc(sizeof(int) * CANTIDAD_NIVELES);
 
     int nro_pagina = obtener_nro_pagina(dir_logica);
     traduccion->nro_pagina = nro_pagina;
