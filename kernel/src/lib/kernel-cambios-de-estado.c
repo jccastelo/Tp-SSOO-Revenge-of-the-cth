@@ -61,12 +61,10 @@ void queue_process(t_pcb* process, int estado){
         if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
         {
             enviar_proceso_cpu(cpu_a_ocupar->socket_dispatch, process);
-            
             if(planner->short_term->algoritmo_planificador == queue_SJF){
-                process->estimaciones_SJF->rafagaReal = temporal_create();
-                temporal_resume(process->estimaciones_SJF->rafagaReal);
+            process->estimaciones_SJF->rafagaReal = temporal_create();
+            temporal_resume(process->estimaciones_SJF->rafagaReal);
             }
-
         } else {
              queue_process(process,READY); //NO puede haber procesos en EXECUTE que no estan ejecutando
              log_warning(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
@@ -93,18 +91,19 @@ void queue_process(t_pcb* process, int estado){
         
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
         log_warning(logger,"SOLICITANDO SUSP A MEMORIA");
-
         if(solicitar_a_memoria(suspender_proceso, process))
         {
         log_warning(logger,"SUSP A MEMORIA ACEPTADO");
         traer_proceso_a_MP();
 
         if(process->hilo_activo){
-            
+        {
             pthread_cancel(process->hilo_block);
-            }
-          pthread_join(process->hilo_block, NULL);
-        }    
+        }
+            pthread_join(process->hilo_block, NULL);
+        }
+            
+        }
         else{ log_error(logger,"Error al suspender proceso");}
 
         
@@ -121,7 +120,7 @@ void queue_process(t_pcb* process, int estado){
         if(list_size(planner->medium_term->queue_READY_SUSPENDED->cola)==1){
             traer_proceso_a_MP();
         }
-        
+
         break;
 
     case EXIT:
@@ -153,9 +152,11 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
     if (process == NULL || sgteEstado == NULL ) {
         return; // O manejar error adecuadamente
     }
+    
+
 
         // if viene de execute => frenamos el timer sjf
-    if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"EXECUTE") && planner->short_term->algoritmo_planificador == queue_SJF && process->estimaciones_SJF->rafagaReal != NULL){
+    if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"EXECUTE") && planner->short_term->algoritmo_planificador== queue_SJF && process->estimaciones_SJF->rafagaReal != NULL){
         
         temporal_stop(process->estimaciones_SJF->rafagaReal);
         actualizar_rafagas_sjf(process);
