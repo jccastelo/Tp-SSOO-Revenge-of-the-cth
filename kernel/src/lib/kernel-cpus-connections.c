@@ -51,22 +51,33 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo,int pid_ejecutando)
 
     pthread_mutex_lock(&list_cpus->mutex);
     int cantidad_cpus = list_size(list_cpus->cola);
-    pthread_mutex_unlock(&list_cpus->mutex);
+    
     for(int i = 0; i < cantidad_cpus ; i++)
     {   
-        pthread_mutex_lock(&list_cpus->mutex);
+       
         t_cpu *cpu =list_get(list_cpus->cola,i);
-        pthread_mutex_unlock(&list_cpus->mutex);
+        
 
         socket_actual = cpu->socket_dispatch;
 
         if(socket_actual == cpu_socket_buscado)
         {
+
             cpu->estado = estado_nuevo;
             cpu->pid =pid_ejecutando;
+
+            if(cantidad_cpus >1 && estado_nuevo == EJECUTANDO)
+            {
+                
+                list_remove(list_cpus->cola,i);
+                list_add(list_cpus->cola,cpu);
+               
+            }
+            pthread_mutex_unlock(&list_cpus->mutex);
             return;
         }
     }
+    pthread_mutex_unlock(&list_cpus->mutex);
 }
 
 t_cpu* buscar_cpu_disponible(){
