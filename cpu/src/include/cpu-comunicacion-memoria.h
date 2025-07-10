@@ -26,12 +26,8 @@ char* devolver_instruccion_a_ejecutar();
 
 int pedir_marco_a_memoria(t_traduccion *traduccion);
 
-char* conseguir_contenido_frame(int frame);
+char* leer_en_memoria(int dir_fisica, int tamanio);
 
-void escribir_pagina_en_memoria(int frame, char* contenido);
-
-char* leer_en_memoria_desde(int dir_fisica, int tamanio);
-
-void escribir_en_memoria_desde(int dir_fisica, char* contenido);
+void escribir_en_memoria(int dir_fisica, char* contenido);
 
 #endif // CPU_COMUNICACION_MEMORIA_H_

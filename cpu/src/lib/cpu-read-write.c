@@ -43,7 +43,7 @@ void leer(int direccion_logica, int tamanio) {
     }
     else {
         int dir_fisica = obtener_direccion_fisica(direccion_logica);
-        char* contenido = leer_en_memoria_desde(dir_fisica, tamanio);
+        char* contenido = leer_en_memoria(dir_fisica, tamanio);
         memcpy(resultado, contenido, tamanio);
         free(contenido);
     }
@@ -67,7 +67,7 @@ void escribir(int direccion_logica, char* contenido) {
     }
     else {
         int dir_fisica = obtener_direccion_fisica(direccion_logica);
-        escribir_en_memoria_desde(dir_fisica, contenido);
+        escribir_en_memoria(dir_fisica, contenido);
     }
 
     log_info(logger, "escribí %s", contenido);
@@ -85,28 +85,24 @@ int busqueda_cache(int nro_pagina) {
 
             // DESALOJO
 
+            int dir_logica_sin_offset = cache[entrada].pagina * TAM_PAGINA;
+            int dir_fisica = obtener_direccion_fisica(dir_logica_sin_offset); // la calculo sin el offset
+
             if (cache[entrada].bit_modificado) {
-                int dir_fisica = obtener_direccion_fisica(cache[entrada].pagina * TAM_PAGINA);
-                escribir_pagina_en_memoria(dir_fisica, cache[entrada].contenido);
+                escribir_en_memoria(dir_fisica, cache[entrada].contenido);
             }
 
             // ACTUALIZO LA CACHE
 
-            char* contenido_frame = leer_frame_memoria(nro_pagina);
+            char* contenido_frame = leer_frame_memoria(dir_fisica);
             agregar_en_entrada_cache(entrada, nro_pagina, contenido_frame);
         }
 
     return entrada;
 }
 
-char* leer_frame_memoria(int nro_pagina) {
-    int dir_logica = nro_pagina * TAM_PAGINA; //sin offset :)
-    t_traduccion* traduccion = traducir_direccion_logica(dir_logica);
-
-    int frame = pedir_marco_a_memoria(traduccion);
-    free(traduccion);
-
-    char* contenido = leer_en_memoria_desde(frame * TAM_PAGINA, TAM_PAGINA);
+char* leer_frame_memoria(int dir_fisica) {
+    char* contenido = leer_en_memoria(dir_fisica, TAM_PAGINA);
     return contenido;
 }
 
@@ -121,7 +117,7 @@ void guardado_de_cache(int entrada) {
     if (cache[entrada].bit_modificado) {
             int dir_fisica = obtener_direccion_fisica(cache[entrada].pagina * TAM_PAGINA);
             int frame = dir_fisica / TAM_PAGINA;
-            escribir_pagina_en_memoria(frame, cache[entrada].contenido);
+            escribir_en_memoria(dir_fisica, cache[entrada].contenido);
             log_info(logger, "PID: %d - Memory Update - Página: %d - Frame: %d", contexto->pid, cache[entrada].pagina, frame);
         }
 }
