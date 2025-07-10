@@ -85,14 +85,16 @@ int busqueda_cache(int nro_pagina) {
 
             // DESALOJO
 
-            int dir_logica_sin_offset = cache[entrada].pagina * TAM_PAGINA;
-            int dir_fisica = obtener_direccion_fisica(dir_logica_sin_offset); // la calculo sin el offset
-
             if (cache[entrada].bit_modificado) {
+                int dir_logica_sin_offset_modificada = cache[entrada].pagina * TAM_PAGINA;
+                int dir_fisica = obtener_direccion_fisica(dir_logica_sin_offset_modificada); // la calculo sin el offset
                 escribir_en_memoria(dir_fisica, cache[entrada].contenido);
             }
 
             // ACTUALIZO LA CACHE
+
+            int dir_logica_sin_offset_nueva = nro_pagina * TAM_PAGINA;
+            int dir_fisica = obtener_direccion_fisica(dir_logica_sin_offset_nueva); // la calculo sin el offset tambien
 
             char* contenido_frame = leer_frame_memoria(dir_fisica);
             agregar_en_entrada_cache(entrada, nro_pagina, contenido_frame);

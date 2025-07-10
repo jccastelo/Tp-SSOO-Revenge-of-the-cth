@@ -104,7 +104,7 @@ int find_frame_from_entries(int id_process, t_list *entries_per_level) {
         else 
             current_table = (t_list *) entry;
 
-        usleep(retardo_memoria);
+        usleep(retardo_memoria * 1000);
         current_level++;
     }
 
