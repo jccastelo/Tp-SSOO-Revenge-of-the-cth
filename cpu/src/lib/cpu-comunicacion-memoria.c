@@ -61,44 +61,7 @@ int pedir_marco_a_memoria(t_traduccion *traduccion) {
     return frame;
 }
 
-char* conseguir_contenido_frame(int frame) {
-    t_paquete* paquete = crear_paquete(READ_MEM);
-    agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
-    agregar_a_paquete(paquete, &frame, sizeof(int));
-    agregar_a_paquete(paquete, &TAM_PAGINA, sizeof(int));
-    enviar_paquete(paquete, socket_memoria);
-
-    t_buffer* new_buffer = malloc(sizeof(t_buffer));
-    new_buffer->size = 0;
-    new_buffer->stream = NULL;
-
-    int cod_op = recibir_operacion(socket_memoria);
-    if (cod_op != OK) {
-        log_error(logger, "Error al recibir el contenido del frame desde Memoria.");
-        return NULL;
-    }
-
-    char* contenido = malloc(TAM_PAGINA);
-
-    new_buffer->stream = recibir_buffer(&new_buffer->size, socket_memoria);
-    memcpy(contenido, new_buffer->stream, TAM_PAGINA);
-
-    free(new_buffer);
-    return contenido;
-}
-
-void escribir_pagina_en_memoria(int frame, char* contenido) {
-    t_paquete* paquete = crear_paquete(WRITE_MEM);
-    agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
-    agregar_a_paquete_string(paquete, contenido, string_length(contenido));
-    agregar_a_paquete(paquete, &frame, sizeof(int));
-    enviar_paquete(paquete, socket_memoria);
-
-    int respuesta;
-    recv(socket_memoria, &respuesta, sizeof(int), 0);
-}
-
-char* leer_en_memoria_desde(int dir_fisica, int tamanio) {
+char* leer_en_memoria(int dir_fisica, int tamanio) {
     t_paquete* paquete = crear_paquete(READ_MEM);
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
     agregar_a_paquete(paquete, &tamanio, sizeof(int));
@@ -129,7 +92,7 @@ char* leer_en_memoria_desde(int dir_fisica, int tamanio) {
     return resultado;
 }
 
-void escribir_en_memoria_desde(int dir_fisica, char* contenido) {
+void escribir_en_memoria(int dir_fisica, char* contenido) {
     log_info(logger, "PID: %d - Acción: ESCRIBIR - Dirección Física: %d - Valor: %s", contexto->pid, dir_fisica, contenido);
     t_paquete* paquete = crear_paquete(WRITE_MEM);
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
