@@ -107,12 +107,13 @@ void suspend_process(int client_socket) {
     aumentar_contador(metricas_por_procesos, MEM_READ_REQUESTS,pid_key); //ver si esto se tiene que sumar por cada entrada a un marco, o con solo cambiar listo
 
 
-    t_list* lista_de_marcos = get_marcos_list_of_proc(pid_key, all_process_page_tables);
- 
+    //t_list* lista_de_marcos = get_marcos_list_of_proc(pid_key, all_process_page_tables);
+    t_list* lista_de_marcos = dictionary_remove(all_process_page_tables, pid_key);
 
     t_list* swap_metadata_proceso = list_create();
-
-    for (int i = 0; i < list_size(lista_de_marcos); i++) {
+    log_warning(logger, "lst lista de marcos %d", list_size(lista_de_marcos));
+    int cantidad_de_marcos = list_size(lista_de_marcos);
+    for (int i = 0; i < cantidad_de_marcos; i++) {
         int frame_id = (int)(intptr_t)list_get(lista_de_marcos, i);
 
         void* contenido = espacio_usuario + frame_id * config_memoria->TAM_PAGINA;
@@ -123,10 +124,11 @@ void suspend_process(int client_socket) {
         entrada->nro_pagina = i;
         entrada->offset_swap = offset;
         list_add(swap_metadata_proceso, entrada);
-
+        log_error(logger, "entrada %d",entrada->nro_pagina);
         bitarray_clean_bit(frames_bitmap, frame_id);
-        eliminar_marco(frame_id,pid_key);
+       
     }
+    list_destroy(lista_de_marcos);
     dictionary_put(diccionario_swap_metadata, pid_key, swap_metadata_proceso);
     
    
@@ -134,7 +136,9 @@ void suspend_process(int client_socket) {
     int resquest = OK;
     send(client_socket, &resquest, sizeof(resquest), 0);
 
-    destruir_tabla_de_paginas(pid_key);
+   
+   // destruir_tabla_de_paginas(pid_key);
+   
     free(pid_key);
 }
 
