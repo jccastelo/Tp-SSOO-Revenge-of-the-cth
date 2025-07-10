@@ -97,56 +97,57 @@ void send_process_instruction(int cliente_socket) {
 
 
 void suspend_process(int client_socket) {
-    
-    int pid = rcv_only_pid(client_socket);
-    log_warning(logger, "supendiendoProc %d", pid);
-    char* pid_key = string_itoa(pid);
+    // Inicializamos variables:
+    int id_process = rcv_only_pid(client_socket);
+    char *id_process_key = string_itoa(id_process);
 
-    aumentar_contador(metricas_por_procesos,SWAP_IN_REQUESTS,pid_key);
-    aumentar_contador(metricas_por_procesos,SWAP_OUT_REQUESTS, pid_key);
-    aumentar_contador(metricas_por_procesos, MEM_READ_REQUESTS,pid_key); //ver si esto se tiene que sumar por cada entrada a un marco, o con solo cambiar listo
+    log_info(logger, "El proceso con PID %d ha entrado en estado de suspensión.", id_process);
 
+    // Aumentamos contadores de metricas:
+    aumentar_contador(metricas_por_procesos, SWAP_IN_REQUESTS, id_process_key);
+    aumentar_contador(metricas_por_procesos, SWAP_OUT_REQUESTS, id_process_key);
+    aumentar_contador(metricas_por_procesos, MEM_READ_REQUESTS, id_process_key); //ver si esto se tiene que sumar por cada entrada a un marco, o con solo cambiar listo
 
-    //t_list* lista_de_marcos = get_marcos_list_of_proc(pid_key, all_process_page_tables);
-    t_list* lista_de_marcos = dictionary_remove(all_process_page_tables, pid_key);
-
+    // Obtenemos los marcos ocupados del proceso, y creamos :
+    t_list *frames_as_busy_process = get_frames_from_entries(id_process);
     t_list* swap_metadata_proceso = list_create();
-    log_warning(logger, "lst lista de marcos %d", list_size(lista_de_marcos));
-    int cantidad_de_marcos = list_size(lista_de_marcos);
-    for (int i = 0; i < cantidad_de_marcos; i++) {
-        int frame_id = (int)(intptr_t)list_get(lista_de_marcos, i);
 
-        void* contenido = espacio_usuario + frame_id * config_memoria->TAM_PAGINA;
-        int offset = ftell(archivo_swap);
-        fwrite(contenido, config_memoria->TAM_PAGINA, 1, archivo_swap);
+    void closure_swap_out(void *frame) {
+        int frame_id = *(int *)frame;
 
+        // Inicializamos contenido a escribir:
+        char *buffer = malloc(config_memoria->TAM_PAGINA);
+        memcpy(buffer, espacio_usuario + frame_id * config_memoria->TAM_PAGINA, config_memoria->TAM_PAGINA);
+        
+        // Logueamos el contenido del marco que se está escribiendo en el archivo de dump:
+        log_warning(logger, "Escribiendo en el archivo de swap: Frame %d", frame_id);
+        log_warning(logger, "Contenido: %s", buffer);
+
+        // Escribimos en el archivo y, al mismo tiempo, inicializamos una variable que indica la posición donde se realizó la escritura.
+        int pointer_location = ftell(archivo_swap);
+        fwrite(buffer, config_memoria->TAM_MEMORIA, 1, archivo_swap);
+
+        // Creamos la entrada de SWAP:
         swap_entry_t* entrada = malloc(sizeof(swap_entry_t));
-        entrada->nro_pagina = i;
-        entrada->offset_swap = offset;
+        entrada->nro_pagina = frame_id;
+        entrada->offset_swap = pointer_location;
         list_add(swap_metadata_proceso, entrada);
-        log_error(logger, "entrada %d",entrada->nro_pagina);
-        bitarray_clean_bit(frames_bitmap, frame_id);
-       
     }
-    list_destroy(lista_de_marcos);
-    dictionary_put(diccionario_swap_metadata, pid_key, swap_metadata_proceso);
+
+    // Ejecutamos el swap out sobre los frames ocupados del proceso, liberamos los frames y actualizamos el diccionario de metadata de swap
+    list_iterate(frames_as_busy_process, closure_swap_out);
+    mark_frames_as_free(frames_as_busy_process);
+    dictionary_put(diccionario_swap_metadata, id_process_key, swap_metadata_proceso);
     
-   
-    
+    // Mandamos respuesta a kernel:
     int resquest = OK;
     send(client_socket, &resquest, sizeof(resquest), 0);
-
-   
-   // destruir_tabla_de_paginas(pid_key);
-   
-    free(pid_key);
 }
 
 void remove_suspend_process(int client_socket) {
     int pid = rcv_only_pid(client_socket);
     char* pid_key = string_itoa(pid);
     swap_in(pid_key, pid, client_socket);
-    free(pid_key);
     log_info(logger, "OK");
 }
 

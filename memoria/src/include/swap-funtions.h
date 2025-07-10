@@ -5,7 +5,6 @@
 #include <commons/collections/dictionary.h>
 #include <stdbool.h>
 
-
 #include "memoria-pages-tables.h" 
 
 typedef struct {
@@ -52,7 +51,6 @@ t_list* remove_marcos_list_of_proc(char* pid_key , t_dictionary *diccionario_swa
  */
 void finalizar_swap(); 
 
-
 /**
  * @brief Realiza el swap in de todas las páginas de un proceso desde el archivo de swap
  *        a la memoria principal. Reconstituye la tabla de páginas del proceso con los marcos
@@ -75,9 +73,6 @@ void finalizar_swap();
  *       y se libera la metadata asociada al intento.
  */
 void swap_in(char* pid_key, int pid, int socket_client); 
-
-
-
 
 /**
  * @brief Vacía las entradas de swap de un proceso en el diccionario de metadatos.
