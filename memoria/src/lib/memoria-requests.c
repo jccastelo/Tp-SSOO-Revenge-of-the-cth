@@ -107,11 +107,13 @@ void suspend_process(int client_socket) {
     aumentar_contador(metricas_por_procesos, MEM_READ_REQUESTS,pid_key); //ver si esto se tiene que sumar por cada entrada a un marco, o con solo cambiar listo
 
 
+    /*
     //t_list* lista_de_marcos = get_marcos_list_of_proc(pid_key, all_process_page_tables);
     t_list* lista_de_marcos = dictionary_remove(all_process_page_tables, pid_key);
 
     t_list* swap_metadata_proceso = list_create();
     log_warning(logger, "lst lista de marcos %d", list_size(lista_de_marcos));
+
     int cantidad_de_marcos = list_size(lista_de_marcos);
     for (int i = 0; i < cantidad_de_marcos; i++) {
         int frame_id = (int)(intptr_t)list_get(lista_de_marcos, i);
@@ -130,9 +132,42 @@ void suspend_process(int client_socket) {
     }
     list_destroy(lista_de_marcos);
     dictionary_put(diccionario_swap_metadata, pid_key, swap_metadata_proceso);
-    
+    */
    
+    //t_list* lista_de_marcos = get_marcos_list_of_proc(pid_key, all_process_page_tables);
+    t_list* lista_de_tablas_de_pagina = dictionary_remove(all_process_page_tables, pid_key);
+
+    t_list* swap_metadata_proceso = list_create();
+
+    int cantidad_de_tablas = list_size(lista_de_tablas_de_pagina);
+
+    for (int j=0; j < cantidad_de_tablas; j++) {
+
+        t_list* lista_de_marcos = list_get(lista_de_tablas_de_pagina, j);
+        int cantidad_de_marcos = list_size(lista_de_marcos);
+
+        log_warning(logger, "lst lista de marcos %d", list_size(lista_de_marcos));
     
+        for (int i = 0; i < cantidad_de_marcos; i++) {
+            int frame_id = (int)(intptr_t)list_get(lista_de_marcos, i);
+
+            void* contenido = espacio_usuario + frame_id * config_memoria->TAM_PAGINA;
+            int offset = ftell(archivo_swap);
+            fwrite(contenido, config_memoria->TAM_PAGINA, 1, archivo_swap);
+
+            swap_entry_t* entrada = malloc(sizeof(swap_entry_t));
+            entrada->nro_pagina = i;
+            entrada->offset_swap = offset;
+            list_add(swap_metadata_proceso, entrada);
+            log_error(logger, "entrada %d",entrada->nro_pagina);
+            bitarray_clean_bit(frames_bitmap, frame_id);
+        
+        }
+        list_destroy(lista_de_marcos);
+        dictionary_put(diccionario_swap_metadata, pid_key, swap_metadata_proceso);
+
+    }
+
     int resquest = OK;
     send(client_socket, &resquest, sizeof(resquest), 0);
 

@@ -1,18 +1,19 @@
 #include "../include/swap-funtions.h"
-FILE* archivo_swap = NULL;
-t_dictionary* diccionario_swap_metadata = NULL;
 
 void init_swap() {
-    archivo_swap = fopen("swap.bin", "wb");
+
+    char* ruta = config_memoria->PATH_SWAPFILE;
+
+    archivo_swap = fopen(ruta, "wb");
     if (!archivo_swap) {
-        perror("Error creando swap.bin");
+        perror("Error creando swapfile.bin");
         exit(EXIT_FAILURE);
     }
     fclose(archivo_swap);
     
     diccionario_swap_metadata = dictionary_create();
 
-    archivo_swap = fopen("swap.bin", "rb+");
+    archivo_swap = fopen(ruta, "rb+");
     if (!archivo_swap) {
         perror("Error abriendo swap para lectura/escritura");
         exit(EXIT_FAILURE);
@@ -55,11 +56,16 @@ void finalizar_swap() {
 }
 
 void swap_in(char* pid_key, int pid, int client_socket){
-    int resquest ;
+    int resquest;
 
     t_list* metadata_swap = remove_marcos_list_of_proc(pid_key , diccionario_swap_metadata);
 
-    int cant_paginas = list_size(metadata_swap);
+    if(!metadata_swap) {
+        log_error(logger, "El proceso %d no tiene metadata swap", pid);
+        exit(EXIT_FAILURE);
+    }
+
+    int cant_paginas = list_size(metadata_swap); 
     t_list* marcos_libres = is_memory_sufficient(cant_paginas * config_memoria->TAM_PAGINA);
 
     if (!marcos_libres) {
@@ -104,7 +110,9 @@ void vaciar_swap_del_proceso(int pid ,char * pid_key) {
 
     t_list* swap_metadata = dictionary_remove(diccionario_swap_metadata, pid_key);
 
-    for (int i = 0; i < list_size(swap_metadata); i++) {
+    int tamanio_swap = list_size(swap_metadata);
+    
+    for(int i = 0; i < tamanio_swap; i++) {
         swap_entry_t* entrada = list_get(swap_metadata, i);
         free(entrada); // solo liberás la estructura, no tocás el archivo
     }

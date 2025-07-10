@@ -20,6 +20,8 @@ extern t_bitarray *frames_bitmap;
 extern void *espacio_usuario;
 extern void *frames_memory;
 extern int quantity_frames;
+extern FILE* archivo_swap;
+extern t_dictionary* diccionario_swap_metadata;
 
 /**
  * @brief Inicializa el estado del servidor de Memoria.

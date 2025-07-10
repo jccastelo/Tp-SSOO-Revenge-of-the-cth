@@ -10,6 +10,8 @@ t_bitarray *frames_bitmap;
 void *espacio_usuario;
 void *frames_memory;
 int quantity_frames;
+FILE* archivo_swap = NULL;
+t_dictionary* diccionario_swap_metadata = NULL;
 
 void memoria_state_init() {
     // Inicializamos las variables globales:
