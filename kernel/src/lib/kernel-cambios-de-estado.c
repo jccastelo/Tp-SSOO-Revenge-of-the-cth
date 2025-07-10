@@ -84,6 +84,18 @@ void queue_process(t_pcb* process, int estado){
 
     case BLOCKED_SUSPENDED:
         pthread_mutex_lock(&process->mutex_estado);
+
+        if(strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"BLOCKED"))
+        {
+        if(process->hilo_activo){
+            {
+                pthread_cancel(process->hilo_block);
+            }
+                pthread_join(process->hilo_block, NULL);
+            }
+            return;
+        }
+
         log_warning(logger,"## PID: %d Pasa del estado %s al estado BLOCKED_SUSPENDED",process->pid,estadoActual);
 
         process->metricas_de_estado->blocked_suspended += 1;
@@ -133,6 +145,11 @@ void queue_process(t_pcb* process, int estado){
         temporal_stop(process->metricas_de_tiempo->metrica_actual);
         
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_EXIT);
+
+
+        if(!strcmp(estadoActual,"BLOCKED") || !strcmp(estadoActual,"BLOCKED_SUSPENDED")){
+            pthread_mutex_unlock(&process->mutex_estado);
+        }
 
         if(solicitar_a_memoria(memoria_delete_process, process))
         {

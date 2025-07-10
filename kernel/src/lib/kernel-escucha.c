@@ -54,6 +54,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             //Si habia pid lo mando a exit
             if(pid_fin >= 0){
                 t_pcb *process = list_get(list_procesos->cola, pid_fin);
+                pthread_mutex_lock(&process->mutex_estado);
                 queue_process(process, EXIT);
             }
 
@@ -171,11 +172,11 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
                 pthread_join(process->hilo_block, NULL);
                 
                 log_error(logger," DUMP ERROR");
+                pthread_mutex_lock(&process->mutex_estado);
                 queue_process(process, EXIT);
                 }
             break;
         case IO:
-          
             set_cpu(cpu_socket, DISPONIBLE,-1);
             gestionar_io(new_buffer);
             mandar_procesos_a_execute();
