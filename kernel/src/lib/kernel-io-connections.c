@@ -265,10 +265,11 @@ void recibir_io(t_buffer* buffer, int socket) {
         nueva_instancia_io->proceso = -1;
 
         pthread_mutex_lock(&ioBuscada->instancias_IO->mutex);
-        list_add(ioBuscada->instancias_IO->cola,nueva_instancia_io);
+        list_add_in_index(ioBuscada->instancias_IO->cola,0,nueva_instancia_io);
         pthread_mutex_unlock(&ioBuscada->instancias_IO->mutex);
 
         log_info(logger, "Llego una nueva INSTANCIA de IO de nombre %s Y SOCKET: %d ", ioBuscada->nombre,nueva_instancia_io->socket );
+        enviar_proceso_io(nueva_instancia_io->socket);
     }
     else
     {
@@ -302,10 +303,13 @@ void recibir_io(t_buffer* buffer, int socket) {
 }
 
 void actualizarIO_a_libre(int pid_desbloqueo) {
+    pthread_mutex_lock(&list_ios->mutex); // Lock externo por si list_ios es compartida
 
     for (int i = 0; i < list_size(list_ios->cola); i++)
     {
         t_IO *ios = list_get(list_ios->cola, i);
+
+        pthread_mutex_lock(&ios->instancias_IO->mutex); // Lock sobre instancias_IO
 
         for (int j = 0; j < list_size(ios->instancias_IO->cola); j++)
         {
@@ -314,8 +318,15 @@ void actualizarIO_a_libre(int pid_desbloqueo) {
             if (io->proceso == pid_desbloqueo)
             {
                 io->proceso = -1;
+
+                pthread_mutex_unlock(&ios->instancias_IO->mutex);
+                pthread_mutex_unlock(&list_ios->mutex);
                 return;
             }
         }
+
+        pthread_mutex_unlock(&ios->instancias_IO->mutex);
     }
+
+    pthread_mutex_unlock(&list_ios->mutex);
 }
