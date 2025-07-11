@@ -1,10 +1,13 @@
 #ifndef SWAP_FUNTIONS_H_
 #define SWAP_FUNTIONS_H_ 
 
+// Incluimos librerias externas:
+#include <commons/memory.h>
 #include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
 #include <stdbool.h>
 
+// Incluimos librerias internas
 #include "memoria-pages-tables.h" 
 
 typedef struct {

@@ -88,8 +88,8 @@ void swap_in(char* pid_key, int pid, int client_socket) {
             log_info(logger, 
             "Swap_in exitoso: PID %d, página %d cargada en frame %d. Espacio de usuario actual: %s", 
                 pid, 
-                pagina_id, 
-                frame_id, 
+                index_frames, 
+                free_frame_id, 
                 mem_hexstring(espacio_usuario, config_memoria->TAM_MEMORIA)
             );
         }
