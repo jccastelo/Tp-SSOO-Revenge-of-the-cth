@@ -1,6 +1,8 @@
 
 #include "../include/kernel-memory-connection.h"
 
+pthread_mutex_t mutex_memoria = PTHREAD_MUTEX_INITIALIZER;
+
 void kernel_memory_connection(void) {
     // Incializamos variables necesarias para la conexión:
     char *puerto_memoria = string_itoa(config_kernel->PUERTO_MEMORIA);
@@ -43,6 +45,7 @@ int enviar_pid_memoria(t_pcb* proceso, int codigo_operacion) {
 }
 
 int solicitar_a_memoria(int (*operacion)(t_pcb* proceso), t_pcb* proceso_a_enviar) {
+    pthread_mutex_lock(&mutex_memoria);
 
     kernel_memory_connection();
 
@@ -52,6 +55,7 @@ int solicitar_a_memoria(int (*operacion)(t_pcb* proceso), t_pcb* proceso_a_envia
 
     close(socket_memoria);
 
+    pthread_mutex_unlock(&mutex_memoria);
     return resultado;
 }
 
