@@ -40,7 +40,17 @@ void queue_process(t_pcb* process, int estado){
         cambiar_estado(planner->short_term->algoritmo_planificador, process, planner->short_term->queue_READY);
         pthread_mutex_unlock(&process->mutex_estado);
 
-        if(buscar_cpu_disponible() != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
+        pthread_mutex_lock(&mutex_cpu); 
+
+        t_cpu* cpu_disponible= buscar_cpu_disponible();
+        if(cpu_disponible != NULL)
+        {
+            set_cpu(cpu_disponible->socket_dispatch,EJECUTANDO,process->pid);
+        }
+        
+        pthread_mutex_unlock(&mutex_cpu); 
+
+        if(cpu_disponible != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
         { 
             queue_process(process, EXECUTE);
             
@@ -60,7 +70,8 @@ void queue_process(t_pcb* process, int estado){
         cambiar_estado(queue_FIFO, process, planner->queue_EXECUTE);
         pthread_mutex_unlock(&process->mutex_estado);
 
-        t_cpu* cpu_a_ocupar = buscar_cpu_disponible();
+        t_cpu* cpu_a_ocupar= buscar_mi_cpu(process->pid);
+
         if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
         {
             enviar_proceso_cpu(cpu_a_ocupar->socket_dispatch, process);
@@ -69,8 +80,8 @@ void queue_process(t_pcb* process, int estado){
             temporal_resume(process->estimaciones_SJF->rafagaReal);
             }
         } else {
-             queue_process(process,READY); //NO puede haber procesos en EXECUTE que no estan ejecutando
-             log_warning(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); }
+            log_warning(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); 
+             queue_process(process,READY); }//NO puede haber procesos en EXECUTE que no estan ejecutando    
         break;
 
     case BLOCKED:
