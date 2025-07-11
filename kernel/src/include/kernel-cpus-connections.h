@@ -14,5 +14,7 @@ t_cpu* buscar_cpu_disponible();
 void enviar_proceso_cpu(int cpu_socket, t_pcb* process);
 void desalojar_proceso(t_cpu* cpu);
 t_cpu* buscar_cpu_con_id(int id);
+t_cpu *buscar_mi_cpu(int pid_buscado);
+extern pthread_mutex_t mutex_cpu;
 
 #endif //KERNEL_CPUS_CONNECTIONS_Hs

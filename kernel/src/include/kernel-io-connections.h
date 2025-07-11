@@ -16,4 +16,7 @@ t_buffer *crear_buffer_io(int milisegundos,int  pid_a_io);
 void recibir_io(t_buffer *buffer, int io_socket);
 void desencolarProcesosEsperando(t_IO *ios_estructura);
 void actualizarIO_a_libre(int pid_desbloqueo);
+
+extern pthread_mutex_t mutex_io;
+
 #endif //KERNEL_IO_CONNECTIONS

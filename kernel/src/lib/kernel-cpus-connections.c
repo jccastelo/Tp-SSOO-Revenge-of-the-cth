@@ -1,5 +1,7 @@
 #include "include/kernel-cpus-connections.h"
 
+pthread_mutex_t mutex_cpu = PTHREAD_MUTEX_INITIALIZER;
+
 void iniciar_cpu(t_buffer *buffer,int socket_cliente, int dispatch_o_interrupt)
 {
     int id;
@@ -66,13 +68,13 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo,int pid_ejecutando)
             cpu->estado = estado_nuevo;
             cpu->pid =pid_ejecutando;
 
-            if(cantidad_cpus >1 && estado_nuevo == EJECUTANDO)
-            {
+            //if(cantidad_cpus >1 && estado_nuevo == EJECUTANDO)
+            //{
                 
-                list_remove(list_cpus->cola,i);
-                list_add(list_cpus->cola,cpu);
-               
-            }
+                //list_remove(list_cpus->cola,i);
+                //list_add(list_cpus->cola,cpu);
+            //   
+            //}
             pthread_mutex_unlock(&list_cpus->mutex);
             return;
         }
@@ -82,21 +84,24 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo,int pid_ejecutando)
 
 t_cpu* buscar_cpu_disponible(){
 
-    pthread_mutex_lock(&list_cpus->mutex);
+
     int cantidad_cpus = list_size(list_cpus->cola);
-    pthread_mutex_unlock(&list_cpus->mutex);
+   
     for(int i = 0; i < cantidad_cpus ; i++)
     {   
-        pthread_mutex_lock(&list_cpus->mutex);
+        
         t_cpu *cpu =list_get(list_cpus->cola,i);
-        pthread_mutex_unlock(&list_cpus->mutex);
+        
 
         if(cpu->estado == DISPONIBLE)
         {
+    
+            log_warning(logger,"HAY CPU");
             return cpu;
         }
     }
 
+     log_warning(logger,"NO HAY CPU");
     return NULL;
 }
 
@@ -121,6 +126,8 @@ t_cpu* buscar_cpu_con_id(int id){
 }
 
 void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
+
+    pthread_mutex_lock(&mutex_cpu);
     
     t_paquete* paquete = crear_paquete(CONTEXT_PROCESS); 
 
@@ -131,8 +138,7 @@ void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
     enviar_paquete(paquete, cpu_socket);
 
     eliminar_paquete(paquete);
-
-    set_cpu(cpu_socket, EJECUTANDO,process->pid);
+    pthread_mutex_unlock(&mutex_cpu);
 }
 
 void desalojar_proceso(t_cpu* cpu){
@@ -157,4 +163,28 @@ t_pcb* recibir_proceso(t_buffer* buffer){
     proceso_buscado->pc = pc_recibido;
 
     return proceso_buscado;
+}
+
+t_cpu *buscar_mi_cpu(int pid_buscado)
+{
+    pthread_mutex_lock(&list_cpus->mutex);
+    int cantidad_cpus = list_size(list_cpus->cola);
+    
+    for(int i = 0; i < cantidad_cpus ; i++)
+    {   
+       
+        t_cpu *cpu =list_get(list_cpus->cola,i);
+        
+
+        int pid_actual = cpu->pid;
+
+        if(pid_actual == pid_buscado)
+        {
+            pthread_mutex_unlock(&list_cpus->mutex);
+            return cpu;
+        }
+    }
+
+        pthread_mutex_unlock(&list_cpus->mutex);
+        return NULL;
 }

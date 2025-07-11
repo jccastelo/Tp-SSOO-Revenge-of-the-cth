@@ -24,4 +24,6 @@ int memoria_delete_process(t_pcb* proceso);
 int avisar_dump_memory(t_pcb* proceso);
 int suspender_proceso(t_pcb* proceso);
 int desuspender_proceso(t_pcb* proceso);
+
+extern pthread_mutex_t mutex_memoria;
 #endif // KERNEL_MEMORY_CONNECTION_H
