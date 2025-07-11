@@ -314,9 +314,12 @@ void sin_desalojo(t_pcb* primer_proceso) {} // null patern nos permite simplific
 
 void desalojo_SJF(t_pcb* primer_proceso) {
     
-    pthread_mutex_lock(&list_cpus->mutex);
-    t_cpu* cpu = list_get_maximum(list_cpus->cola, cpu_mayor_rafaga);
-    pthread_mutex_unlock(&list_cpus->mutex);
+    t_cpu* cpu = cpu_mayor_rafaga();
+
+    if(cpu->estado == DISPONIBLE) {
+        log_info(logger, "Se libero una CPU en medio del desalojo");
+        return;
+    }
 
     pthread_mutex_lock(&list_procesos->mutex);    
     t_pcb* proceso_cpu = list_get(list_procesos->cola, cpu->pid);
@@ -333,15 +336,62 @@ void desalojo_SJF(t_pcb* primer_proceso) {
     return;
 }
 
-void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU) {
+t_cpu* cpu_mayor_rafaga() {
     
-    t_cpu* cpu_a = (t_cpu*) unaCPU;
-    t_cpu* cpu_b = (t_cpu*) otraCPU;
-   
-    pthread_mutex_lock(&list_procesos->mutex);
-    t_pcb* proceso_a = list_get(list_procesos->cola, cpu_a->pid);
-    t_pcb* proceso_b = list_get(list_procesos->cola, cpu_b->pid);
-    pthread_mutex_unlock(&list_procesos->mutex);
+    t_cpu* cpu_buscada;
     
-    return (void*) proceso_a->estimaciones_SJF->rafagaEstimada <= (void*) proceso_b->estimaciones_SJF->rafagaEstimada ? (void*) proceso_a->estimaciones_SJF->rafagaEstimada : (void*) proceso_b->estimaciones_SJF->rafagaEstimada;
+    pthread_mutex_lock(&list_cpus->mutex);
+    int tamanio = list_size(list_cpus->cola);
+    pthread_mutex_unlock(&list_cpus->mutex);
+
+    pthread_mutex_lock(&list_cpus->mutex);
+    cpu_buscada = list_get(list_cpus->cola, 0);
+    pthread_mutex_unlock(&list_cpus->mutex);
+
+    if(cpu_buscada->estado == DISPONIBLE){
+        return cpu_buscada;
+    }
+
+    for(int i = 1; i < tamanio; i++) {
+        
+        pthread_mutex_lock(&list_cpus->mutex);    
+        t_cpu* cpu_i = list_get(list_cpus->cola, i);
+        pthread_mutex_unlock(&list_cpus->mutex);
+
+        if(cpu_i->estado == DISPONIBLE){
+            return cpu_i;
+        }
+        
+        pthread_mutex_lock(&list_procesos->mutex);
+        t_pcb* proceso_a = list_get(list_procesos->cola, cpu_buscada->pid);
+        t_pcb* proceso_b = list_get(list_procesos->cola, cpu_i->pid);
+        pthread_mutex_unlock(&list_procesos->mutex);
+        
+        if(proceso_a->estimaciones_SJF->rafagaEstimada < proceso_b->estimaciones_SJF->rafagaEstimada) {
+            cpu_buscada = cpu_i;
+        }
+    }
+
+    return cpu_buscada;
 }
+
+//void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU) {
+//    
+//    t_cpu* cpu_a = (t_cpu*) unaCPU;
+//    t_cpu* cpu_b = (t_cpu*) otraCPU;
+//   
+//    if(cpu_a->estado == DISPONIBLE){
+//        return unaCPU;
+//    }
+//
+//    if(cpu_b->estado == DISPONIBLE){
+//        return otraCPU;
+//    }
+//
+//    pthread_mutex_lock(&list_procesos->mutex);
+//    t_pcb* proceso_a = list_get(list_procesos->cola, cpu_a->pid);
+//    t_pcb* proceso_b = list_get(list_procesos->cola, cpu_b->pid);
+//    pthread_mutex_unlock(&list_procesos->mutex);
+//
+//    return (void*) proceso_a->estimaciones_SJF->rafagaEstimada <= (void*) proceso_b->estimaciones_SJF->rafagaEstimada ? (void*) proceso_a->estimaciones_SJF->rafagaEstimada : (void*) proceso_b->estimaciones_SJF->rafagaEstimada;
+//}
