@@ -113,7 +113,7 @@ void suspend_process(int client_socket) {
     t_list* swap_metadata_proceso = list_create();
 
     void closure_swap_out(void *frame) {
-        int frame_id = *(int *)frame;
+        int frame_id = (int)(intptr_t)frame;
 
         // Inicializamos contenido a escribir:
         char *buffer = malloc(config_memoria->TAM_PAGINA);
@@ -138,6 +138,7 @@ void suspend_process(int client_socket) {
     list_iterate(frames_as_busy_process, closure_swap_out);
     mark_frames_as_free(frames_as_busy_process);
     dictionary_put(diccionario_swap_metadata, id_process_key, swap_metadata_proceso);
+    dictionary_remove(all_process_page_tables, id_process_key);
     
     // Mandamos respuesta a kernel:
     int resquest = OK;

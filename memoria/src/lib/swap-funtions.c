@@ -99,8 +99,8 @@ void swap_in(char* pid_key, int pid, int client_socket) {
         status = "OK";
 
         // Obtenemos la tabla de páginas raíz del proceso, la populamos con marcos libres y actualizamos métricas relacionadas a escrituras en memoria y operaciones de swap in
-        t_list *root_table = get_root_table(pid);
-        populate_page_table(marcos_libres, root_table);
+       // t_list *root_table = get_root_table(pid);
+        setup_page_tables( pid, marcos_libres);
         aumentar_contador(metricas_por_procesos, MEM_WRITE_REQUESTS, pid_key);
         aumentar_contador(metricas_por_procesos, SWAP_IN_REQUESTS, pid_key);
     }
