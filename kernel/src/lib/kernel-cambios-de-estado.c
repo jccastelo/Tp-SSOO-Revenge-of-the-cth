@@ -8,7 +8,7 @@ void queue_process(t_pcb* process, int estado){
     switch(estado)
     {
     case NEW:
-       
+        pthread_mutex_lock(&process->mutex_estado);
         log_info(logger,"## PID: %d,Tamnio %d - Se crea el proceso - Estado: NEW", process->pid,process->tamanio_proceso);
         
         process->metricas_de_estado->new += 1;
@@ -16,6 +16,7 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_tiempo->metrica_actual = process->metricas_de_tiempo->NEW;
 
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW); 
+        pthread_mutex_unlock(&process->mutex_estado);
 
         if(list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola) && // READY_SUSP vacia => pueden entrar los de NEW
            (list_size(planner->long_term->queue_NEW->cola) == 1 || // Si es el unico en la cola => se le pregunta a memoria si puede entrar
@@ -30,13 +31,14 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case READY:
-        
+        pthread_mutex_lock(&process->mutex_estado);
         log_info(logger,"## PID: %d Pasa del estado %s al estado READY",process->pid,estadoActual);
         
         process->metricas_de_estado->ready += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY));
         
         cambiar_estado(planner->short_term->algoritmo_planificador, process, planner->short_term->queue_READY);
+        pthread_mutex_unlock(&process->mutex_estado);
 
         if(buscar_cpu_disponible() != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
         { 
@@ -49,13 +51,14 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case EXECUTE:
-       
+        pthread_mutex_lock(&process->mutex_estado);
         log_info(logger,"## PID: %d Pasa del estado %s al estado EXECUTE",process->pid,estadoActual);
 
         process->metricas_de_estado->execute += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->EXECUTE));
         
         cambiar_estado(queue_FIFO, process, planner->queue_EXECUTE);
+        pthread_mutex_unlock(&process->mutex_estado);
 
         t_cpu* cpu_a_ocupar = buscar_cpu_disponible();
         if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
@@ -71,13 +74,15 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case BLOCKED:
+        pthread_mutex_lock(&process->mutex_estado);
         log_info(logger,"## PID: %d Pasa del estado %s al estado BLOCKED",process->pid,estadoActual);
 
         process->metricas_de_estado->blocked += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED));
         
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_BLOCKED);
-        
+        pthread_mutex_unlock(&process->mutex_estado);
+
         bloquearProceso(process);
 
         break;
@@ -122,12 +127,14 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case READY_SUSPENDED:
+        pthread_mutex_lock(&process->mutex_estado);
         log_info(logger,"## PID: %d Pasa del estado %s al estado READY_SUSPENDED",process->pid,estadoActual);
 
         process->metricas_de_estado->ready_suspended += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY_SUSPENDED));
         
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_READY_SUSPENDED);
+        pthread_mutex_unlock(&process->mutex_estado);
 
         if(list_size(planner->medium_term->queue_READY_SUSPENDED->cola)==1){
             traer_proceso_a_MP();
@@ -146,12 +153,6 @@ void queue_process(t_pcb* process, int estado){
         temporal_stop(process->metricas_de_tiempo->metrica_actual);
         
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_EXIT);
-
-
-        if(!strcmp(estadoActual,"BLOCKED") || !strcmp(estadoActual,"BLOCKED_SUSPENDED")){
-            
-            pthread_mutex_unlock(&process->mutex_estado);
-        }
         
         if(solicitar_a_memoria(memoria_delete_process, process))
         {

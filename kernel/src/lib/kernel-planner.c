@@ -225,7 +225,7 @@ void queue_PMCP(t_pcb *process, t_list *lista)
     {
 
         t_pcb *procesoIterado = list_get(lista,i);
-        int tamProcesoIt = procesoIterado -> tamanio_proceso;
+        int tamProcesoIt = procesoIterado->tamanio_proceso;
 
         if(tamano_proceso_nuevo <= tamProcesoIt)//Soy menor o igual que el que esta aca?
         {
