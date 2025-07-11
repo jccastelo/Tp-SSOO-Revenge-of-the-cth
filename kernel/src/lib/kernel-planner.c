@@ -1,5 +1,7 @@
 #include "../include/kernel-planner.h"
 
+pthread_mutex_t mutex_traer = PTHREAD_MUTEX_INITIALIZER;
+
 void planner_init(){
 
     list_procesos = malloc(sizeof(t_monitor));
@@ -150,7 +152,7 @@ void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc){
 }
 
 void traer_proceso_a_MP(){
-
+    pthread_mutex_lock(&mutex_traer);
 
     while(!list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola)){
         
@@ -188,11 +190,13 @@ void traer_proceso_a_MP(){
             break; }
     }
     log_info(logger,"NO rompi acaAAAAAAA");
+    pthread_mutex_unlock(&mutex_traer);
     return;
 }
 
 void mandar_procesos_a_execute()
-{
+{   
+    pthread_mutex_lock(&mutex_traer);
     while(!list_is_empty(planner->short_term->queue_READY->cola))
     {
          pthread_mutex_lock(&planner->short_term->queue_READY->mutex);
@@ -218,7 +222,7 @@ void mandar_procesos_a_execute()
             pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
             break; }
     }
-
+    pthread_mutex_unlock(&mutex_traer);
     return;
 }
 

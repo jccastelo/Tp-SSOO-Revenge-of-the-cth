@@ -23,4 +23,6 @@ void mandar_procesos_a_execute();
 int64_t max(int64_t a, int64_t b);
 void actualizar_rafagas_sjf(t_pcb* proceso);
 
+
+extern pthread_mutex_t mutex_traer;
 #endif //KERNEL_PLANNER_H
