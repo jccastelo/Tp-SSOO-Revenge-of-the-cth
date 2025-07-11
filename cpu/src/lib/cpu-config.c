@@ -20,10 +20,10 @@ t_config_cpu* inicializar_config_cpu() {
     return config_cpu;
 }
 
-void cpu_config_init() {
+void cpu_config_init(char* config_path) {
     // Inicializamos variables:
     config_cpu = inicializar_config_cpu();
-    t_config* config = config_create("cpu.config");
+    t_config* config = config_create(config_path);
 
     // Verificamos que el archivo de configuración se haya abierto correctamente:
     if (config == NULL) {

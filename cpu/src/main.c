@@ -2,12 +2,10 @@
 
 int main(int argc, char* argv[]) {
 
-    // Conseguimos la ID de la CPU ./cpu [ID]
-    if (argc < 2) {
-        id_cpu = "4";
-    } else {
-        id_cpu = argv[1];
-    }
+    // Conseguimos la ID de la CPU ./cpu [ID] [CONFIG_PATH]
+    id_cpu = argv[1];
+    char* config_path = argv[2];
+
     
 
     // Inicializamos un logger:
@@ -17,11 +15,11 @@ int main(int argc, char* argv[]) {
     log_info(logger, "cpu iniciada con ID %s", id_cpu);
 
     if (argc < 2) {
-        log_warning(logger, "INICIALIZADA CPU EN MODO DEFAULT");
+        log_warning(logger, "CPU MAL INICIALIZADA");
     }
 
     // Inicializamos la configuración
-    cpu_config_init();
+    cpu_config_init(config_path);
 
     // Conectamos CPU a Kernel y memoria
     cpu_connect();

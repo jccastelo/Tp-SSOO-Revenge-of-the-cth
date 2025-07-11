@@ -14,6 +14,7 @@
 #include "memoria-processes.h"
 #include "memoria-page-tables-operations.h"
 #include "locks-swap.h"
+#include "memoria-state.h"
 /**
  * @brief Inicializa un proceso en el servidor en respuesta a una solicitud del kernel.
  * 

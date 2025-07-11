@@ -10,7 +10,7 @@
 #include "memoria-pages-tables.h"
 
 typedef void (*accion_sobre_nodo_t)(t_list* nodo);
-#endif // MEMORIA_PAGE_TABLES_OPERATIONS_H_
+
 
 /**
  * @brief Aplica recursivamente una acción sobre cada nodo del árbol de páginas.
@@ -58,3 +58,4 @@ void destruir_nodo(t_list* nodo);
  * @param pid Identificador del proceso cuya tabla de páginas se quiere eliminar.
  */
 void destruir_tabla_de_paginas(char* pid_key);
+#endif // MEMORIA_PAGE_TABLES_OPERATIONS_H_

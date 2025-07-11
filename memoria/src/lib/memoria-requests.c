@@ -125,7 +125,7 @@ void suspend_process(int client_socket) {
 
         // Escribimos en el archivo y, al mismo tiempo, inicializamos una variable que indica la posición donde se realizó la escritura.
         int pointer_location = ftell(archivo_swap);
-        fwrite(buffer, config_memoria->TAM_MEMORIA, 1, archivo_swap);
+        fwrite(buffer, config_memoria->TAM_PAGINA, 1, archivo_swap);
 
         // Creamos la entrada de SWAP:
         swap_entry_t* entrada = malloc(sizeof(swap_entry_t));

@@ -1,10 +1,9 @@
 #include "../include/swap-funtions.h"
 
-FILE* archivo_swap = NULL;
-t_dictionary* diccionario_swap_metadata = NULL;
 
-void init_swap() {
-    archivo_swap = fopen("swap.bin", "wb");
+void init_swap() { 
+    char * ruta = config_memoria->PATH_SWAPFILE;
+    archivo_swap = fopen(ruta, "wb");
     if (!archivo_swap) {
         perror("Error creando swap.bin");
         exit(EXIT_FAILURE);
@@ -13,7 +12,7 @@ void init_swap() {
     
     diccionario_swap_metadata = dictionary_create();
 
-    archivo_swap = fopen("swap.bin", "rb+");
+    archivo_swap = fopen(ruta, "rb+");
     if (!archivo_swap) {
         perror("Error abriendo swap para lectura/escritura");
         exit(EXIT_FAILURE);
@@ -73,6 +72,7 @@ void swap_in(char* pid_key, int pid, int client_socket) {
         log_error(logger, "No hay memoria suficiente para reanudar proceso %d", pid);
         resquest = ERROR;
         status = "ERROR";
+        dictionary_put(diccionario_swap_metadata, pid_key, metadata_swap);
     } else {
         void closure_swap_in(void *entry_swap) {
             // Inicializamos variables:

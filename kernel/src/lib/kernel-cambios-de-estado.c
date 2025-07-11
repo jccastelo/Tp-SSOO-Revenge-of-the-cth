@@ -108,7 +108,7 @@ void queue_process(t_pcb* process, int estado){
         log_warning(logger,"SUSP A MEMORIA ACEPTADO");
         traer_proceso_a_MP();
 
-        if(process->hilo_activo){
+        if(process->hilo_activo) {
         {
             pthread_cancel(process->hilo_block);
         }
@@ -136,7 +136,8 @@ void queue_process(t_pcb* process, int estado){
         break;
 
     case EXIT:
-
+        
+        pthread_mutex_lock(&process->mutex_estado);
         log_info(logger,"## PID: %d Pasa del estado %s al estado EXIT",process->pid,estadoActual);
 
         log_info(logger,"## PID: %d - Finaliza el proceso",process->pid);
@@ -148,11 +149,13 @@ void queue_process(t_pcb* process, int estado){
 
 
         if(!strcmp(estadoActual,"BLOCKED") || !strcmp(estadoActual,"BLOCKED_SUSPENDED")){
+            
             pthread_mutex_unlock(&process->mutex_estado);
         }
-
+        
         if(solicitar_a_memoria(memoria_delete_process, process))
         {
+            pthread_mutex_unlock(&process->mutex_estado);
             carnicero(process);
         }
         else{log_info(logger, "Error al pasar proceso a exit");}

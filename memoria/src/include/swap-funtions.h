@@ -14,11 +14,10 @@ typedef struct {
     int nro_pagina;     
     int offset_swap;    
 } swap_entry_t;
-extern t_dictionary* diccionario_swap_metadata; 
-extern FILE* archivo_swap ;; 
 
 
-#endif // SWAP_FUNTIONS_H_
+
+
 
 /**
  * @brief Inicializa el archivo de swap y crea el diccionario de metadata para gestionar el contenido del swap.
@@ -89,3 +88,5 @@ void swap_in(char* pid_key, int pid, int socket_client);
  *                Esta cadena se libera dentro de la función.
  */
 void vaciar_swap_del_proceso(int pid, char* pid_key);
+
+#endif // SWAP_FUNTIONS_H_
