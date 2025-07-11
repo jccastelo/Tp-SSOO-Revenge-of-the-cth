@@ -201,6 +201,8 @@ void finish_process(int client_socket) {
     int resquest;
     int pid = rcv_only_pid(client_socket);
 
+    log_info(logger, "Proceso PID: %d va a finalizar", pid);
+
     // Verificamos si el proceso ya ha finalizado o no:
     if (is_process_end(pid)) { // To Do: Verificar si el proceso ya ha finalizado, funcion que mezcla consulta y estado del proceso
        log_info(logger, "El proceso %d ya ha finalizado", pid);
