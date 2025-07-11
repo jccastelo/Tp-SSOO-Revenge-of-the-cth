@@ -1,8 +1,12 @@
 #include "../include/kernel-io-connections.h"
 
+pthread_mutex_t mutex_io = PTHREAD_MUTEX_INITIALIZER;
+
 //CPu a Kernel
 void gestionar_io(t_buffer *buffer)
 {
+    pthread_mutex_lock(&mutex_io);
+
     int desplazamiento = 0;
     char *ioNombre;
     int milisegundos;
@@ -32,19 +36,23 @@ void gestionar_io(t_buffer *buffer)
     int pc_PID;
     memcpy(&pc_PID, buffer->stream + desplazamiento, sizeof(int));
 
+    pthread_mutex_lock(&list_procesos->mutex);
     t_pcb* process = list_get(list_procesos->cola,pid_a_io);
+    pthread_mutex_unlock(&list_procesos->mutex);
 
     process->pc = pc_PID;
 
     log_info(logger,"## PID: %d - Bloqueado por IO: %s", process->pid,ioNombre);
     queue_process(process, BLOCKED);
 
-
+    
     t_IO *ioBuscada = buscar_io(ioNombre);
     
     if (ioBuscada != NULL)
     {
         t_buffer *buffer_io = crear_buffer_io(milisegundos, pid_a_io);
+
+        
         t_IO_instancia *instancia_io_libre = buscar_instancia_libre(ioBuscada);
 
         if (list_size(ioBuscada->procesos_esperando->cola) == 0 && instancia_io_libre != NULL)
@@ -54,19 +62,30 @@ void gestionar_io(t_buffer *buffer)
             pthread_mutex_unlock(&ioBuscada->procesos_esperando->mutex);
             
             int socket_io_libre = instancia_io_libre->socket;
+            
+
             enviar_proceso_io(socket_io_libre);
+
+            pthread_mutex_unlock(&mutex_io);
         }
         else
-        {
+        {   
             pthread_mutex_lock(&ioBuscada->procesos_esperando->mutex);
             list_add(ioBuscada->procesos_esperando->cola, buffer_io);
             pthread_mutex_unlock(&ioBuscada->procesos_esperando->mutex);
+
+            pthread_mutex_unlock(&mutex_io);
         }
     }
     else
     {
-        t_pcb *process_to_delate = list_get(list_procesos->cola, pid_a_io); // Obtengo el proceso a eliminar de la lista global
+       
 
+        pthread_mutex_lock(&list_procesos->mutex);
+        t_pcb *process_to_delate = list_get(list_procesos->cola, pid_a_io); // Obtengo el proceso a eliminar de la lista global
+        pthread_mutex_unlock(&list_procesos->mutex);
+
+        pthread_mutex_unlock(&mutex_io);
         queue_process(process_to_delate, EXIT);
     }
 }
@@ -98,16 +117,25 @@ t_buffer *crear_buffer_io(int milisegundos,int  pid_a_io)
 
 t_IO_instancia *buscar_instancia_libre(t_IO *ioBuscada)
 {
+    pthread_mutex_lock(&ioBuscada->instancias_IO->mutex);
+
     for (int j = 0; j < list_size(ioBuscada->instancias_IO->cola); j++)
         {
+            
             t_IO_instancia *io_instancia = list_get(ioBuscada->instancias_IO->cola, j);
+            
 
             if (io_instancia->proceso < 0 )
             {
+                io_instancia->proceso =9999999;
+                pthread_mutex_unlock(&ioBuscada->instancias_IO->mutex);
                 return io_instancia;
             }
-        }
 
+            
+        }
+        
+    pthread_mutex_unlock(&ioBuscada->instancias_IO->mutex);
     return NULL;
 }
 
