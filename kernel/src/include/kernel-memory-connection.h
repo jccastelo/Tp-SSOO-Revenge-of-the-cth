@@ -26,4 +26,5 @@ int suspender_proceso(t_pcb* proceso);
 int desuspender_proceso(t_pcb* proceso);
 
 extern pthread_mutex_t mutex_memoria;
+extern pthread_mutex_t mutex_memoria_envio_pid;
 #endif // KERNEL_MEMORY_CONNECTION_H

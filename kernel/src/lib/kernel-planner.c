@@ -161,13 +161,12 @@ void traer_proceso_a_MP(){
         if(solicitar_a_memoria(desuspender_proceso,procesoASolicitar))
         {
             
-            t_pcb* procesoAux = list_remove(planner->long_term->queue_NEW->cola,0);
-            pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
+            pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
 
-            queue_process(procesoAux, READY);
+            queue_process(procesoASolicitar, READY);
             
         } else { 
-            pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
+            pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
             break; }
 
     }
@@ -180,9 +179,9 @@ void traer_proceso_a_MP(){
 
         if(solicitar_a_memoria(memoria_init_proc,procesoASolicitar))
         {
-            t_pcb* procesoAux = list_remove(planner->long_term->queue_NEW->cola,0);
+           
             pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
-            queue_process(procesoAux, READY);
+            queue_process(procesoASolicitar, READY);
 
         } else { 
             pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
@@ -211,10 +210,10 @@ void mandar_procesos_a_execute()
 
         if(cpu_disponible != NULL)
         {
-            t_pcb* procesoAux = list_remove(planner->short_term->queue_READY->cola,0);
+            
             pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
 
-            queue_process(procesoAux, EXECUTE);
+            queue_process(procesoPrimero, EXECUTE);
         } else { 
             pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
             break; }

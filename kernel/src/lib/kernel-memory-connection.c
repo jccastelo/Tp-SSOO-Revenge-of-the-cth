@@ -3,6 +3,8 @@
 
 pthread_mutex_t mutex_memoria = PTHREAD_MUTEX_INITIALIZER;
 
+pthread_mutex_t mutex_memoria_envio_pid = PTHREAD_MUTEX_INITIALIZER;
+
 void kernel_memory_connection(void) {
     // Incializamos variables necesarias para la conexión:
     char *puerto_memoria = string_itoa(config_kernel->PUERTO_MEMORIA);
@@ -19,6 +21,8 @@ void set_socket_memoria(int socket) {
 }
 
 int enviar_pid_memoria(t_pcb* proceso, int codigo_operacion) {
+
+    pthread_mutex_lock(&mutex_memoria_envio_pid);
     
     t_paquete* paquete = crear_paquete(codigo_operacion); // Creo paquete con codigo de operacion
 
@@ -40,7 +44,7 @@ int enviar_pid_memoria(t_pcb* proceso, int codigo_operacion) {
 
     //if(resultado == 1)
     //{log_info(logger,"Memoria confirma %i %i:", codigo_operacion, proceso->pid);}
-
+    pthread_mutex_unlock(&mutex_memoria_envio_pid);
     return resultado;
 }
 

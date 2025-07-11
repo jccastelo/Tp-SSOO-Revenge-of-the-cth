@@ -54,7 +54,8 @@ void queue_process(t_pcb* process, int estado){
         { 
             queue_process(process, EXECUTE);
             
-        } else if(list_get(planner->short_term->queue_READY->cola,0) == process) { // Si el proceso que entro esta primero ahi se fija si desaloja
+        } else if(list_get(planner->short_term->queue_READY->cola,0) == process 
+                    && planner->short_term->algoritmo_desalojo== desalojo_SJF) { // Si el proceso que entro esta primero ahi se fija si desaloja
             planner->short_term->algoritmo_desalojo(process); // Si tiene desalojo ejecuta, sino null pattern 
         }
         
@@ -200,7 +201,8 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
     if(process->queue_ESTADO_ACTUAL != NULL){
         // Cerramos el mutex y sacamos el pcb de la cola del estado en el que estaba el proceso (que esta primero)
         pthread_mutex_lock(&process->queue_ESTADO_ACTUAL->mutex);
-        list_remove_element(process->queue_ESTADO_ACTUAL->cola, process);
+        bool hallado=list_remove_element(process->queue_ESTADO_ACTUAL->cola, process);
+        if(!hallado){log_error(logger,"NO hallado PID %d",process->pid);}
         pthread_mutex_unlock(&process->queue_ESTADO_ACTUAL->mutex);
     }
 

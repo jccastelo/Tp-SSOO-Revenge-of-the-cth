@@ -9,8 +9,10 @@ int main(int argc, char *argv[]) {
     int Tamanio_proc;
 
     if (argc < 3) {
-        log_error(logger, "Uso: %s <archivoProceso> <Tamanio_proc>", argv[0]);
-        return 1;
+        //log_error(logger, "Uso: %s <archivoProceso> <Tamanio_proc>", argv[0]);
+        //return 1;
+         archivo_pseudocodigo= "ESTABILIDAD_GENERAL";
+         Tamanio_proc =0;
     } else {
         archivo_pseudocodigo = argv[1];
         Tamanio_proc = atoi(argv[2]);
