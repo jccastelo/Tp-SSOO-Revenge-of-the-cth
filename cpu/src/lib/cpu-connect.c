@@ -44,6 +44,7 @@ void enviar_id_cpu(int socket) {
     int cpu_id = atoi(id_cpu);
     agregar_a_paquete(paquete, &cpu_id, sizeof(int));
     enviar_paquete(paquete, socket);
+    eliminar_paquete(paquete);
 }
 
 void init_estructura_memoria() {
@@ -74,5 +75,6 @@ void init_estructura_memoria() {
         log_info(logger,"ERROR INICIALIZANDO LOS DATOS DE MEMORIA");
         
 
+    free(new_buffer->stream);
     free(new_buffer);
 }

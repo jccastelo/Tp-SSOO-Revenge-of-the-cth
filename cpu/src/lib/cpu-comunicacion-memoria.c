@@ -6,6 +6,7 @@ void conseguir_siguiente_instruccion() {
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
     agregar_a_paquete(paquete, &contexto->pc, sizeof(int));
     enviar_paquete(paquete, socket_memoria);
+    eliminar_paquete(paquete);
 }
 
 
@@ -30,6 +31,7 @@ char* devolver_instruccion_a_ejecutar() {
     else
         log_error(logger, "error deserializando la instruccion que viene de memoria.");
 
+    free(new_buffer->stream);
     free(new_buffer);
     return instruccion;
 }
@@ -39,6 +41,7 @@ int pedir_marco_a_memoria(t_traduccion *traduccion) {
     agregar_a_paquete(paquete, &contexto->pid, sizeof(int));
     agregar_a_paquete(paquete, traduccion->entradas, sizeof(int) * CANTIDAD_NIVELES);
     enviar_paquete(paquete, socket_memoria);
+    eliminar_paquete(paquete);
 
     // int cod_op;
     int frame;
@@ -67,6 +70,7 @@ char* leer_en_memoria(int dir_fisica, int tamanio) {
     agregar_a_paquete(paquete, &tamanio, sizeof(int));
     agregar_a_paquete(paquete, &dir_fisica, sizeof(int));
     enviar_paquete(paquete, socket_memoria);
+    eliminar_paquete(paquete);
 
     int cod_op = recibir_operacion(socket_memoria);
     if (cod_op != OK) {
@@ -89,6 +93,9 @@ char* leer_en_memoria(int dir_fisica, int tamanio) {
     // parsear_string(buffer->stream, &tamanio, &resultado);
 
     log_info(logger, "PID: %d - Acción: LEER - Dirección Física: %d - Valor: %s", contexto->pid, dir_fisica, resultado);
+
+    free(buffer);
+
     return resultado;
 }
 
@@ -99,6 +106,7 @@ void escribir_en_memoria(int dir_fisica, char* contenido) {
     agregar_a_paquete_string(paquete, contenido, string_length(contenido));
     agregar_a_paquete(paquete, &dir_fisica, sizeof(int));
     enviar_paquete(paquete, socket_memoria);
+    eliminar_paquete(paquete);
 
     int respuesta;
     recv(socket_memoria, &respuesta, sizeof(int), MSG_WAITALL);

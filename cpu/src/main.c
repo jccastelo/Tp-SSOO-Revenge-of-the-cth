@@ -38,6 +38,7 @@ int main(int argc, char* argv[]) {
         // Limpiamos al ser desalojado el proceso
         limpiar_tlb();
         limpiar_cache();
+        free(contexto);
     }
     
     return 0;

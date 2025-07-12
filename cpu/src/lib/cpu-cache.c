@@ -84,6 +84,7 @@ int conseguir_entrada_libre() {
 void agregar_en_entrada_cache(int entrada, int pagina, char* contenido) {
     cache[entrada].pagina = pagina;
     memcpy(cache[entrada].contenido, contenido, TAM_PAGINA);
+    free(contenido);
     cache[entrada].bit_uso = 1;
     cache[entrada].bit_modificado = 0;
     cache[entrada].libre = 0;

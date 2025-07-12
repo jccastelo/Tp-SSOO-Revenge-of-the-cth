@@ -28,7 +28,7 @@ void recibir_contexto_de_kernel() {
     else
         log_info(logger,"ERROR RECIBIENDO PROCESO DE KERNEL");
         
-
+    free(new_buffer->stream);
     free(new_buffer);
 }
 
@@ -53,6 +53,7 @@ void enviar_contexto_desalojo() {
     t_paquete* paquete = crear_paquete(CONTEXTO_DESALOJO);
     agregar_contexto_al_paquete(paquete);
     enviar_paquete(paquete, socket_dispatch);
+    eliminar_paquete(paquete);
 }
 
 
@@ -67,6 +68,7 @@ void syscall_io(char* dispositivo, int tiempo) {
     agregar_a_paquete(paquete, &tiempo, sizeof(int));
     agregar_contexto_al_paquete(paquete);
     enviar_paquete(paquete, socket_dispatch);
+    eliminar_paquete(paquete);
 }
 
 void syscall_init_proc(char* archivo, int tamanio) {
@@ -78,18 +80,21 @@ void syscall_init_proc(char* archivo, int tamanio) {
     agregar_a_paquete(paquete, &tamanio, sizeof(int));
     // agregar_contexto_al_paquete(paquete);
     enviar_paquete(paquete, socket_dispatch);
+    eliminar_paquete(paquete);
 }
 
 void syscall_dump_memory() {
     t_paquete* paquete = crear_paquete(DUMP_MEMORY);
     agregar_contexto_al_paquete(paquete);
     enviar_paquete(paquete, socket_dispatch);
+    eliminar_paquete(paquete);
 }
 
 void syscall_exit() {
     t_paquete* paquete = crear_paquete(EXIT_SYS);
     agregar_contexto_al_paquete(paquete);
     enviar_paquete(paquete, socket_dispatch);
+    eliminar_paquete(paquete);
 }
 
 void agregar_contexto_al_paquete(t_paquete* paquete) {
