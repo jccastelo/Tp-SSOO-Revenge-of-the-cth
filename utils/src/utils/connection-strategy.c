@@ -19,9 +19,9 @@ void conection_strategy_persistence(void * args) {
         int operation = recibir_operacion(client_socket);
 
         if (operation == -1) 
-            log_error(logger, "Error al recibir la operacion");
+            log_debug(logger, "Error al recibir la operacion");
         else {
-            log_info(logger, "Operacion recibida: %d", operation);
+            log_debug(logger, "Operacion recibida: %d", operation);
             client_handler(client_socket, operation, server_name);
         }
     }
@@ -39,7 +39,7 @@ void conection_strategy_once(void * args) {
 
     // Si la operación es -1, significa que hubo un error al recibir la operación:
     if (operation == -1) 
-        log_error(logger, "Error al recibir la operacion");
+        log_debug(logger, "Error al recibir la operacion");
 
     client_handler(client_socket, operation, server_name);
 }

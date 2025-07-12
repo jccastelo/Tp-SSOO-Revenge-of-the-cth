@@ -23,7 +23,7 @@ int iniciar_servidor(const char* name, char* ip, char* puerto) {
 
 		if(setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEPORT, &(int){1}, sizeof(int)) < 0){
 			
-			log_warning(logger,"Error setsockpt");
+			log_debug(logger,"Error setsockpt");
 			return EXIT_SUCCESS;
 		}
 		
@@ -45,7 +45,7 @@ int iniciar_servidor(const char* name, char* ip, char* puerto) {
     listen(socket_servidor, SOMAXCONN); // Escuchando (hasta SOMAXCONN conexiones simultaneas)
 
     // Aviso al logger
-    log_info(logger, "Escuchando en %s:%s (%s)\n", ip, puerto, name);
+    log_debug(logger, "Escuchando en %s:%s (%s)\n", ip, puerto, name);
 
     freeaddrinfo(servinfo);
 
@@ -70,17 +70,17 @@ int crear_conexion(const char* server_name, char* ip, char* puerto) {
 
     // Fallo en crear el socket
     if(socket_cliente == -1) {
-        log_error(logger, "Error creando el socket para %s:%s", ip, puerto);
+        log_debug(logger, "Error creando el socket para %s:%s", ip, puerto);
         return -1;
     }
 
     // Error conectando
     if(connect(socket_cliente, servinfo->ai_addr, servinfo->ai_addrlen) == -1) {
-        log_error(logger, "Error al conectar (a %s)\n", server_name);
+        log_debug(logger, "Error al conectar (a %s)\n", server_name);
         freeaddrinfo(servinfo);
         return -1;
     } else
-        log_info(logger, "Cliente conectado en %s:%s (a %s)\n", ip, puerto, server_name);
+        log_debug(logger, "Cliente conectado en %s:%s (a %s)\n", ip, puerto, server_name);
 
     freeaddrinfo(servinfo);
 
@@ -93,7 +93,7 @@ int esperar_cliente(const char* name, int socket_servidor) {
 
     int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
-    log_info(logger, "Cliente conectado (a %s)\n", name);
+    log_debug(logger, "Cliente conectado (a %s)\n", name);
 
     return socket_cliente;
 }

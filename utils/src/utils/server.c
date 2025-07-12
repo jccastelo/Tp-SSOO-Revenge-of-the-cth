@@ -8,13 +8,13 @@ void server_clients(
     void (*client_handler)(int client_socket, int operation, const char *server_name)
 ) {
     // Inicializamos el logger:
-    log_info(logger, "Esperando conexiones en %s", server_name);
+    log_debug(logger, "Esperando conexiones en %s", server_name);
 
     while (1) {
         int client_socket = esperar_cliente(server_name, server_socket);
 
         if (client_socket == -1) {
-            log_error(logger, "Error en la conexión del cliente");
+            log_debug(logger, "Error en la conexión del cliente");
             continue;
         }
 

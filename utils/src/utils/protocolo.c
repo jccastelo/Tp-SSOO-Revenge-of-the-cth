@@ -106,9 +106,9 @@ void generar_handshake(int socket, char *server_name) {
 	recv(socket, &result, sizeof(int32_t), MSG_WAITALL);
 
     if(result == 0) 
-        log_info(logger, "Handshake exitoso con %s", server_name);
+        log_debug(logger, "Handshake exitoso con %s", server_name);
     else {
-        log_error(logger, "Error en el handshake con %s", server_name);
+        log_debug(logger, "Error en el handshake con %s", server_name);
         exit(EXIT_FAILURE);
     }
 }

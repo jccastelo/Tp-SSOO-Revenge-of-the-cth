@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
    
     while(list_size(list_cpus->cola) == 0) {}
     
-
+    log_info(logger,"## Kernel esperando confirmacion para iniciar");
     getchar();
 
     // INICIO PRIMER PROCESO
