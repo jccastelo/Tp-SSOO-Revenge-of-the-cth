@@ -330,6 +330,7 @@ void desalojo_SJF(t_pcb* primer_proceso) {
 
     if (restante > primer_proceso->estimaciones_SJF->rafagaEstimada) {
         desalojar_proceso(cpu);
+        log_error(logger, "DESALOJO PAPUI");
         return;
     }
 
@@ -338,40 +339,46 @@ void desalojo_SJF(t_pcb* primer_proceso) {
 
 t_cpu* cpu_mayor_rafaga() {
     
+    pthread_mutex_lock(&list_cpus->mutex);
     t_cpu* cpu_buscada;
     
-    pthread_mutex_lock(&list_cpus->mutex);
+    
     int tamanio = list_size(list_cpus->cola);
-    pthread_mutex_unlock(&list_cpus->mutex);
+    
 
-    pthread_mutex_lock(&list_cpus->mutex);
+    
     cpu_buscada = list_get(list_cpus->cola, 0);
-    pthread_mutex_unlock(&list_cpus->mutex);
+    
 
     if(cpu_buscada->estado == DISPONIBLE){
+        pthread_mutex_unlock(&list_cpus->mutex);
         return cpu_buscada;
     }
 
     for(int i = 1; i < tamanio; i++) {
         
-        pthread_mutex_lock(&list_cpus->mutex);    
+          
         t_cpu* cpu_i = list_get(list_cpus->cola, i);
-        pthread_mutex_unlock(&list_cpus->mutex);
+        
 
         if(cpu_i->estado == DISPONIBLE){
+            pthread_mutex_unlock(&list_cpus->mutex);
             return cpu_i;
         }
         
-        pthread_mutex_lock(&list_procesos->mutex);
+        
         t_pcb* proceso_a = list_get(list_procesos->cola, cpu_buscada->pid);
+ 
+
+        
         t_pcb* proceso_b = list_get(list_procesos->cola, cpu_i->pid);
-        pthread_mutex_unlock(&list_procesos->mutex);
+       
         
         if(proceso_a->estimaciones_SJF->rafagaEstimada < proceso_b->estimaciones_SJF->rafagaEstimada) {
             cpu_buscada = cpu_i;
         }
     }
-
+    pthread_mutex_unlock(&list_cpus->mutex);
     return cpu_buscada;
 }
 
