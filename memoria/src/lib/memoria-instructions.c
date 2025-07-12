@@ -63,7 +63,7 @@ void get_instruction(int client_socket, int id_process, int program_counter, cha
 
     // Verificamos que el proceso tenga instrucciones cargadas.
     if (!process_instructions) {
-        log_error(logger, "El proceso no tiene instrucciones cargadas en memoria.");
+        log_debug(logger, "El proceso no tiene instrucciones cargadas en memoria.");
         free(key_id_process); 
         return;
     }

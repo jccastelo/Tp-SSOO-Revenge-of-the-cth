@@ -25,7 +25,7 @@ t_list* get_marcos_list_of_proc(char* pid_key, t_dictionary *tabla_de_paginas) {
     t_list* lista_de_marcos = dictionary_get(tabla_de_paginas, pid_key);
 
     if (lista_de_marcos == NULL) {
-        log_warning(logger, "No se encontraron marcos para el proceso PID %d", atoi(pid_key));
+        log_debug(logger, "No se encontraron marcos para el proceso PID %d", atoi(pid_key));
         return NULL;
     }
     return lista_de_marcos;
@@ -35,7 +35,7 @@ t_list* remove_marcos_list_of_proc(char* pid_key , t_dictionary *diccionario_swa
     t_list* metadata_swap = dictionary_remove(diccionario_swap_metadata, pid_key);
 
     if (!metadata_swap) {
-        log_error(logger, "No hay metadata de swap para el proceso %d", atoi(pid_key));
+        log_debug(logger, "No hay metadata de swap para el proceso %d", atoi(pid_key));
         return NULL;
     }
     return metadata_swap;
@@ -112,7 +112,7 @@ void swap_in(char* pid_key, int pid, int client_socket) {
 void vaciar_swap_del_proceso(int pid ,char * pid_key) {
 
     if (!dictionary_has_key(diccionario_swap_metadata, pid_key)) {
-        log_info(logger, "El proceso %d no tenía entradas en swap", pid);
+        log_debug(logger, "El proceso %d no tenía entradas en swap", pid);
         return;
     }
 
@@ -124,5 +124,5 @@ void vaciar_swap_del_proceso(int pid ,char * pid_key) {
     }
 
     list_destroy(swap_metadata);
-    log_info(logger, "Swap del proceso %d vaciado (fragmentación lógica generada)", pid);
+    log_debug(logger, "Swap del proceso %d vaciado (fragmentación lógica generada)", pid);
 }

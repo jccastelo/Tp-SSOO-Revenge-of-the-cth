@@ -52,10 +52,10 @@ void destruir_nodo(t_list* nodo) {
 }
 
 void destruir_tabla_de_paginas(char *pid_key) {
-    log_warning(logger , "por remover la lista del dic");
+    log_debug(logger , "por remover la lista del dic");
     t_list* tabla = dictionary_remove(all_process_page_tables, pid_key);
-    log_warning(logger,"lista obtenida");
+    log_debug(logger,"lista obtenida");
     //destruir_nodo(tabla);
     list_destroy(tabla);
-    log_warning(logger,"lista borrada");
+    log_debug(logger,"lista borrada");
 }

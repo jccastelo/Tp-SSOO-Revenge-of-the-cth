@@ -29,7 +29,7 @@ void init_process(int client_socket) {
     }
 
     // Enviamos la respuesta indicando si el proceso fue creado correctamente o no
-    log_warning(logger, "PID: %d - Proceso %s para crearse", id_process, status_process);
+    log_info(logger, "PID: %d - Proceso %s para crearse", id_process, status_process);
     send(client_socket, &request, sizeof(request), 0);
 }
 
@@ -39,13 +39,13 @@ void access_to_page_tables(int client_socket) {
     t_list *entries_per_levels = rcv_entries_per_levels(client_socket, &id_process);
 
     // Logueamos la información del proceso y las entradas recibidas:
-    log_info(logger, "PID: %d - Acceso a tablas de páginas", id_process);
+    log_debug(logger, "PID: %d - Acceso a tablas de páginas", id_process);
 
     // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
     int searched_frame = find_frame_from_entries(id_process, entries_per_levels);
 
     aumentar_contador(metricas_por_procesos, TABLAS_REQUESTS, string_itoa(id_process));
-    log_info(logger, "PID: %d - Frame encontrado: %d", id_process, searched_frame);
+    log_debug(logger, "PID: %d - Frame encontrado: %d", id_process, searched_frame);
 
     // Enviar el frame encontrado al cliente que lo solicitó, y liberamos memoria
     send(client_socket, &searched_frame, sizeof(int), 0);
@@ -62,7 +62,7 @@ void write_in_user_spaces(int client_socket) {
     write_memory(client_socket, id_process, content_to_write, physical_address);
 
     // Logueamos el contenido del espacio de usuario después de la escritura:
-    log_info(logger, "user space after write: %s", mem_hexstring(espacio_usuario, config_memoria->TAM_MEMORIA));
+    log_debug(logger, "user space after write: %s", mem_hexstring(espacio_usuario, config_memoria->TAM_MEMORIA));
     aumentar_contador(metricas_por_procesos, MEM_WRITE_REQUESTS, string_itoa(id_process));
 }
 
@@ -85,7 +85,7 @@ void send_process_instruction(int cliente_socket) {
     
     // Llamamos a la función que recibe y configura los valores necesarios para el proceso. Luego, enviamos la instrucción correspondiente:
     rcv_instruction_consumer(cliente_socket, &id_process, &program_counter);
-    log_info(logger, "Obtener instrucción: ## PID: %d - Obtener instrucción: %d", id_process, program_counter);
+    log_debug(logger, "Obtener instrucción: ## PID: %d - Obtener instrucción: %d", id_process, program_counter);
 
     // Obtenemos la instrucción del proceso y la enviamos al consumidor:
     get_instruction(cliente_socket, id_process, program_counter, &instruction);
@@ -99,7 +99,7 @@ void suspend_process(int client_socket) {
     int id_process = rcv_only_pid(client_socket);
     char *id_process_key = string_itoa(id_process);
 
-    log_info(logger, "El proceso con PID %d ha entrado en estado de suspensión.", id_process);
+    log_debug(logger, "El proceso con PID %d ha entrado en estado de suspensión.", id_process);
 
     // Aumentamos contadores de metricas:
     aumentar_contador(metricas_por_procesos, SWAP_IN_REQUESTS, id_process_key);
@@ -189,14 +189,14 @@ void finish_process(int client_socket) {
     int resquest;
     int pid = rcv_only_pid(client_socket);
 
-    log_info(logger, "Proceso PID: %d va a finalizar", pid);
+    log_debug(logger, "Proceso PID: %d va a finalizar", pid);
 
     // Verificamos si el proceso ya ha finalizado o no:
     if (is_process_end(pid)) { // To Do: Verificar si el proceso ya ha finalizado, funcion que mezcla consulta y estado del proceso
-       log_info(logger, "El proceso %d ya ha finalizado", pid);
+       log_debug(logger, "El proceso %d ya ha finalizado", pid);
        resquest = OK;
     } else {
-       log_info(logger, "El proceso %d no ha finalizado", pid);
+       log_debug(logger, "El proceso %d no ha finalizado", pid);
        resquest = ERROR;     
     }
 

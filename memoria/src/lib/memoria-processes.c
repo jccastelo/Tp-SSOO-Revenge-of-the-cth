@@ -37,7 +37,7 @@ int is_process_end(int id_process) {
         frames_as_busy = get_frames_from_entries(id_process);
         mark_frames_as_free(frames_as_busy);
     } else
-        log_info(logger, "El proceso PID: %d fue suspendido y se procede a finalizar sin liberar ningún marco", id_process);
+        log_debug(logger, "El proceso PID: %d fue suspendido y se procede a finalizar sin liberar ningún marco", id_process);
 
     // Mostramos los contadores del proceso:
     imprimir_contadores_del_proceso(id_process, process);

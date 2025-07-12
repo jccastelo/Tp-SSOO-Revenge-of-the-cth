@@ -55,7 +55,7 @@ void send_instruction_consumer(int cliente_socket, int id_process, int program_c
     // Verificamos que haya instruccion para enviar al cliente.
     // Si no hay instruccion valida, registramos un error y salimos. 
     if (!instruction) {
-        log_error(logger, "No se puede enviar la instrucción solicitada por CPU. Program Counter: %d | ID de Proceso: %d", program_counter, id_process);
+        log_debug(logger, "No se puede enviar la instrucción solicitada por CPU. Program Counter: %d | ID de Proceso: %d", program_counter, id_process);
         return;
     }
  
@@ -125,7 +125,7 @@ void send_values_memory(int client_socket) {
     agregar_a_paquete(values_packages, &config_memoria->ENTRADAS_POR_TABLA, sizeof(int));
     agregar_a_paquete(values_packages, &config_memoria->CANTIDAD_NIVELES, sizeof(int));
 
-    log_info(logger, "Enviando configuración de memoria al cliente: Tamaño de página: %d, Entradas por tabla: %d, Cantidad de niveles: %d",
+    log_debug(logger, "Enviando configuración de memoria al cliente: Tamaño de página: %d, Entradas por tabla: %d, Cantidad de niveles: %d",
              config_memoria->TAM_PAGINA, config_memoria->ENTRADAS_POR_TABLA, config_memoria->CANTIDAD_NIVELES);
 
     // Enviamos el paquete con los valores de configuración de memoria al cliente.

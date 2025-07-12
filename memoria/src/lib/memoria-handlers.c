@@ -4,7 +4,7 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
     switch (operation) {
         case HANDSHAKE:
             recibir_handshake(client_socket);
-            log_info(logger, "Se ha recibido un handshake del socket %d ", client_socket);
+            log_debug(logger, "Se ha recibido un handshake del socket %d ", client_socket);
         break;
         case INIT_PROC:
             log_info(logger, "## Kernel Conectado - FD del socket: %d", client_socket);
@@ -42,7 +42,7 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
         break;
         // Otros casos de operaciones pueden ir aquí.
         default:
-            log_warning(logger, "Operación desconocida: %d", operation);
+            log_debug(logger, "Operación desconocida: %d", operation);
         break;
     }
 }
