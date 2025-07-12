@@ -149,6 +149,7 @@ void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc){
 
     //Llamada de la syscall INIC_PROC
     recibir_y_crear_proceso(new_buffer);
+    free(new_buffer);
 }
 
 void traer_proceso_a_MP(){

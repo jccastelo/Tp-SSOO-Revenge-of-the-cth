@@ -17,6 +17,7 @@ int main(int argc, char *argv[]) {
         archivo_pseudocodigo = argv[1];
         Tamanio_proc = atoi(argv[2]);
     }
+    signal(SIGINT, terminar_kernel);
 
     // Inicializamos la configuración del kernel y los servidores:
     kernel_config_init();
@@ -38,7 +39,6 @@ int main(int argc, char *argv[]) {
    
     while(list_size(list_cpus->cola) == 0) {}
     
-    signal(SIGINT, terminar_kernel);
 
     getchar();
 

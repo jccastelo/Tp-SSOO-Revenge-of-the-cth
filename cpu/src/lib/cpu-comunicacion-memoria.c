@@ -49,7 +49,7 @@ int pedir_marco_a_memoria(t_traduccion *traduccion) {
     // new_buffer->size = 0;
     // new_buffer->stream = NULL;
 
-    recv(socket_memoria, &frame, sizeof(int), 0);
+    recv(socket_memoria, &frame, sizeof(int), MSG_WAITALL);
     // new_buffer->stream = recibir_buffer(&new_buffer->size, socket_memoria);
     // memcpy(&(frame), new_buffer->stream + desplazamiento, sizeof(int));
 
@@ -101,7 +101,7 @@ void escribir_en_memoria(int dir_fisica, char* contenido) {
     enviar_paquete(paquete, socket_memoria);
 
     int respuesta;
-    recv(socket_memoria, &respuesta, sizeof(int), 0);
+    recv(socket_memoria, &respuesta, sizeof(int), MSG_WAITALL);
     
     if (respuesta != OK) {
         log_error(logger, "Error al escribir en memoria.");

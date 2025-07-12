@@ -75,40 +75,65 @@ void carnicero_de_io(t_IO* io){
 
 void terminar_kernel(){
     
+    log_warning(logger,"LIBERANDO KERNEL");
     //liberar planner
-    if (!planner) return;
+    // Destruir y liberar list_procesos
+    pthread_mutex_destroy(&(list_procesos->mutex));
+    list_destroy(list_procesos->cola);
+    free(list_procesos);
 
-    if (planner->short_term) {
-        liberar_monitor(planner->short_term->queue_READY);
-        free(planner->short_term);
-    }
+    // Destruir y liberar list_cpus
+    pthread_mutex_destroy(&(list_cpus->mutex));
+    list_destroy(list_cpus->cola);
+    free(list_cpus);
 
-    if (planner->medium_term) {
-        liberar_monitor(planner->medium_term->queue_BLOCKED_SUSPENDED);
-        liberar_monitor(planner->medium_term->queue_READY_SUSPENDED);
-        free(planner->medium_term);
-    }
+    // Destruir y liberar list_ios
+    pthread_mutex_destroy(&(list_ios->mutex));
+    list_destroy(list_ios->cola);
+    free(list_ios);
 
-    if (planner->long_term) {
-        liberar_monitor(planner->long_term->queue_NEW);
-        liberar_monitor(planner->long_term->queue_BLOCKED);
-        liberar_monitor(planner->long_term->queue_EXIT);
-        free(planner->long_term);
-    }
+    // Destruir planner->queue_EXECUTE
+    pthread_mutex_destroy(&(planner->queue_EXECUTE->mutex));
+    list_destroy(planner->queue_EXECUTE->cola);
+    free(planner->queue_EXECUTE);
 
-    liberar_monitor(planner->queue_EXECUTE);
+    // SHORT TERM
+    pthread_mutex_destroy(&(planner->short_term->queue_READY->mutex));
+    list_destroy(planner->short_term->queue_READY->cola);
+    free(planner->short_term->queue_READY);
+    free(planner->short_term);
 
+    // MEDIUM TERM
+    pthread_mutex_destroy(&(planner->medium_term->queue_BLOCKED_SUSPENDED->mutex));
+    list_destroy(planner->medium_term->queue_BLOCKED_SUSPENDED->cola);
+    free(planner->medium_term->queue_BLOCKED_SUSPENDED);
+
+    pthread_mutex_destroy(&(planner->medium_term->queue_READY_SUSPENDED->mutex));
+    list_destroy(planner->medium_term->queue_READY_SUSPENDED->cola);
+    free(planner->medium_term->queue_READY_SUSPENDED);
+
+    free(planner->medium_term);
+
+    // LONG TERM
+    pthread_mutex_destroy(&(planner->long_term->queue_NEW->mutex));
+    list_destroy(planner->long_term->queue_NEW->cola);
+    free(planner->long_term->queue_NEW);
+
+    pthread_mutex_destroy(&(planner->long_term->queue_EXIT->mutex));
+    list_destroy(planner->long_term->queue_EXIT->cola);
+    free(planner->long_term->queue_EXIT);
+
+    pthread_mutex_destroy(&(planner->long_term->queue_BLOCKED->mutex));
+    list_destroy(planner->long_term->queue_BLOCKED->cola);
+    free(planner->long_term->queue_BLOCKED);
+
+    free(planner->long_term);
+
+    // Finalmente, liberar planner
     free(planner);
 
-    //liberar listas cpus, procesos e io
-    liberar_monitor(list_cpus);    
-    liberar_monitor(list_procesos);
-    liberar_monitor(list_ios);    
-
-    //liberar conexiones
-    close(socket_memoria);
-    //liberar lo que haya quedado
-
+    log_warning(logger,"LIBERadO KERNEL");
+    exit(EXIT_SUCCESS);
 }   
 
 void liberar_monitor(t_monitor* monitor) {
