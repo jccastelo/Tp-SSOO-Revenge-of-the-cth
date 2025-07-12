@@ -3,6 +3,7 @@
 t_config_memoria* inicializar_config_memoria() {
     t_config_memoria* config_memoria = malloc(sizeof(t_config_memoria));
 
+    config_memoria->IP_SERVER = NULL;
     config_memoria->IP_MEMORIA = NULL; // Fixed initialization
     config_memoria->PUERTO_ESCUCHA = 0;
     config_memoria->TAM_MEMORIA = 0;
@@ -19,16 +20,10 @@ t_config_memoria* inicializar_config_memoria() {
     return config_memoria; // Ensure the allocated memory is returned
 }
 
-void memoria_config_init() {
+void memoria_config_init(char* config_path) {
     // Inicializamos variables:
     config_memoria = inicializar_config_memoria();
-    t_config* config = config_create("memoria.config");
-
-    // Verificamos que el archivo de configuración se haya abierto correctamente:
-    if (config == NULL) {
-        log_error(logger, "No se pudo abrir el archivo de configuración");
-        exit(EXIT_FAILURE);
-    }
+    t_config* config = config_create(config_path);
 
     // To Do: Implementar una función que valide la existencia de los parámetros en el archivo de configuración
     // Establecemos la configuración del kernel:
@@ -37,12 +32,10 @@ void memoria_config_init() {
     configurar_valores_de_paths(config_memoria, config);
     configurar_valores_de_log(config_memoria, config);
     config_destroy(config);
-
-    // Verificamos que la configuración de la memoria se haya inicializado correctamente:
-    log_info(logger, "Configuración de la memoria inicializada correctamente");
 }
 
 void configurar_valores_de_puerto(t_config_memoria* config_io, t_config* config) {
+    config_memoria->IP_SERVER = strdup(config_get_string_value(config, "IP_SERVER"));
     config_memoria->IP_MEMORIA = strdup(config_get_string_value(config, "IP_MEMORIA"));
     config_memoria-> PUERTO_ESCUCHA = config_get_int_value(config, "PUERTO_ESCUCHA");
 }

@@ -2,25 +2,23 @@
 
 int main(int argc, char *argv[]) {
 
-    // Inicializamos un logger
-    logger = log_create("kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
-
     char *archivo_pseudocodigo;
     int Tamanio_proc;
+    char *config_path;
 
-    if (argc < 3) {
-        //log_error(logger, "Uso: %s <archivoProceso> <Tamanio_proc>", argv[0]);
-        //return 1;
-         archivo_pseudocodigo= "ESTABILIDAD_GENERAL";
-         Tamanio_proc =0;
-    } else {
-        archivo_pseudocodigo = argv[1];
-        Tamanio_proc = atoi(argv[2]);
-    }
+    // ./bin/kernel "ARCHIVO" TAMAÑO ./path
+
+    archivo_pseudocodigo = argv[1];
+    Tamanio_proc = atoi(argv[2]);
+    config_path = argv[3];
+
     signal(SIGINT, terminar_kernel);
 
     // Inicializamos la configuración del kernel y los servidores:
-    kernel_config_init();
+    kernel_config_init(config_path);
+
+    // Inicializamos un logger
+    logger = log_create("kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
 
     planner_init();
 

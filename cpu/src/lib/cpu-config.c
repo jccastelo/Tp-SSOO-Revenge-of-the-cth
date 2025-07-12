@@ -25,12 +25,6 @@ void cpu_config_init(char* config_path) {
     config_cpu = inicializar_config_cpu();
     t_config* config = config_create(config_path);
 
-    // Verificamos que el archivo de configuración se haya abierto correctamente:
-    if (config == NULL) {
-        log_error(logger, "No se pudo abrir el archivo de configuración");
-        exit(EXIT_FAILURE);
-    }
-
     // To Do: Implementar una función que valide la existencia de los parámetros en el archivo de configuración
     // Establecemos la configuración del cpu:
     configurar_valores_de_memoria(config_cpu, config);
@@ -40,8 +34,6 @@ void cpu_config_init(char* config_path) {
     configurar_valores_de_log(config_cpu, config);
     config_destroy(config);
 
-    // Verificamos que la configuración del cpu se haya inicializado correctamente:
-    log_info(logger, "Configuración del cpu inicializada correctamente");
 }
 
 void configurar_valores_de_memoria(t_config_cpu* config_cpu, t_config* config) {

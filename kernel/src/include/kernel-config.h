@@ -27,7 +27,7 @@ t_config_kernel* inicializar_config_kernel();
  * 
  * @return No devuelve ningún valor.
  */
-void kernel_config_init();
+void kernel_config_init(char *config_route);
 
 /**
  * @brief Configura los valores relacionados con la memoria en la estructura de configuración del Kernel.

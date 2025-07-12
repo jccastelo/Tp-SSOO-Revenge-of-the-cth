@@ -28,7 +28,7 @@ t_config_cpu* inicializar_config_cpu();
  * 
  * @return No devuelve ningún valor.
  */
-void cpu_config_init();
+void cpu_config_init(char *config_path);
 
 /**
  * @brief Configura los valores relacionados con la memoria en la estructura de configuración del cpu.

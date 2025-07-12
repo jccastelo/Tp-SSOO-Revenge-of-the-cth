@@ -20,6 +20,7 @@ void realizar_ciclo_de_instruccion() {
             finaliza = check_interrupt();
 
         // LIBERO LA MEMORIA
+        string_array_destroy(instruccion->argv);
         free(instruccion_a_ejecutar);
         free(instruccion);
     }
@@ -38,7 +39,6 @@ t_instruccion* decode(char* instruccion) {
     instr->argv = palabras_instr;
     instr->argc = string_array_size(palabras_instr);
     instr->tipo = mapeo_string_tipo(palabras_instr[0]);
-    string_array_destroy(palabras_instr);
     return instr;
 }
 

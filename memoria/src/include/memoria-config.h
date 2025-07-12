@@ -37,7 +37,7 @@ t_config_memoria* inicializar_config_memoria(void);
  * 
  * Generalmente, esta función se invoca durante la fase de inicialización del proceso de Memoria.
  */
- void memoria_config_init(void);
+ void memoria_config_init(char *config_path);
  
 /**
  * @brief Configura el valor del puerto de escucha de la memoria.
