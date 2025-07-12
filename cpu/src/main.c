@@ -6,7 +6,8 @@ int main(int argc, char* argv[]) {
     id_cpu = argv[1];
     char* config_path = argv[2];
 
-    
+    // Inicializamos la configuración
+    cpu_config_init(config_path);
 
     // Inicializamos un logger:
     char log_name[10];
@@ -17,9 +18,6 @@ int main(int argc, char* argv[]) {
     if (argc < 2) {
         log_warning(logger, "CPU MAL INICIALIZADA");
     }
-
-    // Inicializamos la configuración
-    cpu_config_init(config_path);
 
     // Conectamos CPU a Kernel y memoria
     cpu_connect();

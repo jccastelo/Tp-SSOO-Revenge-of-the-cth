@@ -8,6 +8,7 @@
 
 //Configuracion del kernel
 typedef struct {
+    char *IP_SERVER;
     char *IP_MEMORIA;
     int PUERTO_MEMORIA;
     int PUERTO_ESCUCHA_DISPATCH;
