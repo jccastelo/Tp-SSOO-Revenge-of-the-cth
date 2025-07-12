@@ -51,7 +51,7 @@ char* leer_pagina_cache(int entrada) {
 char* leer_pagina_cache_parcial(int entrada, int offset, int tamanio) {
     cache[entrada].bit_uso = 1;
     char* resultado = malloc(tamanio + 1);
-    log_warning(logger, "EN CACHE HAY AL LEER: %s", cache[entrada].contenido);
+    log_debug(logger, "EN CACHE HAY AL LEER: %s", cache[entrada].contenido);
     memcpy(resultado, &cache[entrada].contenido[offset], tamanio);
     resultado[tamanio] = '\0';
 
@@ -62,7 +62,7 @@ void escribir_pagina_cache(int entrada, int offset, char* contenido) {
     cache[entrada].bit_uso = 1;
     cache[entrada].bit_modificado = 1;
     memcpy(&cache[entrada].contenido[offset], contenido, strlen(contenido));
-    log_warning(logger, "en CACHE.C  HAY: %s", cache[entrada].contenido);
+    log_debug(logger, "en CACHE.C  HAY: %s", cache[entrada].contenido);
 }
 
 int conseguir_entrada_libre() {

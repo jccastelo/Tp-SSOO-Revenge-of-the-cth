@@ -50,9 +50,9 @@ void enviar_id_cpu(int socket) {
 void init_estructura_memoria() {
 
     int cod_op = MEMORY_CONFIG;
-    log_info(logger,"ANTES DE SEND A MEMORIA INIT");
+    log_debug(logger,"ANTES DE SEND A MEMORIA INIT");
     send(socket_memoria, &cod_op, sizeof(int), 0);
-    log_info(logger, "YA ENVIE EL MENSAJE");
+    log_debug(logger, "YA ENVIE EL MENSAJE");
 
     t_buffer* new_buffer = malloc(sizeof(t_buffer));
     new_buffer->size = 0;

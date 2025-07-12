@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     log_info(logger, "cpu iniciada con ID %s", id_cpu);
 
     if (argc < 2) {
-        log_warning(logger, "CPU MAL INICIALIZADA");
+        log_error(logger, "CPU MAL INICIALIZADA");
     }
 
     // Conectamos CPU a Kernel y memoria

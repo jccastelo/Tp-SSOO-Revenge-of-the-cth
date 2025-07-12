@@ -24,12 +24,12 @@ char* devolver_instruccion_a_ejecutar() {
     if (cod_op == RETURN_INSTRUCCION)
     {
         new_buffer->stream = recibir_buffer(&new_buffer->size, socket_memoria);
-        // log_info(logger, "deserializando la instruccion..");
+        log_debug(logger, "deserializando la instruccion..");
         parsear_string(new_buffer->stream, &desplazamiento , &instruccion);
-        // log_info(logger, "Instruccion: %s", instruccion);
+         log_debug(logger, "Instruccion: %s", instruccion);
     }
     else
-        log_error(logger, "error deserializando la instruccion que viene de memoria.");
+        log_debug(logger, "error deserializando la instruccion que viene de memoria.");
 
     free(new_buffer->stream);
     free(new_buffer);
@@ -74,7 +74,7 @@ char* leer_en_memoria(int dir_fisica, int tamanio) {
 
     int cod_op = recibir_operacion(socket_memoria);
     if (cod_op != OK) {
-        log_error(logger, "Error al recibir contenido parcial de memoria.");
+        log_debug(logger, "Error al recibir contenido parcial de memoria.");
     }
 
     int size = 0;
@@ -112,6 +112,6 @@ void escribir_en_memoria(int dir_fisica, char* contenido) {
     recv(socket_memoria, &respuesta, sizeof(int), MSG_WAITALL);
     
     if (respuesta != OK) {
-        log_error(logger, "Error al escribir en memoria.");
+        log_debug(logger, "Error al escribir en memoria.");
     }
 }

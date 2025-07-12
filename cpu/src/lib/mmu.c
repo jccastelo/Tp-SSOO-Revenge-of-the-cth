@@ -9,11 +9,11 @@ t_traduccion* traducir_direccion_logica(int dir_logica) {
     obtener_entradas_por_nivel(traduccion->entradas, nro_pagina);
     traduccion->desplazamiento = obtener_desplazamiento(dir_logica);
 
-    log_warning(logger, "NRO PAGINA: %d", traduccion->nro_pagina);
+    log_debug(logger, "NRO PAGINA: %d", traduccion->nro_pagina);
     for (int i=0; i < CANTIDAD_NIVELES; i++) {
-        log_warning(logger, "ENTRADA: %d, NIVEL: %d", i, traduccion->entradas[i]);
+        log_debug(logger, "ENTRADA: %d, NIVEL: %d", i, traduccion->entradas[i]);
     }
-    log_warning(logger, "offset: %d", traduccion->desplazamiento);
+    log_debug(logger, "offset: %d", traduccion->desplazamiento);
 
     return traduccion;
 }

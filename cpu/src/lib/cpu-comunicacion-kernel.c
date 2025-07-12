@@ -9,12 +9,12 @@ void recibir_contexto_de_kernel() {
     new_buffer->size = 0;
     new_buffer->stream = NULL;
 
-    log_info(logger, "Recibiendo PID y PC desde Kernel por el puesto DISPATCH");
+    log_debug(logger, "Recibiendo PID y PC desde Kernel por el puesto DISPATCH");
 
     cod_op = recibir_operacion(socket_dispatch);
     //buffer = recibir_buffer(&buffer_size, socket_dispatch);
 
-    log_info(logger, "recibi el op_cod %d", cod_op);
+    log_debug(logger, "recibi el op_cod %d", cod_op);
 
     new_buffer->stream = recibir_buffer(&new_buffer->size, socket_dispatch);
 
@@ -26,7 +26,7 @@ void recibir_contexto_de_kernel() {
         // log_info(logger, "PID: %d - Programa a ejecutar - Program Counter: %d", contexto->pid, contexto->pc);
     }
     else
-        log_info(logger,"ERROR RECIBIENDO PROCESO DE KERNEL");
+        log_debug(logger,"ERROR RECIBIENDO PROCESO DE KERNEL");
         
     free(new_buffer->stream);
     free(new_buffer);
