@@ -84,14 +84,16 @@ void inicializar_tlb() {
 }
 
 void limpiar_tlb() {
-    for (int i = 0; i < config_cpu->ENTRADAS_TLB; i++) {
+    /* for (int i = 0; i < config_cpu->ENTRADAS_TLB; i++) {
         tlb[i].libre = 1;
         tlb[i].pagina = -1;
         tlb[i].marco = -1;
         tlb[i].bit_presencia = 0;
         tlb[i].bit_modificado = 0;
         tlb[i].timestamp = 0;
-    }
+    } */
+
+    free(tlb);
 
     puntero_fifo = 0;
 }
