@@ -58,3 +58,15 @@ void configurar_valores_de_paths(t_config_memoria* config_io, t_config* config) 
 void configurar_valores_de_log(t_config_memoria* config_io, t_config* config) {
     config_memoria->LOG_LEVEL = strdup(config_get_string_value(config, "LOG_LEVEL"));
 }
+
+void destruir_config_memoria(t_config_memoria* config_memoria) {
+    if (config_memoria == NULL) return;
+
+    free(config_memoria->IP_MEMORIA);
+    free(config_memoria->PATH_SWAPFILE);
+    free(config_memoria->PATH_INSTRUCCIONES);
+    free(config_memoria->LOG_LEVEL);
+    free(config_memoria->DUMP_PATH);
+
+    free(config_memoria);
+}

@@ -19,14 +19,17 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
         case SUSPENDER:
             log_info(logger, "## Kernel Conectado - FD del socket: %d", client_socket);
             suspend_process(client_socket);
+            close(client_socket);
         break; 
         case DESUSPENDER:
             log_info(logger, "## Kernel Conectado - FD del socket: %d", client_socket);
-            remove_suspend_process(client_socket);    
+            remove_suspend_process(client_socket);
+            close(client_socket);    
         break;
         case DUMP_MEMORY:
             log_info(logger, "## Kernel Conectado - FD del socket: %d", client_socket);
             dump_process(client_socket);
+            close(client_socket);
         break;
         case GET_FRAME:
             access_to_page_tables(client_socket);

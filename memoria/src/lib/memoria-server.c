@@ -3,9 +3,12 @@
 void memoria_servers_init(void) {
     // Inicializamos variables:
     memoria_servers = malloc(sizeof(t_memoria_servers));
+    char* puerto = string_itoa(config_memoria->PUERTO_ESCUCHA);
 
     // Inicializamos la estructura de servidores:
-    setup_server("Memoria", config_memoria->IP_MEMORIA, string_itoa(config_memoria->PUERTO_ESCUCHA),  set_escucha_id); // Rellenar variable de IP
+    setup_server("Memoria", config_memoria->IP_MEMORIA, puerto ,  set_escucha_id);
+     // Rellenar variable de IP 
+     free(puerto);
 }
 
 void set_escucha_id (int id_server) {

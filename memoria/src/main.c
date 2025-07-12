@@ -11,6 +11,8 @@ int main(int argc, char* argv[]) {
     logger = log_create("memoria.log", "MEMORIA", true, LOG_LEVEL_INFO);
 
     // Inicializamos la configuración del memoria, y las variables globales:
+    // configurar_senial_cierre();
+    memoria_config_init(config_path);
     memoria_state_init();
 
     // Inicializamos el server y comenzamos a escuchar:

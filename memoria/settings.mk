@@ -1,5 +1,5 @@
 # Libraries
-LIBS=utils commons pthread readline check subunit m
+LIBS=utils commons pthread readline m
 
 # Custom libraries' paths
 SHARED_LIBPATHS=

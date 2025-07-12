@@ -8,4 +8,5 @@ void memoria_servers_listening() {
         "Memoria", 
         conection_strategy_persistence, 
         memoria_server_escucha_handler);
+        
 }

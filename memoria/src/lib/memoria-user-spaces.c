@@ -38,7 +38,7 @@ t_list *is_memory_sufficient(int size_process) {
 
     // Validamos que haya suficientes frames libres
     if (added_frames < quantity_frames_process) {
-        list_destroy(free_frames);  // Liberar lista parcial
+        list_destroy_and_destroy_elements(free_frames, free);
         return NULL;
     }
 
@@ -91,6 +91,8 @@ void write_memory(int client_socket, int id_process, char *content_to_write, int
         data_size, 
         process_status
     );
+
+    // Mandamos respuesta, y liberamos memoria:
     send(client_socket, &response, sizeof(int), 0);
 }
 
@@ -122,5 +124,8 @@ void read_memory(int client_socket, int id_process, int quantity_bytes, int phys
         process_status
     );
     log_info(logger, "## PID: %d - Contenido leído: \"%s\"", id_process, (char *)buffer);
+
+    // Mandamos respuesta, y liberamos memoria:
     send_read_content(client_socket, buffer, response);
+    free(buffer);
 }

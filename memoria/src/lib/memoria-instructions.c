@@ -45,13 +45,15 @@ t_list *read_pseudocode_file(FILE *pseudocode_file) {
     
     // Liberamos memoria:
     fclose(pseudocode_file);
-
+    free(instruction);
+    
     return process_instructions;
 }
 
 void load_process_instructions_in_instrucciones_por_procesos(int id_process, t_list *process_instructions) {
     char *key_procces = string_itoa(id_process);
     dictionary_put(instrucciones_por_procesos, key_procces, process_instructions);
+    free(key_procces);
 }
 
 void get_instruction(int client_socket, int id_process, int program_counter, char **instruction) {
