@@ -70,6 +70,7 @@ void excecute(t_instruccion* instruccion) {
     case INSTR_IO:
         char* dispositivo = instruccion->argv[1];
         int tiempo = atoi(instruccion->argv[2]);
+        guardado_cache_por_desalojo();
         syscall_io(dispositivo, tiempo);
         break;
     case INSTR_INIT_PROC:
@@ -78,9 +79,11 @@ void excecute(t_instruccion* instruccion) {
         syscall_init_proc(archivo_instrucciones, tamanio_proc);
         break;
     case INSTR_DUMP_MEMORY:
+        guardado_cache_por_desalojo();
         syscall_dump_memory();
         break;
     case INSTR_EXIT:
+        guardado_cache_por_desalojo();
         syscall_exit();
         break;
     default:
@@ -97,6 +100,7 @@ bool check_interrupt() {
     bool finaliza = false;
     if (recibir_interrupciones()) {
         log_warning(logger, "## Llega interrupción al puerto Interrupt");
+        guardado_cache_por_desalojo();
         enviar_contexto_desalojo();
         finaliza = true;
     }
