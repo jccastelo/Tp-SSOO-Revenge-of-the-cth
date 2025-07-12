@@ -1,5 +1,0 @@
-NOOP 
-INIT_PROC proc_largo.txt 12
-INIT_PROC proc_corto.txt 12
-NOOP
-EXIT
