@@ -10,7 +10,7 @@ void init_process(int client_socket) {
 
     // Recibimos y configuramos los valores para el proceso
     rcv_setup_to_process(client_socket, &id_process, &tam_process, &file_process);
-    log_info(logger, "PID: %d - Proceso a punto de crearse - Tamaño: %d - Archivo: %s",
+    log_debug(logger, "PID: %d - Proceso a punto de crearse - Tamaño: %d - Archivo: %s",
             id_process, tam_process, file_process);
 
     // Verificamos si hay suficiente espacio en memoria para el proceso
@@ -23,13 +23,14 @@ void init_process(int client_socket) {
         mark_frames_as_busy(free_frames);
         status_process = "aceptado";
         request = OK;
+        log_info(logger, "PID: %d , - Proceso creado - Tamaño: %d ", id_process , tam_process);
     } else {
         status_process = "denegado";
         request = ERROR;
     }
 
     // Enviamos la respuesta indicando si el proceso fue creado correctamente o no
-    log_info(logger, "PID: %d - Proceso %s para crearse", id_process, status_process);
+    log_debug(logger, "PID: %d - Proceso %s para crearse", id_process, status_process);
     send(client_socket, &request, sizeof(request), 0);
 }
 
@@ -85,7 +86,7 @@ void send_process_instruction(int cliente_socket) {
     
     // Llamamos a la función que recibe y configura los valores necesarios para el proceso. Luego, enviamos la instrucción correspondiente:
     rcv_instruction_consumer(cliente_socket, &id_process, &program_counter);
-    log_debug(logger, "Obtener instrucción: ## PID: %d - Obtener instrucción: %d", id_process, program_counter);
+    log_debug(logger, " ## PID: %d - Obtener instrucción: %d", id_process, program_counter);
 
     // Obtenemos la instrucción del proceso y la enviamos al consumidor:
     get_instruction(cliente_socket, id_process, program_counter, &instruction);
