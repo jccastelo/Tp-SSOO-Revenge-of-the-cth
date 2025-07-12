@@ -37,7 +37,6 @@ void rcv_physical_memory_and_content_to_write(int client_socket, int *id_process
     parsear_int(buffer, &desplazamiento, id_process);
     parsear_string(buffer, &desplazamiento, content_to_write);
     parsear_int(buffer, &desplazamiento, physical_memory);
-    free(buffer);
 }
 
 void rcv_physical_memory_and_quantity_bytes(int client_socket, int *id_process, int *physical_memory, int *quantity_bytes) {
@@ -50,7 +49,6 @@ void rcv_physical_memory_and_quantity_bytes(int client_socket, int *id_process, 
     parsear_int(buffer, &desplazamiento, id_process);
     parsear_int(buffer, &desplazamiento, quantity_bytes);
     parsear_int(buffer, &desplazamiento, physical_memory);
-    free(buffer);
 }
 
 void send_instruction_consumer(int cliente_socket, int id_process, int program_counter, char *instruction) {
@@ -114,8 +112,6 @@ t_list *rcv_entries_per_levels(int client_socket, int *id_process) {
         parsear_int(buffer, &desplazamiento, entrada_ptr);
         list_add(entries_per_level, entrada_ptr);
     }
-
-    free(buffer);
 
     return entries_per_level;
 }
