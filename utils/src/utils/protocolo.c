@@ -37,9 +37,10 @@ void agregar_a_paquete_string(t_paquete* paquete, char* cadena, int tamanio) {
 
 void enviar_paquete(t_paquete* paquete, int socket_cliente) {
 	int bytes = paquete->buffer->size + 2 *sizeof(int);
-	void* a_enviar = serializar_paquete(paquete, bytes);
+	void *a_enviar = serializar_paquete(paquete, bytes);
 
 	send(socket_cliente, a_enviar, bytes, 0);
+    free(a_enviar);
 }
 
 void eliminar_paquete(t_paquete* paquete) {

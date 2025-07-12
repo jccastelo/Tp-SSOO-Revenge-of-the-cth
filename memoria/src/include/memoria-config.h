@@ -67,5 +67,20 @@ t_config_memoria* inicializar_config_memoria(void);
   * Lee y asigna el nivel de logeo que utilizará la memoria para registrar eventos.
   */
  void configurar_valores_de_log(t_config_memoria* config_memoria, t_config* config);
+
+/**
+ * @brief Libera la memoria ocupada por una estructura de configuración de memoria.
+ * 
+ * Esta función libera la memoria dinámica reservada para cada campo de tipo cadena (`char*`)
+ * dentro de la estructura `t_config_memoria`, y finalmente libera la memoria de la estructura
+ * en sí misma. 
+ * 
+ * @param config_memoria Puntero a la estructura `t_config_memoria` que se desea liberar.
+ * 
+ * @note Después de llamar a esta función, el puntero pasado quedará inválido y no debe ser utilizado
+ *       sin volver a inicializarlo. Se recomienda asignarlo a `NULL` después de la liberación.
+ */
+
+void destruir_config_memoria(t_config_memoria* config_memoria);
  
 #endif //MEMORIA_CONFIG_H

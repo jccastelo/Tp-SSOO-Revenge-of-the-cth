@@ -10,6 +10,7 @@ void setup_page_tables(int id_process, t_list *free_frames) {
 
     // Construimos la tabla de páginas asignando frames bajo demanda
     populate_page_table(free_frames, page_table_root);
+    free(key_id_process);
 }
 
 void populate_page_table(t_list *free_frames, t_list *page_table_root) {
@@ -131,10 +132,32 @@ void get_occupied_frames_from_page_table(int current_level, int total_levels, t_
     }
 }
 
+void delete_page_tables(int current_level, int total_levels, t_list *current_table) {
+    if (current_table == NULL) {
+        return;
+    }
+
+    if (current_level < total_levels) {
+        // En los niveles intermedios, destruimos recursivamente cada tabla hija
+        void destroy_child(void *child_table_ptr) {
+            t_list *child_table = (t_list *) child_table_ptr;
+            delete_page_tables(current_level + 1, total_levels, child_table);
+        }
+
+        list_destroy_and_destroy_elements(current_table, destroy_child);
+    } else {
+        // En el último nivel, las entradas son enteros (no requieren free)
+        list_destroy(current_table);
+    }
+}
+
 t_list *get_root_table(int id_process) {
     // Convertimos el ID del proceso a cadena para usar como clave en el diccionario
     char *key_id_process = string_itoa(id_process);
 
     // Obtenemos la tabla de páginas raíz asociada al proceso desde el diccionario global
-    return dictionary_get(all_process_page_tables, key_id_process);
+    void* elemento = dictionary_get(all_process_page_tables, key_id_process);
+    free(key_id_process);
+    
+    return elemento;
 }
