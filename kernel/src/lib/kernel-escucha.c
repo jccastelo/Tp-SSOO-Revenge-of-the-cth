@@ -5,7 +5,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
     if (operation == HANDSHAKE) {
         
         recibir_handshake(io_socket);
-        log_info(logger,"Conexion IO lista");
+        log_debug(logger,"Conexion IO lista");
         return;
     }
 
@@ -20,7 +20,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
 
     switch(operation){
         case IDENTIFICAR_IO:
-            log_info(logger,"IO A identificarse");
+            log_debug(logger,"IO A identificarse");
             recibir_io(new_buffer, io_socket);
         break;
         case DESBLOQUEO_IO:
@@ -48,7 +48,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
                 queue_process(process, READY_SUSPENDED); }
         break;
         case FIN_CONEXION_DE_IO:
-            log_info(logger,"Llego IO A desconectarse");
+            log_debug(logger,"Llego IO A desconectarse");
             int pid_fin = recibir_pid(new_buffer, io_socket);
         
             //Si habia pid lo mando a exit
@@ -60,10 +60,10 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             // Borramos la instancia y si era la ultima instancia borramos la estructura general
             // Si habia procesos esperando, van a exit
             eliminar_instancia(io_socket);
-            log_info(logger,"IO desconectada");
+            log_debug(logger,"IO desconectada");
         break;
         default:
-            log_error(logger, "Operación no válida para el servidor IO: %d", operation);
+            log_debug(logger, "Operación no válida para el servidor IO: %d", operation);
             break;
     }
     if(new_buffer != NULL){
@@ -77,7 +77,7 @@ void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *
     if (operation == HANDSHAKE) {
         
         recibir_handshake(cpu_socket);
-        log_info(logger,"Conexion interrupt lista");
+        log_debug(logger,"Conexion interrupt lista");
         return;
     }
 
@@ -92,12 +92,12 @@ void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *
 
     switch(operation) {
         case CPU_ID:
-            log_info(logger, "Llego cpu para identificarse");
+            log_debug(logger, "Llego cpu para identificarse");
             iniciar_cpu(new_buffer,cpu_socket, 0);
-            log_info(logger,"Se recibio la ID de la CPU desde el server %s",server_name);
+            log_debug(logger,"Se recibio la ID de la CPU desde el server %s",server_name);
             break;
         default:
-            log_error(logger, "Operación no válida para el servidor HANDLER: %d", operation);
+            log_debug(logger, "Operación no válida para el servidor HANDLER: %d", operation);
             break;
     }
 
@@ -113,7 +113,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
     if (operation == HANDSHAKE) {
         
         recibir_handshake(cpu_socket);
-        log_info(logger,"Coonexion disptach lista ");
+        log_debug(logger,"Coonexion disptach lista ");
         return;
     }
 
@@ -143,7 +143,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             break;
         case DUMP_MEMORY:
 
-            log_warning(logger,"LLEGO DUMP");
+            log_debug(logger,"LLEGO DUMP");
 
             t_pcb* process = recibir_proceso(new_buffer);
 
@@ -151,7 +151,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             queue_process(process, BLOCKED);
             mandar_procesos_a_execute();
             
-            log_warning(logger,"SOLITO DUMP");
+            log_debug(logger,"SOLITO DUMP");
             if(solicitar_a_memoria(avisar_dump_memory, process))
             {
                 if(process->hilo_activo){
@@ -160,7 +160,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
 
                 pthread_join(process->hilo_block, NULL);
                 
-                log_warning(logger," DUMP CORRECTO");
+                log_debug(logger," DUMP CORRECTO");
                 queue_process(process, READY);
             }
             else{
@@ -170,7 +170,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
 
                 pthread_join(process->hilo_block, NULL);
                 
-                log_error(logger," DUMP ERROR");
+                log_debug(logger," DUMP ERROR");
                 pthread_mutex_lock(&process->mutex_estado);
                 queue_process(process, EXIT);
                 }
@@ -183,11 +183,11 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
         case EXIT_SYS:
             delate_process(new_buffer);
             set_cpu(cpu_socket, DISPONIBLE,-1);
-            log_info(logger,"Se recibio la syscall EXIT_Sys desde el server %s",server_name);
+            log_debug(logger,"Se recibio la syscall EXIT_Sys desde el server %s",server_name);
             mandar_procesos_a_execute();
             break;
         default:
-            log_error(logger, "Operación no válida para el servidor HANDLER: %d", operation);
+            log_debug(logger, "Operación no válida para el servidor HANDLER: %d", operation);
             break;
     }
 

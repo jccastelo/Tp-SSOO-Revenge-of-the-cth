@@ -68,7 +68,7 @@ void recibir_y_crear_proceso(t_buffer *buffer){
 
 void cargar_proceso(t_pcb* process, t_buffer* buffer){
     
-    log_warning(logger, "CARGANDO PROCESO");
+    log_debug(logger, "CARGANDO PROCESO");
 	int desplazamiento = 0;
     // Copiamos el tamanio del nombre
     int tamanio_nombre=0;
@@ -90,8 +90,8 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer){
     pthread_mutex_unlock(&list_procesos->mutex);
 
     if(desplazamiento < buffer->size) 
-    {log_error(logger,"Hay informacion sin deserializar en INIC_PROC"); }
-    else{ log_info(logger,"Se inicializo proceso PID: %d ",process->pid ); }
+    {log_debug(logger,"Hay informacion sin deserializar en INIC_PROC"); }
+    else{ log_debug(logger,"Se inicializo proceso PID: %d ",process->pid ); }
     //sleep(1);
 
 }

@@ -39,7 +39,7 @@ int enviar_pid_memoria(t_pcb* proceso, int codigo_operacion) {
 
     if (bytes_recibidos <= 0) {
         perror("recv");
-        log_error(logger, "No se pudo recibir respuesta de memoria para %i proceso", codigo_operacion);
+        log_debug(logger, "No se pudo recibir respuesta de memoria para %i proceso", codigo_operacion);
     }
 
     //if(resultado == 1)

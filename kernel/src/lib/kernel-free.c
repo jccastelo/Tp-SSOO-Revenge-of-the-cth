@@ -75,7 +75,7 @@ void carnicero_de_io(t_IO* io){
 
 void terminar_kernel(){
     
-    log_warning(logger,"LIBERANDO KERNEL");
+    log_debug(logger,"LIBERANDO KERNEL");
     //liberar planner
     // Destruir y liberar list_procesos
     pthread_mutex_destroy(&(list_procesos->mutex));
@@ -132,7 +132,7 @@ void terminar_kernel(){
     // Finalmente, liberar planner
     free(planner);
 
-    log_warning(logger,"LIBERadO KERNEL");
+    log_debug(logger,"LIBERadO KERNEL");
     exit(EXIT_SUCCESS);
 }   
 

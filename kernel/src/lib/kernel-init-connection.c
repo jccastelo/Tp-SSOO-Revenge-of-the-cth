@@ -12,15 +12,15 @@ void kernel_servers_init(void) {
 
 void set_dispatcher_id (int id_server) {
     kernel_servers->id_server_dispatch = id_server;
-    log_info(logger, "ID del servidor DISPATCH: %d", kernel_servers->id_server_dispatch);
+    log_warning(logger, "ID del servidor DISPATCH: %d", kernel_servers->id_server_dispatch);
 }
 
 void set_io_id (int id_server) {
     kernel_servers->id_server_io = id_server;
-    log_info(logger, "ID del servidor IO: %d", kernel_servers->id_server_io);
+    log_warning(logger, "ID del servidor IO: %d", kernel_servers->id_server_io);
 }
 
 void set_interrupt_id (int id_server) {
     kernel_servers->id_server_interrupt = id_server;
-    log_info(logger, "ID del servidor INTERRUPT: %d", kernel_servers->id_server_interrupt);
+    log_warning(logger, "ID del servidor INTERRUPT: %d", kernel_servers->id_server_interrupt);
 }

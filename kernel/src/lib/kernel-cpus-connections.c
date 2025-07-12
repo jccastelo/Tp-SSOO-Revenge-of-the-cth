@@ -96,12 +96,12 @@ t_cpu* buscar_cpu_disponible(){
         if(cpu->estado == DISPONIBLE)
         {
     
-            log_warning(logger,"HAY CPU");
+            log_debug(logger,"HAY CPU");
             return cpu;
         }
     }
 
-     log_warning(logger,"NO HAY CPU");
+     log_debug(logger,"NO HAY CPU");
     return NULL;
 }
 
@@ -134,7 +134,7 @@ void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
     agregar_a_paquete(paquete, &process->pid, sizeof(int));
     agregar_a_paquete(paquete, &process->pc, sizeof(int));
 
-    log_info(logger," SE ENVIO PID  %d,  CON PC %d", process->pid,process->pc);
+    log_debug(logger," SE ENVIO PID  %d,  CON PC %d", process->pid,process->pc);
     enviar_paquete(paquete, cpu_socket);
 
     eliminar_paquete(paquete);

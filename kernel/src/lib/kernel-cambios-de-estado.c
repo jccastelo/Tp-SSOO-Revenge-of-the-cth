@@ -57,11 +57,11 @@ void queue_process(t_pcb* process, int estado){
             
         } else if(list_get(planner->short_term->queue_READY->cola,0) == process 
                     && planner->short_term->algoritmo_desalojo== desalojo_SJF) { // Si el proceso que entro esta primero ahi se fija si desaloja
-            log_info(logger, "INTENO DESALOJO");
+            log_debug(logger, "INTENO DESALOJO");
             pthread_mutex_lock(&mutex_desalojo);
             planner->short_term->algoritmo_desalojo(process);
             pthread_mutex_unlock(&mutex_desalojo); // Si tiene desalojo ejecuta, sino null pattern 
-            log_info(logger, "INTENO DESALOJO TERMINADO");
+            log_debug(logger, "INTENO DESALOJO TERMINADO");
         }
         
         break;
@@ -86,7 +86,7 @@ void queue_process(t_pcb* process, int estado){
             temporal_resume(process->estimaciones_SJF->rafagaReal);
             }
         } else {
-            log_warning(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); 
+            log_debug(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); 
              queue_process(process,READY); }//NO puede haber procesos en EXECUTE que no estan ejecutando    
         break;
 
@@ -118,16 +118,16 @@ void queue_process(t_pcb* process, int estado){
             return;
         }
 
-        log_warning(logger,"## PID: %d Pasa del estado %s al estado BLOCKED_SUSPENDED",process->pid,estadoActual);
+        log_info(logger,"## PID: %d Pasa del estado %s al estado BLOCKED_SUSPENDED",process->pid,estadoActual);
 
         process->metricas_de_estado->blocked_suspended += 1;
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->BLOCKED_SUSPENDED));
         
         cambiar_estado(planner->medium_term->algoritmo_planificador, process, planner->medium_term->queue_BLOCKED_SUSPENDED);
-        log_warning(logger,"SOLICITANDO SUSP A MEMORIA");
+        log_debug(logger,"SOLICITANDO SUSP A MEMORIA");
         if(solicitar_a_memoria(suspender_proceso, process))
         {
-        log_warning(logger,"SUSP A MEMORIA ACEPTADO");
+        log_debug(logger,"SUSP A MEMORIA ACEPTADO");
         traer_proceso_a_MP();
 
         if(process->hilo_activo) {
@@ -138,7 +138,7 @@ void queue_process(t_pcb* process, int estado){
         }
             
         }
-        else{ log_error(logger,"Error al suspender proceso");}
+        else{ log_debug(logger,"Error al suspender proceso");}
 
         
         break;
@@ -176,10 +176,10 @@ void queue_process(t_pcb* process, int estado){
             pthread_mutex_unlock(&process->mutex_estado);
             carnicero(process);
         }
-        else{log_info(logger, "Error al pasar proceso a exit");}
+        else{log_debug(logger, "Error al pasar proceso a exit");}
         
         traer_proceso_a_MP();
-        log_info(logger , "NO mas procesos por traer a mp desde exit");
+        log_debug(logger , "NO mas procesos por traer a mp desde exit");
         break;
     }
 }
@@ -210,7 +210,7 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
         // Cerramos el mutex y sacamos el pcb de la cola del estado en el que estaba el proceso (que esta primero)
         pthread_mutex_lock(&process->queue_ESTADO_ACTUAL->mutex);
         bool hallado=list_remove_element(process->queue_ESTADO_ACTUAL->cola, process);
-        if(!hallado){log_error(logger,"NO hallado PID %d",process->pid);}
+        if(!hallado){log_debug(logger,"NO hallado PID %d",process->pid);}
         pthread_mutex_unlock(&process->queue_ESTADO_ACTUAL->mutex);
     }
 

@@ -296,7 +296,7 @@ void recibir_io(t_buffer* buffer, int socket) {
         list_add_in_index(ioBuscada->instancias_IO->cola,0,nueva_instancia_io);
         pthread_mutex_unlock(&ioBuscada->instancias_IO->mutex);
 
-        log_info(logger, "Llego una nueva INSTANCIA de IO de nombre %s Y SOCKET: %d ", ioBuscada->nombre,nueva_instancia_io->socket );
+        log_debug(logger, "Llego una nueva INSTANCIA de IO de nombre %s Y SOCKET: %d ", ioBuscada->nombre,nueva_instancia_io->socket );
         enviar_proceso_io(nueva_instancia_io->socket);
     }
     else
@@ -326,7 +326,7 @@ void recibir_io(t_buffer* buffer, int socket) {
         list_add(list_ios->cola,ioNueva);
         pthread_mutex_unlock(&list_ios->mutex);
 
-        log_info(logger, "Llego una Nueva IO de nombre %s Y SOCKET: %d ", ioNueva->nombre,nueva_instancia_io->socket );
+        log_debug(logger, "Llego una Nueva IO de nombre %s Y SOCKET: %d ", ioNueva->nombre,nueva_instancia_io->socket );
     }   
 }
 

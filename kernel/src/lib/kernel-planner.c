@@ -95,7 +95,7 @@ void planner_init(){
     pthread_mutex_init(&(planner->long_term->queue_BLOCKED->mutex), NULL);
     planner->long_term->queue_BLOCKED->cola = list_create();
     
-    log_info(logger,"PLANIFICADOR INICIADO");
+    log_debug(logger,"PLANIFICADOR INICIADO");
 }   
 
 // Funciones del planificador
@@ -114,7 +114,7 @@ int get_algoritm(char *algoritm_name)
     else if(!strcmp("SJFcD",algoritm_name))
     {return SJFcD;}
 
-    else{log_info(logger,"BOOOM");
+    else{log_error(logger,"BOOOM");
     return -1;}
 
 }
@@ -190,7 +190,7 @@ void traer_proceso_a_MP(){
             pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
             break; }
     }
-    log_info(logger,"NO rompi acaAAAAAAA");
+    log_debug(logger,"NO rompi acaAAAAAAA");
     pthread_mutex_unlock(&mutex_traer);
     return;
 }
@@ -318,7 +318,7 @@ void desalojo_SJF(t_pcb* primer_proceso) {
     t_cpu* cpu = cpu_mayor_rafaga();
 
     if(cpu->estado == DISPONIBLE) {
-        log_info(logger, "Se libero una CPU en medio del desalojo");
+        log_debug(logger, "Se libero una CPU en medio del desalojo");
         return;
     }
 
@@ -331,7 +331,7 @@ void desalojo_SJF(t_pcb* primer_proceso) {
 
     if (restante > primer_proceso->estimaciones_SJF->rafagaEstimada) {
         desalojar_proceso(cpu);
-        log_error(logger, "DESALOJO PAPUI");
+        log_debug(logger, "DESALOJO PAPUI");
         return;
     }
 
