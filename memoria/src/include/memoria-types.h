@@ -1,6 +1,7 @@
 #ifndef MEMORIA_TYPES_H_
 #define MEMORIA_TYPES_H_
 typedef struct {
+    char* IP_MEMORIA;
     int PUERTO_ESCUCHA;
     int TAM_MEMORIA;
     int TAM_PAGINA;

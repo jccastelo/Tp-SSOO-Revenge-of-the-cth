@@ -7,22 +7,25 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
             log_info(logger, "Se ha recibido un handshake del socket %d ", client_socket);
         break;
         case INIT_PROC:
+            log_info(logger, "## Kernel Conectado - FD del socket: %d", client_socket);
             init_process(client_socket);
         break;
         case EXIT_SYS:
-            log_info(logger, "Se va finalizar el proceso");
             finish_process(client_socket);
         break;
         case GET_INSTRUCTION:
             send_process_instruction(client_socket);
         break; 
         case SUSPENDER:
+            log_info(logger, "## Kernel Conectado - FD del socket: %d", client_socket);
             suspend_process(client_socket);
         break; 
         case DESUSPENDER:
+            log_info(logger, "## Kernel Conectado - FD del socket: %d", client_socket);
             remove_suspend_process(client_socket);    
         break;
         case DUMP_MEMORY:
+            log_info(logger, "## Kernel Conectado - FD del socket: %d", client_socket);
             dump_process(client_socket);
         break;
         case GET_FRAME:
@@ -35,7 +38,6 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
             read_in_user_spaces(client_socket);
         break;
         case MEMORY_CONFIG:
-            log_info(logger,"QIESO");
             send_values_memory(client_socket);
         break;
         // Otros casos de operaciones pueden ir aquí.

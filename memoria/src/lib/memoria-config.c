@@ -3,6 +3,7 @@
 t_config_memoria* inicializar_config_memoria() {
     t_config_memoria* config_memoria = malloc(sizeof(t_config_memoria));
 
+    config_memoria->IP_MEMORIA = NULL; // Fixed initialization
     config_memoria->PUERTO_ESCUCHA = 0;
     config_memoria->TAM_MEMORIA = 0;
     config_memoria->TAM_PAGINA = 0;
@@ -42,6 +43,7 @@ void memoria_config_init() {
 }
 
 void configurar_valores_de_puerto(t_config_memoria* config_io, t_config* config) {
+    config_memoria->IP_MEMORIA = strdup(config_get_string_value(config, "IP_MEMORIA"));
     config_memoria-> PUERTO_ESCUCHA = config_get_int_value(config, "PUERTO_ESCUCHA");
 }
 

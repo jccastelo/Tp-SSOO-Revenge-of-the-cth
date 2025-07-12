@@ -39,7 +39,6 @@ void insert_frame_in_table(t_list *current_node, int level, int total_levels, in
     if (level == total_levels) {
         if (list_size(current_node) < entries_per_level) {
             list_add(current_node, (void *)(intptr_t)frame);
-            log_info(logger, "Se agregó el frame %d en el nivel %d (nivel final)", frame, level);
         }
         return;
     }
@@ -47,7 +46,6 @@ void insert_frame_in_table(t_list *current_node, int level, int total_levels, in
     // Calculamos el índice del frame en el nivel actual, y obtenemos o creamos el hijo correspondiente al índice calculado:
     int index = calculate_index(frame_id, level, entries_per_level, divisors);
     t_list *child = get_or_create_child(current_node, index);
-    log_info(logger, "Nivel %d | frame_id %d → índice calculado %d", level, frame_id, index);
 
     // Recurre al siguiente nivel para insertar el frame:
     insert_frame_in_table(child, level + 1, total_levels, entries_per_level, divisors, frame, frame_id);
@@ -60,16 +58,10 @@ int calculate_index(int frame_id, int level, int entries_per_level, int *divisor
 t_list* get_or_create_child(t_list *parent, int index) {
     t_list *child = (index < list_size(parent)) ? list_get(parent, index) : NULL;
 
-    const char* mensaje = NULL;
-
     if (!child) {
         child = list_create();
         list_add(parent, child);
-        mensaje = "creó";
-    } else
-        mensaje = "obtuvo";
-
-    log_info(logger, "Se %s un hijo en el índice %d", mensaje, index);
+    } 
 
     return child;
 }
@@ -92,9 +84,6 @@ int find_frame_from_entries(int id_process, t_list *entries_per_level) {
     void closure(void *entry_index_ptr) {
         int entry_index = *(int *)entry_index_ptr;
 
-        log_warning(logger, "ARRANCO A BUSCAR EN NIVEL: %d", current_level);
-        log_warning(logger, "ENTRY INDEX: %d", entry_index);
-
         // Obtener la entrada de la tabla actual
         void *entry = list_get(current_table, entry_index);
 
@@ -106,11 +95,6 @@ int find_frame_from_entries(int id_process, t_list *entries_per_level) {
 
         usleep(retardo_memoria * 1000);
         current_level++;
-    }
-
-    for (int i = 0; i < list_size(entries_per_level); i++) {
-        int *val = list_get(entries_per_level, i);
-        printf("entries[%d] = %d\n", i, *val);
     }
 
     list_iterate(entries_per_level, closure);
@@ -128,15 +112,6 @@ t_list *get_frames_from_entries(int id_process) {
 
     // Iteramos sobre los niveles de la tabla de páginas:
     get_occupied_frames_from_page_table(current_level, total_levels, current_table, frame_as_busy);
-    log_info(logger, "Se obtuvieron %d frames ocupados del proceso %d", list_size(frame_as_busy), id_process);
-
-    // Logueamos los frames ocupados:
-    void closure(void *frame_ptr) {
-        int frame = (int)(intptr_t)frame_ptr;
-        log_info(logger, "Frame ocupado: %d", frame);
-    }
-    
-    list_iterate(frame_as_busy, closure);
 
     return frame_as_busy;
 }

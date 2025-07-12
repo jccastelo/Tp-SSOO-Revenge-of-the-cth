@@ -40,7 +40,6 @@ void access_to_page_tables(int client_socket) {
     int size_entries_per_levels = list_size(entries_per_levels);
 
     // Logueamos la información del proceso y las entradas recibidas:
-    log_info(logger, "PID: %d - Entradas por niveles recibidas: %d", id_process, size_entries_per_levels);
     log_info(logger, "PID: %d - Acceso a tablas de páginas", id_process);
 
     // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
@@ -118,10 +117,6 @@ void suspend_process(int client_socket) {
         // Inicializamos contenido a escribir:
         char *buffer = malloc(config_memoria->TAM_PAGINA);
         memcpy(buffer, espacio_usuario + frame_id * config_memoria->TAM_PAGINA, config_memoria->TAM_PAGINA);
-        
-        // Logueamos el contenido del marco que se está escribiendo en el archivo de dump:
-        log_warning(logger, "Escribiendo en el archivo de swap: Frame %d", frame_id);
-        log_warning(logger, "Contenido: %s", buffer);
 
         // Escribimos en el archivo y, al mismo tiempo, inicializamos una variable que indica la posición donde se realizó la escritura.
         int pointer_location = ftell(archivo_swap);
@@ -157,13 +152,15 @@ void dump_process(int client_socket) {
     int resquest = OK;
     int id_process = rcv_only_pid(client_socket);
     
+    // Logueamos la solicitud de dump:
+    log_info(logger, "## PID: %d - Memory Dump solicitado", id_process);
+
     // Creamos el archivo de dump con el nombre del PID:
     char *filename = string_from_format("%sdump_%d.bin", config_memoria->DUMP_PATH, id_process);
     FILE *archivo_dump = fopen(filename, "wb");
 
     // Obtenemos el lista de marcos ocupados por el proceso:
     t_list *frames_as_busy = get_frames_from_entries(id_process);
-    log_info(logger, "PID: %d - Se han obtenido %d marcos ocupados", id_process, list_size(frames_as_busy));
 
     if(!archivo_dump) {
         log_error(logger, "Error al crear el archivo de dump: %s", filename);
@@ -173,16 +170,11 @@ void dump_process(int client_socket) {
     }
 
     void closure_dump(void *frame) {
-        log_info(logger, "Escribiendo en el archivo de dump: Frame %d", (int)(intptr_t)frame);
         int frame_id = (int)(intptr_t)frame;
         char *buffer = malloc(config_memoria->TAM_PAGINA);
 
+        // Copiamos el contenido del espacio de usuario al buffer:
         memcpy(buffer, espacio_usuario + frame_id * config_memoria->TAM_PAGINA, config_memoria->TAM_PAGINA);
-        
-        // Logueamos el contenido del marco que se está escribiendo en el archivo de dump:
-        log_warning(logger, "Escribiendo en el archivo de dump: Frame %d", frame_id);
-        log_warning(logger, "Contenido: %s", buffer);
-
         fwrite(buffer, config_memoria->TAM_PAGINA, 1, archivo_dump);
     }
 
@@ -190,10 +182,8 @@ void dump_process(int client_socket) {
     list_iterate(frames_as_busy, closure_dump);
     fclose(archivo_dump);
 
-    // Liberamos la lista de marcos ocupados:
-    log_info(logger, "Se ha creado el archivo de dump: %s", filename);
+    // Liberamos la lista de marcos ocupados, y enviamos la respuesta al cliente:
     list_destroy(frames_as_busy);
-
     send(client_socket, &resquest, sizeof(resquest), 0);
 }
 
@@ -213,6 +203,5 @@ void finish_process(int client_socket) {
     }
 
     // Enviamos la respuesta al cliente:
-    log_info(logger, "Enviando respuesta al cliente: %d", resquest);
     send(client_socket, &resquest, sizeof(resquest), 0);
 }

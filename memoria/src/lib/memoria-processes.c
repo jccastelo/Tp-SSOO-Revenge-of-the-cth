@@ -90,13 +90,13 @@ void aumentar_contador(t_dictionary* dictionary, t_campo campo, char* pid_key) {
 void imprimir_contadores_del_proceso(int id_process, t_process_in_memory* estructura) {
     if (!estructura) return;
 
-    log_info(logger, "Contadores del proceso:");
-    log_info(logger, "Tablas Requests: %d", estructura->tablas_requests);
-    log_info(logger, "Instrucciones Requests: %d", estructura->instrs_requests);
-    log_info(logger, "Swap Out Requests: %d", estructura->swap_out_requests);
-    log_info(logger, "Swap In Requests: %d", estructura->swap_in_requests);
-    log_info(logger, "Memoria Read Requests: %d", estructura->mem_read_requests);
-    log_info(logger, "Memoria Write Requests: %d", estructura->mem_write_requests);
-    log_info(logger, "-----------------------------------");
-    log_info(logger, "PID: %d - Contadores del proceso finalizados", id_process);
+    log_info(logger, "## PID: %d - Proceso Destruido - Métricas - Acc.T.Pag: %d; Inst.Sol.: %d; SWAP: %d; Mem.Prin.: %d; Lec.Mem.: %d; Esc.Mem.: %d", 
+        id_process, 
+        estructura->tablas_requests, 
+        estructura->instrs_requests, 
+        estructura->swap_out_requests + estructura->swap_in_requests, 
+        estructura->swap_in_requests, 
+        estructura->mem_read_requests, 
+        estructura->mem_write_requests
+    );
 }

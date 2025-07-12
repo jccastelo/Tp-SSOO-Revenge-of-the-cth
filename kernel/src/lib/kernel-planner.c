@@ -339,6 +339,7 @@ void desalojo_SJF(t_pcb* primer_proceso) {
 
 t_cpu* cpu_mayor_rafaga() {
     
+    pthread_mutex_lock(&mutex_cpu);
     pthread_mutex_lock(&list_cpus->mutex);
     t_cpu* cpu_buscada;
     
@@ -379,6 +380,7 @@ t_cpu* cpu_mayor_rafaga() {
         }
     }
     pthread_mutex_unlock(&list_cpus->mutex);
+    pthread_mutex_unlock(&mutex_cpu);
     return cpu_buscada;
 }
 
