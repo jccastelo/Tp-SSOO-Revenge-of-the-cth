@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
     // Inicializamos un logger:
     char log_name[10];
     sprintf(log_name, "cpu%s.log", id_cpu);
-    logger = log_create(log_name, "CPU", true, LOG_LEVEL_INFO);
+    logger = log_create(log_name, "CPU", true, LOG_LEVEL_TRACE);
     log_info(logger, "cpu iniciada con ID %s", id_cpu);
 
     if (argc < 2) {

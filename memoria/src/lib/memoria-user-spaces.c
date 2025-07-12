@@ -91,6 +91,7 @@ void write_memory(int client_socket, int id_process, char *content_to_write, int
         data_size, 
         process_status
     );
+
     send(client_socket, &response, sizeof(int), 0);
 }
 

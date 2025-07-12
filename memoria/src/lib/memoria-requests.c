@@ -40,7 +40,7 @@ void access_to_page_tables(int client_socket) {
     t_list *entries_per_levels = rcv_entries_per_levels(client_socket, &id_process);
 
     // Logueamos la información del proceso y las entradas recibidas:
-    log_debug(logger, "PID: %d - Acceso a tablas de páginas", id_process);
+    log_info(logger, "PID: %d - Acceso a tablas de páginas", id_process);
 
     // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
     int searched_frame = find_frame_from_entries(id_process, entries_per_levels);
@@ -63,7 +63,6 @@ void write_in_user_spaces(int client_socket) {
     write_memory(client_socket, id_process, content_to_write, physical_address);
 
     // Logueamos el contenido del espacio de usuario después de la escritura:
-    log_debug(logger, "user space after write: %s", mem_hexstring(espacio_usuario, config_memoria->TAM_MEMORIA));
     aumentar_contador(metricas_por_procesos, MEM_WRITE_REQUESTS, string_itoa(id_process));
 }
 
@@ -100,7 +99,7 @@ void suspend_process(int client_socket) {
     int id_process = rcv_only_pid(client_socket);
     char *id_process_key = string_itoa(id_process);
 
-    log_debug(logger, "El proceso con PID %d ha entrado en estado de suspensión.", id_process);
+    log_info(logger, "El proceso con PID %d ha entrado en estado de suspensión.", id_process);
 
     // Aumentamos contadores de metricas:
     aumentar_contador(metricas_por_procesos, SWAP_IN_REQUESTS, id_process_key);
