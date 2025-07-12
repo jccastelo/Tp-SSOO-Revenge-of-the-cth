@@ -3,6 +3,8 @@
 
 void carnicero(t_pcb* process){
 
+    pthread_mutex_unlock(&mutex_control_kernel);
+
     pthread_mutex_lock(&process->queue_ESTADO_ACTUAL->mutex);
     list_remove_element(process->queue_ESTADO_ACTUAL->cola, process);
     pthread_mutex_unlock(&process->queue_ESTADO_ACTUAL->mutex);

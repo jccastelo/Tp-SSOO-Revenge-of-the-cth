@@ -14,5 +14,5 @@
 #include "kernel-planner.h"
 #include "kernel-free.h"
 
-
+extern pthread_mutex_t mutex_control_kernel;
 #endif // KERNEL_Hs

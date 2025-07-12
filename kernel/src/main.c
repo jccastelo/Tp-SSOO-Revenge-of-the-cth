@@ -1,6 +1,10 @@
 #include "include/kernel.h"
 
+pthread_mutex_t mutex_control_kernel = PTHREAD_MUTEX_INITIALIZER;
+
 int main(int argc, char *argv[]) {
+
+    pthread_mutex_lock(&mutex_control_kernel);
 
     char *archivo_pseudocodigo;
     int Tamanio_proc;
@@ -35,7 +39,7 @@ int main(int argc, char *argv[]) {
     // //Nos conectamos a la memoria como clientes
     kernel_memory_connection();
    
-    while(list_size(list_cpus->cola) == 0) {}
+    
     
     log_info(logger,"## Kernel esperando confirmacion para iniciar");
     getchar();
@@ -45,7 +49,9 @@ int main(int argc, char *argv[]) {
 
     // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
     // Ya que detachamos los hilos, no podemos esperar a que terminen.
-    while(list_size(list_cpus->cola) > 0) {}
+    
+
+    pthread_mutex_lock(&mutex_control_kernel);
 
     return 0;
 }
