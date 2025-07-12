@@ -15,4 +15,6 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
 void actualizarTiempo(t_temporal **metrica_actual,t_temporal **metricas_de_tiempo_estado);
 void bloquearProceso(t_pcb* process);
 char *get_NombreDeEstado(t_monitor* queue_ESTADO);
+
+extern pthread_mutex_t mutex_desalojo;
 #endif //KERNEL_CAMBIOS_DE_ESTADO_H

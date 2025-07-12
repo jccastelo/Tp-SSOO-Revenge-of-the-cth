@@ -43,7 +43,7 @@ t_cpu *cpu_init(){
     new_cpu->pid = -1;
     new_cpu->socket_interrupt = -1;
     new_cpu->socket_dispatch = -1;
-
+    pthread_mutex_init(&new_cpu->mutex, NULL);
     return new_cpu;
 }
 

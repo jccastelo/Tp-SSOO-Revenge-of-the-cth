@@ -1,5 +1,6 @@
 #include "../include/kernel-cambios-de-estado.h"
 
+pthread_mutex_t mutex_desalojo = PTHREAD_MUTEX_INITIALIZER;
 
 void queue_process(t_pcb* process, int estado){
 
@@ -56,7 +57,11 @@ void queue_process(t_pcb* process, int estado){
             
         } else if(list_get(planner->short_term->queue_READY->cola,0) == process 
                     && planner->short_term->algoritmo_desalojo== desalojo_SJF) { // Si el proceso que entro esta primero ahi se fija si desaloja
-            planner->short_term->algoritmo_desalojo(process); // Si tiene desalojo ejecuta, sino null pattern 
+            log_info(logger, "INTENO DESALOJO");
+            pthread_mutex_lock(&mutex_desalojo);
+            planner->short_term->algoritmo_desalojo(process);
+            pthread_mutex_unlock(&mutex_desalojo); // Si tiene desalojo ejecuta, sino null pattern 
+            log_info(logger, "INTENO DESALOJO TERMINADO");
         }
         
         break;
@@ -190,10 +195,13 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
 
         // if viene de execute => frenamos el timer sjf
     if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"EXECUTE") && planner->short_term->algoritmo_planificador== queue_SJF && process->estimaciones_SJF->rafagaReal != NULL){
-        
+        pthread_mutex_lock(&mutex_desalojo);
+
         temporal_stop(process->estimaciones_SJF->rafagaReal);
         actualizar_rafagas_sjf(process);
         temporal_destroy(process->estimaciones_SJF->rafagaReal);
+
+        pthread_mutex_unlock(&mutex_desalojo);
     } 
   
 

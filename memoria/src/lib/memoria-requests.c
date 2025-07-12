@@ -37,7 +37,6 @@ void access_to_page_tables(int client_socket) {
     // Se recibe la dirección física, representada por las entradas por nivel asociadas al proceso.
     int id_process;
     t_list *entries_per_levels = rcv_entries_per_levels(client_socket, &id_process);
-    int size_entries_per_levels = list_size(entries_per_levels);
 
     // Logueamos la información del proceso y las entradas recibidas:
     log_info(logger, "PID: %d - Acceso a tablas de páginas", id_process);
@@ -144,7 +143,6 @@ void remove_suspend_process(int client_socket) {
     int pid = rcv_only_pid(client_socket);
     char* pid_key = string_itoa(pid);
     swap_in(pid_key, pid, client_socket);
-    log_info(logger, "OK");
 }
 
 void dump_process(int client_socket) {

@@ -76,28 +76,27 @@ void precompute_divisors(int total_levels, int entries_per_level, int *divisors)
 
 int find_frame_from_entries(int id_process, t_list *entries_per_level) {
     int frame = -1;
-    int current_level = 1;
     int total_levels = config_memoria->CANTIDAD_NIVELES;
     int retardo_memoria = config_memoria->RETARDO_MEMORIA;
     t_list *current_table = get_root_table(id_process);
 
-    void closure(void *entry_index_ptr) {
-        int entry_index = *(int *)entry_index_ptr;
+    for (int current_level = 1; current_level <= total_levels; current_level++) {
+        if (list_size(entries_per_level) == 0) {
+            // No hay entradas, no se puede seguir
+            return -1;
+        }
 
-        // Obtener la entrada de la tabla actual
+        int entry_index = *(int *)list_get(entries_per_level, current_level - 1);
         void *entry = list_get(current_table, entry_index);
 
-        // Si estamos en el último nivel, asignamos el frame correspondiente, de lo contrario, seguimos recorriendo.
-        if (current_level == total_levels) 
-            frame = (int)(intptr_t) entry;  // Ojo: depende si entry representa un número o puntero
-        else 
-            current_table = (t_list *) entry;
-
         usleep(retardo_memoria * 1000);
-        current_level++;
+
+        if (current_level == total_levels) 
+            frame = (int)(intptr_t)entry;
+        else 
+            current_table = (t_list *)entry;
     }
 
-    list_iterate(entries_per_level, closure);
     return frame;
 }
 

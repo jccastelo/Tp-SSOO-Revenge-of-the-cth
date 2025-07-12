@@ -133,6 +133,7 @@ typedef struct{
     int pid;
     int socket_dispatch;
     int socket_interrupt;
+    pthread_mutex_t mutex;
 }t_cpu;
 
 typedef enum{
