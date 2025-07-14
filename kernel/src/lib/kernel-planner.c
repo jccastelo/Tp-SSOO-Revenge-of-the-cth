@@ -159,9 +159,7 @@ void traer_proceso_a_MP(){
 
     while(!list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola)){
         
-        pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
         t_pcb *procesoASolicitar = list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0);
-        pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
         
         if(solicitar_a_memoria(desuspender_proceso,procesoASolicitar)) {
             
@@ -176,9 +174,7 @@ void traer_proceso_a_MP(){
 
     while(!list_is_empty(planner->long_term->queue_NEW->cola)){ 
 
-        pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
-        t_pcb *procesoASolicitar = list_get(planner->long_term->queue_NEW->cola,0);
-        pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);        
+        t_pcb *procesoASolicitar = list_get(planner->long_term->queue_NEW->cola,0);    
 
         if(solicitar_a_memoria(memoria_init_proc,procesoASolicitar)) {
             
