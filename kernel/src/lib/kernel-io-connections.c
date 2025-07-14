@@ -129,7 +129,6 @@ t_IO_instancia *buscar_instancia_libre(t_IO *ioBuscada)
             pthread_mutex_unlock(&ioBuscada->instancias_IO->mutex);
             return io_instancia;
         }
-
         
     }
         
@@ -198,16 +197,16 @@ void enviar_proceso_io(int io_socket)
                     
                     free(pid_y_milisegundos);
                 }
-                
+
                 pthread_mutex_unlock(&ios->procesos_esperando->mutex);
                 pthread_mutex_unlock(&ios->instancias_IO->mutex);
                 pthread_mutex_unlock(&list_ios->mutex);
                 
                 return;
-            }
-
-            pthread_mutex_unlock(&ios->instancias_IO->mutex);   
+            } 
         }
+
+        pthread_mutex_unlock(&ios->instancias_IO->mutex);  
     }
     
     pthread_mutex_unlock(&list_ios->mutex);
@@ -238,6 +237,7 @@ void eliminar_instancia(int io_socket)
                 if (list_is_empty(ios->instancias_IO->cola)) {
                     
                     desencolarProcesosEsperando(ios);
+                    log_error(logger, "llego el carnicero");
                     carnicero_de_io(ios);
 
                     list_remove(list_ios->cola,i); 
@@ -245,9 +245,9 @@ void eliminar_instancia(int io_socket)
 
                 return;
             }
-
-            pthread_mutex_unlock(&ios->instancias_IO->mutex);   
         }
+        
+        pthread_mutex_unlock(&ios->instancias_IO->mutex);   
     }
     
     pthread_mutex_unlock(&list_ios->mutex);
@@ -257,7 +257,6 @@ void eliminar_instancia(int io_socket)
 
 void desencolarProcesosEsperando(t_IO *ios_estructura) {
    
-    pthread_mutex_lock(&ios_estructura->procesos_esperando->mutex);
     int tamano_lista = list_size(ios_estructura->procesos_esperando->cola);
     int i = 0;
     while(tamano_lista > i && tamano_lista > 0)
@@ -282,7 +281,6 @@ void desencolarProcesosEsperando(t_IO *ios_estructura) {
         
         i++;
     }
-    pthread_mutex_unlock(&ios_estructura->procesos_esperando->mutex);
 }
 
 void recibir_io(t_buffer* buffer, int socket) {
@@ -373,7 +371,7 @@ void actualizarIO_a_libre(int pid_desbloqueo) {
                 return;
             }
         }
-
+        
         pthread_mutex_unlock(&ios->instancias_IO->mutex);
     }
 
