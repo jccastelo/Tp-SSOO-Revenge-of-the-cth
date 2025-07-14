@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     signal(SIGINT, cierre_de_io);
 
     // Inicializamos un logger
-    logger = log_create("io.log", "IO", true, LOG_LEVEL_INFO);
+    logger = log_create("io.log", "IO", true, log_level_from_string(config_io->LOG_LEVEL));
 
     // Inicializamos la configuración de IO y nos conectamos al servidor:
     io_config_init();

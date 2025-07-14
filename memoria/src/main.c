@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
     memoria_config_init(config_path);
 
     // Inicializamos un logger:
-    logger = log_create("memoria.log", "MEMORIA", true, LOG_LEVEL_TRACE);
+    logger = log_create("memoria.log", "MEMORIA", true, log_level_from_string(config_memoria->LOG_LEVEL));
 
     // Inicializamos la configuración del memoria, y las variables globales:
     // configurar_senial_cierre();
