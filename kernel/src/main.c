@@ -12,9 +12,17 @@ int main(int argc, char *argv[]) {
 
     // ./bin/kernel "ARCHIVO" TAMAÑO ./path
 
+    if( argc < 3){
+    archivo_pseudocodigo = "PLANI_LYM_PLAZO";
+    Tamanio_proc = 0;
+    config_path= "./configs_kernel/lym_pmcp.config";
+    }else{
     archivo_pseudocodigo = argv[1];
     Tamanio_proc = atoi(argv[2]);
     config_path = argv[3];
+
+    }
+
 
     signal(SIGINT, terminar_kernel);
 
