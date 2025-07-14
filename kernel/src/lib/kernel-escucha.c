@@ -13,8 +13,8 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
     new_buffer->size = 0;
     new_buffer->stream = NULL;
 
-    if((operation != HANDSHAKE))
-    {
+    if((operation != HANDSHAKE)){
+      
       new_buffer->stream = recibir_buffer(&new_buffer->size, io_socket);
     }
 
@@ -22,6 +22,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
         case IDENTIFICAR_IO:
             log_debug(logger,"IO A identificarse");
             recibir_io(new_buffer, io_socket);
+
         break;
         case DESBLOQUEO_IO:
             // REcibo el pid (no hace falta paquete)
@@ -33,19 +34,29 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             enviar_proceso_io(io_socket);
 
             // Con el pid busco el proceso 
+            pthread_mutex_lock(&list_procesos->mutex);
             t_pcb *process = list_get(list_procesos->cola, pid_desbloqueo);
+            pthread_mutex_unlock(&list_procesos->mutex);
 
             //Si esta en block va a ready, sino a readysuspended
             pthread_mutex_lock(&process->mutex_estado);
-            if(process->queue_ESTADO_ACTUAL->cola == planner->long_term->queue_BLOCKED->cola) 
-            {   log_info(logger,"## PID: %d finalizó IO y pasa a READY",process->pid);
-                 pthread_mutex_unlock(&process->mutex_estado);
-                queue_process(process, READY);}
-
-            else {
-                log_info(logger,"## PID: %d finalizó IO y pasa a READY_SUSPENDED",process->pid );
+            
+            if(process->queue_ESTADO_ACTUAL->cola == planner->long_term->queue_BLOCKED->cola) {   
+                
+                log_info(logger,"## PID: %d finalizó IO y pasa a READY",process->pid);
+               
                 pthread_mutex_unlock(&process->mutex_estado);
-                queue_process(process, READY_SUSPENDED); }
+                
+                queue_process(process, READY);
+                
+            } else {
+
+                log_info(logger,"## PID: %d finalizó IO y pasa a READY_SUSPENDED",process->pid );
+            
+                pthread_mutex_unlock(&process->mutex_estado);
+                
+                queue_process(process, READY_SUSPENDED); 
+            }
         break;
         case FIN_CONEXION_DE_IO:
             log_debug(logger,"Llego IO A desconectarse");
@@ -53,7 +64,11 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
         
             //Si habia pid lo mando a exit
             if(pid_fin >= 0){
+
+                pthread_mutex_lock(&list_procesos->mutex);
                 t_pcb *process = list_get(list_procesos->cola, pid_fin);
+                pthread_mutex_unlock(&list_procesos->mutex);
+
                 queue_process(process, EXIT);
             }
 
@@ -66,9 +81,9 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             log_debug(logger, "Operación no válida para el servidor IO: %d", operation);
             break;
     }
-    if(new_buffer != NULL){
-        free(new_buffer);
-    }
+
+    free(new_buffer->stream);
+    free(new_buffer);
     return;
 }
 
@@ -101,9 +116,8 @@ void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *
             break;
     }
 
-    if(new_buffer != NULL){
-        free(new_buffer);
-    }
+    free(new_buffer->stream);
+    free(new_buffer);
     return;
 }
 
@@ -162,35 +176,46 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
                 
                 log_debug(logger," DUMP CORRECTO");
                 queue_process(process, READY);
-            }
-            else{
+                
+            } else {
+                
                 if(process->hilo_activo){
                     pthread_cancel(process->hilo_block);
-                    }
+                }
 
                 pthread_join(process->hilo_block, NULL);
                 
                 log_debug(logger," DUMP ERROR");
+
                 pthread_mutex_lock(&process->mutex_estado);
                 queue_process(process, EXIT);
-                }
+            }
             break;
         case IO:
+
             set_cpu(cpu_socket, DISPONIBLE,-1);
+
             gestionar_io(new_buffer);
+            
             mandar_procesos_a_execute();
             break;
         case EXIT_SYS:
+
             delate_process(new_buffer);
+
             set_cpu(cpu_socket, DISPONIBLE,-1);
+
             log_debug(logger,"Se recibio la syscall EXIT_Sys desde el server %s",server_name);
+
             mandar_procesos_a_execute();
             break;
         default:
+
             log_debug(logger, "Operación no válida para el servidor HANDLER: %d", operation);
             break;
     }
 
+    free(new_buffer->stream);
     free(new_buffer);
 
     return;

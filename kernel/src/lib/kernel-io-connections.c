@@ -36,8 +36,8 @@ void gestionar_io(t_buffer *buffer)
     int pc_PID;
     memcpy(&pc_PID, buffer->stream + desplazamiento, sizeof(int));
 
-    pthread_mutex_lock(&list_procesos->mutex);
-    t_pcb* process = list_get(list_procesos->cola,pid_a_io);
+    pthread_mutex_lock(&list_procesos->mutex);    
+    t_pcb* process = list_get(list_procesos->cola, pid_a_io);
     pthread_mutex_unlock(&list_procesos->mutex);
 
     process->pc = pc_PID;
@@ -79,10 +79,8 @@ void gestionar_io(t_buffer *buffer)
     }
     else
     {
-       
-
         pthread_mutex_lock(&list_procesos->mutex);
-        t_pcb *process_to_delate = list_get(list_procesos->cola, pid_a_io); // Obtengo el proceso a eliminar de la lista global
+        t_pcb *process_to_delate = list_get(list_procesos->cola, pid_a_io);
         pthread_mutex_unlock(&list_procesos->mutex);
 
         pthread_mutex_unlock(&mutex_io);
@@ -257,8 +255,12 @@ void desencolarProcesosEsperando(t_IO *ios_estructura)
         //log_info(logger, "PID A ELIMINAR: %d, ELEMENTOS RESTANTES: %d",pid_a_remover, tamano_lista > i);
 
         free(pid_milisegundos);
-        
-        queue_process(list_get(list_procesos->cola,pid_a_remover), EXIT);
+
+        pthread_mutex_lock(&list_procesos->mutex);
+        t_pcb* proceso = list_get(list_procesos->cola, pid_a_remover);
+        pthread_mutex_unlock(&list_procesos->mutex);
+
+        queue_process(proceso, EXIT);
         
         i++;
     }
