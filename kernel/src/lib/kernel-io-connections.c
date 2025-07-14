@@ -316,7 +316,7 @@ void recibir_io(t_buffer* buffer, int socket) {
         pthread_mutex_unlock(&ioBuscada->instancias_IO->mutex);
 
         log_debug(logger, "Llego una nueva INSTANCIA de IO de nombre %s Y SOCKET: %d ", ioBuscada->nombre,nueva_instancia_io->socket );
-        enviar_proceso_io(nueva_instancia_io->socket);
+        
     }
     else
     {
