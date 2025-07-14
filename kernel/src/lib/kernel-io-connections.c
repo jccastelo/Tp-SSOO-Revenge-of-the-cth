@@ -185,11 +185,9 @@ void enviar_proceso_io(int io_socket)
                 
                 pthread_mutex_lock(&ios->procesos_esperando->mutex);
                 int cant_procesos_esperando = list_size(ios->procesos_esperando->cola);
-                pthread_mutex_unlock(&ios->procesos_esperando->mutex);
 
                 if(cant_procesos_esperando) {
 
-                    pthread_mutex_lock(&ios->procesos_esperando->mutex);
                     t_buffer* pid_y_milisegundos = (t_buffer*)list_remove(ios->procesos_esperando->cola, 0);
                     pthread_mutex_unlock(&ios->procesos_esperando->mutex);
 
@@ -200,7 +198,8 @@ void enviar_proceso_io(int io_socket)
                     
                     free(pid_y_milisegundos);
                 }
-
+                
+                pthread_mutex_unlock(&ios->procesos_esperando->mutex);
                 pthread_mutex_unlock(&ios->instancias_IO->mutex);
                 pthread_mutex_unlock(&list_ios->mutex);
                 

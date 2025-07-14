@@ -22,6 +22,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
         case IDENTIFICAR_IO:
             log_debug(logger,"IO A identificarse");
             recibir_io(new_buffer, io_socket);
+            enviar_proceso_io(io_socket);
 
         break;
         case DESBLOQUEO_IO:
