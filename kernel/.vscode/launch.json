@@ -6,7 +6,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/bin/${workspaceFolderBasename}",
-      "args": [],
+      "args": ["\"ESTABILIDAD GENERAL\"",0,"./configs_kernel/estabilidad.config"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],

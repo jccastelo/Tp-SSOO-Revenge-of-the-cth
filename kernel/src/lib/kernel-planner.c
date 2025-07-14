@@ -203,15 +203,19 @@ void mandar_procesos_a_execute()
          pthread_mutex_lock(&planner->short_term->queue_READY->mutex);
          t_pcb* procesoPrimero = list_get(planner->short_term->queue_READY->cola,0);
          
-        pthread_mutex_lock(&mutex_cpu); 
+        //pthread_mutex_lock(&mutex_cpu); 
 
         t_cpu* cpu_disponible= buscar_cpu_disponible();
         if(cpu_disponible != NULL)
         {
-            set_cpu(cpu_disponible->socket_dispatch,EJECUTANDO,procesoPrimero->pid);
+            //set_cpu(cpu_disponible->socket_dispatch,EJECUTANDO,procesoPrimero->pid); al re pedo buscarla si ya la tengo
+            pthread_mutex_lock(&cpu_disponible->mutex);
+            cpu_disponible->estado = EJECUTANDO;
+            cpu_disponible->pid = procesoPrimero->pid;
+            pthread_mutex_unlock(&cpu_disponible->mutex);
         }
         
-        pthread_mutex_unlock(&mutex_cpu); 
+        //pthread_mutex_unlock(&mutex_cpu); 
 
         if(cpu_disponible != NULL)
         {
@@ -340,8 +344,8 @@ void desalojo_SJF(t_pcb* primer_proceso) {
 
 t_cpu* cpu_mayor_rafaga() {
     
-    pthread_mutex_lock(&mutex_cpu);
-    pthread_mutex_lock(&list_cpus->mutex);
+    //pthread_mutex_lock(&mutex_cpu);
+    //pthread_mutex_lock(&list_cpus->mutex);
     t_cpu* cpu_buscada;
     
     int tamanio = list_size(list_cpus->cola);
@@ -350,7 +354,6 @@ t_cpu* cpu_mayor_rafaga() {
     
 
     if(cpu_buscada->estado == DISPONIBLE){
-        pthread_mutex_unlock(&list_cpus->mutex);
         return cpu_buscada;
     }
 
@@ -359,7 +362,6 @@ t_cpu* cpu_mayor_rafaga() {
         t_cpu* cpu_i = list_get(list_cpus->cola, i);
         
         if(cpu_i->estado == DISPONIBLE){
-            pthread_mutex_unlock(&list_cpus->mutex);
             return cpu_i;
         }
         
@@ -376,7 +378,7 @@ t_cpu* cpu_mayor_rafaga() {
         }
     }
 
-    pthread_mutex_unlock(&list_cpus->mutex);
-    pthread_mutex_unlock(&mutex_cpu);
+    //pthread_mutex_unlock(&list_cpus->mutex);
+    //pthread_mutex_unlock(&mutex_cpu);
     return cpu_buscada;
 }
