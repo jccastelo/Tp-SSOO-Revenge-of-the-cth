@@ -333,7 +333,7 @@ void desalojo_SJF(t_pcb* primer_proceso) {
     int64_t tiempo = temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal);
     int64_t restante = max(proceso_cpu->estimaciones_SJF->rafagaEstimada - tiempo,(int64_t)0);
 
-    if (restante > primer_proceso->estimaciones_SJF->rafagaEstimada) {
+    if (restante > primer_proceso->estimaciones_SJF->rafagaEstimada && cpu->estado == EJECUTANDO ) {
         desalojar_proceso(cpu);
         log_debug(logger, "DESALOJO PAPUI");
         return;
