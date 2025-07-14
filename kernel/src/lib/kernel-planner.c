@@ -153,59 +153,59 @@ void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc){
 }
 
 void traer_proceso_a_MP(){
-    pthread_mutex_lock(&mutex_traer);
+    //pthread_mutex_lock(&mutex_traer);
+
+    pthread_mutex_lock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
 
     while(!list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola)){
         
-        pthread_mutex_lock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
+        pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
         t_pcb *procesoASolicitar = list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0);
+        pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
         
-
-        if(solicitar_a_memoria(desuspender_proceso,procesoASolicitar))
-        {
+        if(solicitar_a_memoria(desuspender_proceso,procesoASolicitar)) {
             
-            pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
-
             queue_process(procesoASolicitar, READY);
-            
         } else { 
-            pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
             break; }
-
     }
+
+    pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
+
+    pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
 
     while(!list_is_empty(planner->long_term->queue_NEW->cola)){ 
 
         pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
         t_pcb *procesoASolicitar = list_get(planner->long_term->queue_NEW->cola,0);
-        
+        pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);        
 
-        if(solicitar_a_memoria(memoria_init_proc,procesoASolicitar))
-        {
-           
-            pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
+        if(solicitar_a_memoria(memoria_init_proc,procesoASolicitar)) {
+            
             queue_process(procesoASolicitar, READY);
-
         } else { 
-            pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
             break; }
     }
-    log_debug(logger,"NO rompi acaAAAAAAA");
-    pthread_mutex_unlock(&mutex_traer);
+
+    pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
+
+    //pthread_mutex_unlock(&mutex_traer);
     return;
 }
 
 void mandar_procesos_a_execute()
 {   
-    pthread_mutex_lock(&mutex_traer);
+    //pthread_mutex_lock(&mutex_traer);
+    pthread_mutex_lock(&planner->short_term->queue_READY->mutex);
     while(!list_is_empty(planner->short_term->queue_READY->cola))
     {
-         pthread_mutex_lock(&planner->short_term->queue_READY->mutex);
-         t_pcb* procesoPrimero = list_get(planner->short_term->queue_READY->cola,0);
-         
+        
+        pthread_mutex_lock(&list_procesos->mutex);
+        t_pcb* procesoPrimero = list_get(planner->short_term->queue_READY->cola,0);
+        pthread_mutex_unlock(&list_procesos->mutex); 
         //pthread_mutex_lock(&mutex_cpu); 
 
-        t_cpu* cpu_disponible= buscar_cpu_disponible();
+        t_cpu* cpu_disponible = buscar_cpu_disponible();
         if(cpu_disponible != NULL)
         {
             //set_cpu(cpu_disponible->socket_dispatch,EJECUTANDO,procesoPrimero->pid); al re pedo buscarla si ya la tengo
@@ -213,21 +213,14 @@ void mandar_procesos_a_execute()
             cpu_disponible->estado = EJECUTANDO;
             cpu_disponible->pid = procesoPrimero->pid;
             pthread_mutex_unlock(&cpu_disponible->mutex);
+
+            queue_process(procesoPrimero, EXECUTE);
         }
         
         //pthread_mutex_unlock(&mutex_cpu); 
-
-        if(cpu_disponible != NULL)
-        {
-            
-            pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
-
-            queue_process(procesoPrimero, EXECUTE);
-        } else { 
-            pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
-            break; }
     }
-    pthread_mutex_unlock(&mutex_traer);
+    //pthread_mutex_unlock(&mutex_traer);
+    pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
     return;
 }
 
@@ -333,12 +326,16 @@ void desalojo_SJF(t_pcb* primer_proceso) {
     int64_t tiempo = temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal);
     int64_t restante = max(proceso_cpu->estimaciones_SJF->rafagaEstimada - tiempo,(int64_t)0);
 
-    if (restante > primer_proceso->estimaciones_SJF->rafagaEstimada && cpu->estado == EJECUTANDO ) {
+    pthread_mutex_lock(&cpu->mutex);
+    if (restante > primer_proceso->estimaciones_SJF->rafagaEstimada && cpu->pid == proceso_cpu->pid) {
+        
         desalojar_proceso(cpu);
-        log_debug(logger, "DESALOJO PAPUI");
+        pthread_mutex_unlock(&cpu->mutex);
+        log_debug(logger, "SE DESALOJO EL PROCESO %d", proceso_cpu->pid);
         return;
     }
-
+   
+    pthread_mutex_unlock(&cpu->mutex);
     return;
 }
 
@@ -350,7 +347,7 @@ t_cpu* cpu_mayor_rafaga() {
     
     int tamanio = list_size(list_cpus->cola);
     
-    cpu_buscada = list_get(list_cpus->cola, 0);
+    cpu_buscada = list_get(list_cpus->cola,0);
     
 
     if(cpu_buscada->estado == DISPONIBLE){
@@ -366,11 +363,15 @@ t_cpu* cpu_mayor_rafaga() {
         }
         
         pthread_mutex_lock(&list_procesos->mutex);
+        pthread_mutex_lock(&cpu_buscada->mutex);
         t_pcb* proceso_a = list_get(list_procesos->cola, cpu_buscada->pid);
+        pthread_mutex_unlock(&cpu_buscada->mutex);
         pthread_mutex_unlock(&list_procesos->mutex);
 
         pthread_mutex_lock(&list_procesos->mutex);
+        pthread_mutex_lock(&cpu_buscada->mutex);
         t_pcb* proceso_b = list_get(list_procesos->cola, cpu_i->pid);
+        pthread_mutex_unlock(&cpu_buscada->mutex);
         pthread_mutex_unlock(&list_procesos->mutex);    
 
         if(proceso_a->estimaciones_SJF->rafagaEstimada < proceso_b->estimaciones_SJF->rafagaEstimada) {

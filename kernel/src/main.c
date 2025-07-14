@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     kernel_config_init(config_path);
 
     // Inicializamos un logger
-    logger = log_create("kernel.log", "KERNEL", true, LOG_LEVEL_INFO);
+    logger = log_create("kernel.log", "KERNEL", true, LOG_LEVEL_TRACE);
 
     planner_init();
 
