@@ -55,14 +55,13 @@ void queue_process(t_pcb* process, int estado){
         { 
             queue_process(process, EXECUTE);
             
-        } else {
+        } else if(planner->short_term->algoritmo_desalojo == desalojo_SJF) {
 
             pthread_mutex_lock(&planner->short_term->queue_READY->mutex);
             t_pcb *pcb = list_get(planner->short_term->queue_READY->cola,0);
             pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
 
-
-            if (pcb == process && planner->short_term->algoritmo_desalojo == desalojo_SJF)
+            if (pcb == process)
             { // Si el proceso que entro esta primero ahi se fija si desaloja
                 log_error(logger, "INTENO DESALOJO");
                 pthread_mutex_lock(&mutex_desalojo);
