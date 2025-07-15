@@ -49,19 +49,27 @@ void queue_process(t_pcb* process, int estado){
             set_cpu(cpu_disponible->socket_dispatch,EJECUTANDO,process->pid);
         }
         
-        pthread_mutex_unlock(&mutex_cpu); 
+        pthread_mutex_unlock(&mutex_cpu);
 
         if(cpu_disponible != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
         { 
             queue_process(process, EXECUTE);
             
-        } else if(list_get(planner->short_term->queue_READY->cola,0) == process 
-                    && planner->short_term->algoritmo_desalojo== desalojo_SJF) { // Si el proceso que entro esta primero ahi se fija si desaloja
-            log_debug(logger, "INTENO DESALOJO");
-            pthread_mutex_lock(&mutex_desalojo);
-            planner->short_term->algoritmo_desalojo(process);
-            pthread_mutex_unlock(&mutex_desalojo); // Si tiene desalojo ejecuta, sino null pattern 
-            log_debug(logger, "INTENO DESALOJO TERMINADO");
+        } else {
+
+            pthread_mutex_lock(&planner->short_term->queue_READY->mutex);
+            t_pcb *pcb = list_get(planner->short_term->queue_READY->cola,0);
+            pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
+
+
+            if (pcb == process && planner->short_term->algoritmo_desalojo == desalojo_SJF)
+            { // Si el proceso que entro esta primero ahi se fija si desaloja
+                log_error(logger, "INTENO DESALOJO");
+                pthread_mutex_lock(&mutex_desalojo);
+                planner->short_term->algoritmo_desalojo(process);
+                pthread_mutex_unlock(&mutex_desalojo); // Si tiene desalojo ejecuta, sino null pattern 
+                log_error(logger, "INTENO DESALOJO TERMINADO");
+            }
         }
         
         break;
