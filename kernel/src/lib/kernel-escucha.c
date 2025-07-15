@@ -22,6 +22,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
         case IDENTIFICAR_IO:
             log_debug(logger,"IO A identificarse");
             recibir_io(new_buffer, io_socket);
+            enviar_proceso_io(io_socket);
         break;
         case DESBLOQUEO_IO:
             // REcibo el pid (no hace falta paquete)
@@ -161,7 +162,12 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
                 pthread_join(process->hilo_block, NULL);
                 
                 log_debug(logger," DUMP CORRECTO");
-                queue_process(process, READY);
+                if(process->queue_ESTADO_ACTUAL == planner->medium_term->queue_BLOCKED_SUSPENDED){
+
+                    queue_process(process, READY_SUSPENDED);
+                }
+                else{
+                    queue_process(process, READY);}
             }
             else{
                 if(process->hilo_activo){

@@ -151,7 +151,7 @@ void dump_process(int client_socket) {
     int id_process = rcv_only_pid(client_socket);
     
     // Logueamos la solicitud de dump:
-    log_info(logger, "## PID: %d - Memory Dump solicitado", id_process);
+    log_error(logger, "## PID: %d - Memory Dump solicitado", id_process);
 
     // Creamos el archivo de dump con el nombre del PID:
     char *filename = string_from_format("%sdump_%d.bin", config_memoria->DUMP_PATH, id_process);
@@ -183,6 +183,7 @@ void dump_process(int client_socket) {
     // Liberamos la lista de marcos ocupados, y enviamos la respuesta al cliente:
     list_destroy(frames_as_busy);
     send(client_socket, &resquest, sizeof(resquest), 0);
+    log_error(logger, "## PID: %d - Memory DUMP ACABADOOOO", id_process);
 }
 
 void finish_process(int client_socket) {

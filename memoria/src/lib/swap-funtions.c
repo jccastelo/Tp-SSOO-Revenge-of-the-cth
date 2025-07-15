@@ -105,7 +105,7 @@ void swap_in(char* pid_key, int pid, int client_socket) {
         aumentar_contador(metricas_por_procesos, SWAP_IN_REQUESTS, pid_key);
     }
 
-    log_info(logger, "Proceso PID %d: swap-in finalizado con estado %s", pid, status);
+    log_error(logger, "Proceso PID %d: swap-in finalizado con estado %s", pid, status);
     send(client_socket, &resquest, sizeof(resquest), 0);
 } 
 
