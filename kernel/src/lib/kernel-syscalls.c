@@ -103,7 +103,9 @@ void delate_process(t_buffer *buffer){
 
     memcpy(&pid_delate, buffer->stream, sizeof(int)); 
 
+    pthread_mutex_lock(&list_procesos->mutex);
     t_pcb *process = list_get(list_procesos->cola, pid_delate); //Obtengo el proceso a eliminar de la lista global
+    pthread_mutex_unlock(&list_procesos->mutex);
 
     queue_process(process,EXIT); 
 }

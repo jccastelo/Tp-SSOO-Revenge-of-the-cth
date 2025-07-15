@@ -64,13 +64,23 @@ char buffer[1024];
 
 void carnicero_de_instancias_io(t_IO_instancia* instancia_io){
     free(instancia_io);
+    return;
 }
 
 void carnicero_de_io(t_IO* io){
     free(io->nombre);
+
+    list_destroy(io->instancias_IO->cola);
+    pthread_mutex_destroy(&io->instancias_IO->mutex);
     free(io->instancias_IO);
+    
+    list_destroy(io->procesos_esperando->cola);
+    pthread_mutex_destroy(&io->procesos_esperando->mutex);
     free(io->procesos_esperando);
+
     free(io);
+
+    return;
 }
 
 void terminar_kernel(){

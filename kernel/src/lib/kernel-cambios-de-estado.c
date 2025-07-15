@@ -41,26 +41,32 @@ void queue_process(t_pcb* process, int estado){
         cambiar_estado(planner->short_term->algoritmo_planificador, process, planner->short_term->queue_READY);
         pthread_mutex_unlock(&process->mutex_estado);
 
-        pthread_mutex_lock(&mutex_cpu); 
+        //pthread_mutex_lock(&mutex_cpu); 
 
-        t_cpu* cpu_disponible= buscar_cpu_disponible();
+        t_cpu* cpu_disponible = buscar_cpu_disponible();
         if(cpu_disponible != NULL)
         {
-            set_cpu(cpu_disponible->socket_dispatch,EJECUTANDO,process->pid);
+            pthread_mutex_lock(&cpu_disponible->mutex);
+            //set_cpu(cpu_disponible->socket_dispatch,EJECUTANDO,process->pid); al re pedo, para que voy a buscarla si ya ltenfo
+            cpu_disponible->estado = EJECUTANDO;
+            cpu_disponible->pid = process->pid;
+            pthread_mutex_unlock(&cpu_disponible->mutex);
         }
         
-        pthread_mutex_unlock(&mutex_cpu); 
+        //pthread_mutex_unlock(&mutex_cpu); 
 
         if(cpu_disponible != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
         { 
             queue_process(process, EXECUTE);
             
-        } else if(list_get(planner->short_term->queue_READY->cola,0) == process 
-                    && planner->short_term->algoritmo_desalojo== desalojo_SJF) { // Si el proceso que entro esta primero ahi se fija si desaloja
+        } else if(list_get(planner->short_term->queue_READY->cola,0) == process && planner->short_term->algoritmo_desalojo== desalojo_SJF) { // Si el proceso que entro esta primero ahi se fija si desaloja
+            
             log_debug(logger, "INTENO DESALOJO");
+            
             pthread_mutex_lock(&mutex_desalojo);
             planner->short_term->algoritmo_desalojo(process);
             pthread_mutex_unlock(&mutex_desalojo); // Si tiene desalojo ejecuta, sino null pattern 
+            
             log_debug(logger, "INTENO DESALOJO TERMINADO");
         }
         
@@ -76,21 +82,29 @@ void queue_process(t_pcb* process, int estado){
         cambiar_estado(queue_FIFO, process, planner->queue_EXECUTE);
         pthread_mutex_unlock(&process->mutex_estado);
 
-        t_cpu* cpu_a_ocupar= buscar_mi_cpu(process->pid);
+        t_cpu* cpu_a_ocupar = buscar_mi_cpu(process->pid);
 
         if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
         {
+            pthread_mutex_lock(&cpu_a_ocupar->mutex);
             enviar_proceso_cpu(cpu_a_ocupar->socket_dispatch, process);
+            pthread_mutex_unlock(&cpu_a_ocupar->mutex);
+
             if(planner->short_term->algoritmo_planificador == queue_SJF){
-            process->estimaciones_SJF->rafagaReal = temporal_create();
-            temporal_resume(process->estimaciones_SJF->rafagaReal);
+                
+                process->estimaciones_SJF->rafagaReal = temporal_create();
+                temporal_resume(process->estimaciones_SJF->rafagaReal);
             }
+
         } else {
+
             log_debug(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); 
-             queue_process(process,READY); }//NO puede haber procesos en EXECUTE que no estan ejecutando    
+            queue_process(process,READY); 
+        } //NO puede haber procesos en EXECUTE que no estan ejecutando    
         break;
 
     case BLOCKED:
+    
         pthread_mutex_lock(&process->mutex_estado);
         log_info(logger,"## PID: %d Pasa del estado %s al estado BLOCKED",process->pid,estadoActual);
 
@@ -190,28 +204,24 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
     if (process == NULL || sgteEstado == NULL ) {
         return; // O manejar error adecuadamente
     }
-    
-
 
         // if viene de execute => frenamos el timer sjf
     if(!strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"EXECUTE") && planner->short_term->algoritmo_planificador== queue_SJF && process->estimaciones_SJF->rafagaReal != NULL){
-        pthread_mutex_lock(&mutex_desalojo);
-
+        
         temporal_stop(process->estimaciones_SJF->rafagaReal);
         actualizar_rafagas_sjf(process);
         temporal_destroy(process->estimaciones_SJF->rafagaReal);
-
-        pthread_mutex_unlock(&mutex_desalojo);
     } 
-  
-
 
     if(process->queue_ESTADO_ACTUAL != NULL){
         // Cerramos el mutex y sacamos el pcb de la cola del estado en el que estaba el proceso (que esta primero)
         pthread_mutex_lock(&process->queue_ESTADO_ACTUAL->mutex);
-        bool hallado=list_remove_element(process->queue_ESTADO_ACTUAL->cola, process);
-        if(!hallado){log_debug(logger,"NO hallado PID %d",process->pid);}
-        pthread_mutex_unlock(&process->queue_ESTADO_ACTUAL->mutex);
+        bool hallado = list_remove_element(process->queue_ESTADO_ACTUAL->cola, process);
+        pthread_mutex_unlock(&process->queue_ESTADO_ACTUAL->mutex);        
+        
+        if(!hallado) {
+            log_debug(logger,"NO hallado PID %d",process->pid);
+        }
     }
 
     // Cerramos el mutex y replanificamos la cola del estado al que pasamos agregando el pcb

@@ -19,11 +19,9 @@ void sin_desalojo(t_pcb *process);
 void desalojo_SJF(t_pcb *process);
 void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc);
 t_cpu* cpu_mayor_rafaga();
-//void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU);
 void mandar_procesos_a_execute();
 int64_t max(int64_t a, int64_t b);
 void actualizar_rafagas_sjf(t_pcb* proceso);
-
 
 extern pthread_mutex_t mutex_traer;
 #endif //KERNEL_PLANNER_H

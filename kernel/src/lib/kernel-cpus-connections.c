@@ -29,9 +29,9 @@ void iniciar_cpu(t_buffer *buffer,int socket_cliente, int dispatch_o_interrupt)
             memcpy(&cpu->socket_interrupt, &socket_cliente, sizeof(int));            
         }
 
-        pthread_mutex_lock(&list_cpus->mutex);
+        //pthread_mutex_lock(&list_cpus->mutex);
         list_add(list_cpus->cola, cpu);
-        pthread_mutex_unlock(&list_cpus->mutex);
+        //pthread_mutex_unlock(&list_cpus->mutex);
     }
 }
 
@@ -49,20 +49,17 @@ t_cpu *cpu_init(){
 
 void set_cpu(int cpu_socket_buscado,int estado_nuevo,int pid_ejecutando)
 {
-    int socket_actual = -1;
-
-    pthread_mutex_lock(&list_cpus->mutex);
+    //pthread_mutex_lock(&list_cpus->mutex);
     int cantidad_cpus = list_size(list_cpus->cola);
     
     for(int i = 0; i < cantidad_cpus ; i++)
     {   
        
-        t_cpu *cpu =list_get(list_cpus->cola,i);
+        t_cpu *cpu = list_get(list_cpus->cola,i);
         
 
-        socket_actual = cpu->socket_dispatch;
-
-        if(socket_actual == cpu_socket_buscado)
+        pthread_mutex_lock(&cpu->mutex);
+        if(cpu->socket_dispatch == cpu_socket_buscado)
         {
 
             cpu->estado = estado_nuevo;
@@ -75,11 +72,15 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo,int pid_ejecutando)
                 //list_add(list_cpus->cola,cpu);
             //   
             //}
-            pthread_mutex_unlock(&list_cpus->mutex);
+
+            //pthread_mutex_unlock(&list_cpus->mutex);
+            pthread_mutex_unlock(&cpu->mutex);
             return;
         }
+        pthread_mutex_unlock(&cpu->mutex);
     }
-    pthread_mutex_unlock(&list_cpus->mutex);
+    //pthread_mutex_unlock(&list_cpus->mutex);
+    return;
 }
 
 t_cpu* buscar_cpu_disponible(){
@@ -90,36 +91,43 @@ t_cpu* buscar_cpu_disponible(){
     for(int i = 0; i < cantidad_cpus ; i++)
     {   
         
-        t_cpu *cpu =list_get(list_cpus->cola,i);
+        t_cpu *cpu = list_get(list_cpus->cola,i);
         
-
+        pthread_mutex_lock(&cpu->mutex);
         if(cpu->estado == DISPONIBLE)
         {
     
             log_debug(logger,"HAY CPU");
+
+            pthread_mutex_unlock(&cpu->mutex);
+
             return cpu;
         }
+        pthread_mutex_unlock(&cpu->mutex);
     }
 
-     log_debug(logger,"NO HAY CPU");
+    log_debug(logger,"NO HAY CPU");
     return NULL;
 }
 
 t_cpu* buscar_cpu_con_id(int id){
     
-    pthread_mutex_lock(&list_cpus->mutex);
+    //pthread_mutex_lock(&list_cpus->mutex);
     int cantidad_cpus = list_size(list_cpus->cola);
-    pthread_mutex_unlock(&list_cpus->mutex);
+    //pthread_mutex_unlock(&list_cpus->mutex);
     for(int i = 0; i < cantidad_cpus ; i++)
     {   
-        pthread_mutex_lock(&list_cpus->mutex);
-        t_cpu *cpu =list_get(list_cpus->cola,i);
-        pthread_mutex_unlock(&list_cpus->mutex);
+        //pthread_mutex_lock(&list_cpus->mutex);
+        t_cpu *cpu = list_get(list_cpus->cola,i);
+        //pthread_mutex_unlock(&list_cpus->mutex);
 
+        pthread_mutex_lock(&cpu->mutex);
         if(cpu->id == id)
         {
+            pthread_mutex_unlock(&cpu->mutex);
             return cpu;
         }
+        pthread_mutex_unlock(&cpu->mutex);
     }
 
     return NULL;
@@ -127,7 +135,7 @@ t_cpu* buscar_cpu_con_id(int id){
 
 void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
 
-    pthread_mutex_lock(&mutex_cpu);
+    //pthread_mutex_lock(&mutex_cpu);
     
     t_paquete* paquete = crear_paquete(CONTEXT_PROCESS); 
 
@@ -138,14 +146,18 @@ void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
     enviar_paquete(paquete, cpu_socket);
 
     eliminar_paquete(paquete);
-    pthread_mutex_unlock(&mutex_cpu);
+    //pthread_mutex_unlock(&mutex_cpu);
 }
 
 void desalojar_proceso(t_cpu* cpu){
     
+    pthread_mutex_lock(&cpu->mutex);
+
     t_paquete* paquete = crear_paquete(INTERRUPT); // NO SE SI ESTE CODIGO DE OPERACION ESTA BIEN
     
     enviar_paquete(paquete, cpu->socket_interrupt);
+
+    pthread_mutex_unlock(&cpu->mutex);
 }
 
 t_pcb* recibir_proceso(t_buffer* buffer){
@@ -167,24 +179,23 @@ t_pcb* recibir_proceso(t_buffer* buffer){
 
 t_cpu *buscar_mi_cpu(int pid_buscado)
 {
-    pthread_mutex_lock(&list_cpus->mutex);
+    //pthread_mutex_lock(&list_cpus->mutex);
     int cantidad_cpus = list_size(list_cpus->cola);
     
     for(int i = 0; i < cantidad_cpus ; i++)
     {   
-       
-        t_cpu *cpu =list_get(list_cpus->cola,i);
-        
+        t_cpu *cpu = list_get(list_cpus->cola,i);
 
-        int pid_actual = cpu->pid;
-
-        if(pid_actual == pid_buscado)
+        pthread_mutex_lock(&cpu->mutex);
+        if(cpu->pid == pid_buscado)
         {
-            pthread_mutex_unlock(&list_cpus->mutex);
+            //pthread_mutex_unlock(&list_cpus->mutex);
+            pthread_mutex_unlock(&cpu->mutex);
             return cpu;
         }
+        pthread_mutex_unlock(&cpu->mutex);
     }
 
-        pthread_mutex_unlock(&list_cpus->mutex);
-        return NULL;
+    //pthread_mutex_unlock(&list_cpus->mutex);
+    return NULL;
 }

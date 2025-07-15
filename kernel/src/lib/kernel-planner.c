@@ -198,32 +198,38 @@ void traer_proceso_a_MP(){
 void mandar_procesos_a_execute()
 {   
     pthread_mutex_lock(&mutex_traer);
+    
+
     while(!list_is_empty(planner->short_term->queue_READY->cola))
     {
-         pthread_mutex_lock(&planner->short_term->queue_READY->mutex);
-         t_pcb* procesoPrimero = list_get(planner->short_term->queue_READY->cola,0);
-         
-        pthread_mutex_lock(&mutex_cpu); 
-
-        t_cpu* cpu_disponible= buscar_cpu_disponible();
-        if(cpu_disponible != NULL)
-        {
-            set_cpu(cpu_disponible->socket_dispatch,EJECUTANDO,procesoPrimero->pid);
-        }
+        pthread_mutex_lock(&planner->short_term->queue_READY->mutex);
         
-        pthread_mutex_unlock(&mutex_cpu); 
+        pthread_mutex_lock(&list_procesos->mutex);
+        t_pcb* procesoPrimero = list_get(planner->short_term->queue_READY->cola,0);
+        pthread_mutex_unlock(&list_procesos->mutex); 
+        //pthread_mutex_lock(&mutex_cpu); 
 
+        t_cpu* cpu_disponible = buscar_cpu_disponible();
         if(cpu_disponible != NULL)
         {
-            
+            //set_cpu(cpu_disponible->socket_dispatch,EJECUTANDO,procesoPrimero->pid); al re pedo buscarla si ya la tengo
+            pthread_mutex_lock(&cpu_disponible->mutex);
+            cpu_disponible->estado = EJECUTANDO;
+            cpu_disponible->pid = procesoPrimero->pid;
+            pthread_mutex_unlock(&cpu_disponible->mutex);
+
             pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
 
             queue_process(procesoPrimero, EXECUTE);
-        } else { 
+        }else { 
             pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
             break; }
+        
+        //pthread_mutex_unlock(&mutex_cpu); 
     }
     pthread_mutex_unlock(&mutex_traer);
+
+    
     return;
 }
 
@@ -329,79 +335,60 @@ void desalojo_SJF(t_pcb* primer_proceso) {
     int64_t tiempo = temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal);
     int64_t restante = max(proceso_cpu->estimaciones_SJF->rafagaEstimada - tiempo,(int64_t)0);
 
-    if (restante > primer_proceso->estimaciones_SJF->rafagaEstimada) {
+    pthread_mutex_lock(&cpu->mutex);
+    if (restante > primer_proceso->estimaciones_SJF->rafagaEstimada && cpu->pid == proceso_cpu->pid) {
+        
         desalojar_proceso(cpu);
-        log_debug(logger, "DESALOJO PAPUI");
+        pthread_mutex_unlock(&cpu->mutex);
+        log_debug(logger, "SE DESALOJO EL PROCESO %d", proceso_cpu->pid);
         return;
     }
-
+   
+    pthread_mutex_unlock(&cpu->mutex);
     return;
 }
 
 t_cpu* cpu_mayor_rafaga() {
     
-    pthread_mutex_lock(&mutex_cpu);
-    pthread_mutex_lock(&list_cpus->mutex);
+    //pthread_mutex_lock(&mutex_cpu);
+    //pthread_mutex_lock(&list_cpus->mutex);
     t_cpu* cpu_buscada;
-    
     
     int tamanio = list_size(list_cpus->cola);
     
-
-    
-    cpu_buscada = list_get(list_cpus->cola, 0);
+    cpu_buscada = list_get(list_cpus->cola,0);
     
 
     if(cpu_buscada->estado == DISPONIBLE){
-        pthread_mutex_unlock(&list_cpus->mutex);
         return cpu_buscada;
     }
 
     for(int i = 1; i < tamanio; i++) {
         
-          
         t_cpu* cpu_i = list_get(list_cpus->cola, i);
         
-
         if(cpu_i->estado == DISPONIBLE){
-            pthread_mutex_unlock(&list_cpus->mutex);
             return cpu_i;
         }
         
-        
+        pthread_mutex_lock(&list_procesos->mutex);
+        pthread_mutex_lock(&cpu_buscada->mutex);
         t_pcb* proceso_a = list_get(list_procesos->cola, cpu_buscada->pid);
- 
+        pthread_mutex_unlock(&cpu_buscada->mutex);
+        pthread_mutex_unlock(&list_procesos->mutex);
 
-        
+        pthread_mutex_lock(&list_procesos->mutex);
+        pthread_mutex_lock(&cpu_buscada->mutex);
         t_pcb* proceso_b = list_get(list_procesos->cola, cpu_i->pid);
-       
-        
+        pthread_mutex_unlock(&cpu_buscada->mutex);
+        pthread_mutex_unlock(&list_procesos->mutex);    
+
         if(proceso_a->estimaciones_SJF->rafagaEstimada < proceso_b->estimaciones_SJF->rafagaEstimada) {
             cpu_buscada = cpu_i;
         }
     }
-    pthread_mutex_unlock(&list_cpus->mutex);
-    pthread_mutex_unlock(&mutex_cpu);
+
+    //pthread_mutex_unlock(&list_cpus->mutex);
+    //pthread_mutex_unlock(&mutex_cpu);
     return cpu_buscada;
 }
-
-//void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU) {
-//    
-//    t_cpu* cpu_a = (t_cpu*) unaCPU;
-//    t_cpu* cpu_b = (t_cpu*) otraCPU;
-//   
-//    if(cpu_a->estado == DISPONIBLE){
-//        return unaCPU;
-//    }
-//
-//    if(cpu_b->estado == DISPONIBLE){
-//        return otraCPU;
-//    }
-//
-//    pthread_mutex_lock(&list_procesos->mutex);
-//    t_pcb* proceso_a = list_get(list_procesos->cola, cpu_a->pid);
-//    t_pcb* proceso_b = list_get(list_procesos->cola, cpu_b->pid);
-//    pthread_mutex_unlock(&list_procesos->mutex);
-//
-//    return (void*) proceso_a->estimaciones_SJF->rafagaEstimada <= (void*) proceso_b->estimaciones_SJF->rafagaEstimada ? (void*) proceso_a->estimaciones_SJF->rafagaEstimada : (void*) proceso_b->estimaciones_SJF->rafagaEstimada;
-//}
