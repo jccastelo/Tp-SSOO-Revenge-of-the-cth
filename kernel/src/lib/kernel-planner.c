@@ -353,6 +353,7 @@ t_cpu* cpu_mayor_rafaga() {
     
 
     if(cpu_buscada->estado == DISPONIBLE){
+        pthread_mutex_unlock(&mutex_cpu);
         pthread_mutex_unlock(&list_cpus->mutex);
         return cpu_buscada;
     }
@@ -364,6 +365,7 @@ t_cpu* cpu_mayor_rafaga() {
         
 
         if(cpu_i->estado == DISPONIBLE){
+            pthread_mutex_unlock(&mutex_cpu);
             pthread_mutex_unlock(&list_cpus->mutex);
             return cpu_i;
         }
