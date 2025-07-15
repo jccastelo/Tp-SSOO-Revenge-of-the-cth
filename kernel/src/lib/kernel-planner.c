@@ -352,9 +352,9 @@ t_cpu* cpu_mayor_rafaga() {
     cpu_buscada = list_get(list_cpus->cola, 0);
     
 
-    if(cpu_buscada->estado == DISPONIBLE){
-        pthread_mutex_unlock(&mutex_cpu);
+    if(cpu_buscada->estado == DISPONIBLE){     
         pthread_mutex_unlock(&list_cpus->mutex);
+        pthread_mutex_unlock(&mutex_cpu);
         return cpu_buscada;
     }
 
@@ -364,21 +364,28 @@ t_cpu* cpu_mayor_rafaga() {
         t_cpu* cpu_i = list_get(list_cpus->cola, i);
         
 
-        if(cpu_i->estado == DISPONIBLE){
-            pthread_mutex_unlock(&mutex_cpu);
+        if(cpu_i->estado == DISPONIBLE){    
             pthread_mutex_unlock(&list_cpus->mutex);
+            pthread_mutex_unlock(&mutex_cpu);
             return cpu_i;
         }
         
-        
-        t_pcb* proceso_a = list_get(list_procesos->cola, cpu_buscada->pid);
- 
+        t_pcb* proceso_a = NULL;
+        if(cpu_buscada->pid >= 0){
 
+            t_pcb* proceso_a = list_get(list_procesos->cola, cpu_buscada->pid);
         
-        t_pcb* proceso_b = list_get(list_procesos->cola, cpu_i->pid);
+        }
+        else{log_error(logger, "SE QUISO ACCEDER A PID NEGATIVO");}
+ 
+        t_pcb* proceso_b = NULL;
+        if(cpu_i->pid >= 0){
+            t_pcb* proceso_b = list_get(list_procesos->cola, cpu_i->pid);
+        }
+        else{log_error(logger, "SE QUISO ACCEDER A PID NEGATIVO");}
        
         
-        if(proceso_a->estimaciones_SJF->rafagaEstimada < proceso_b->estimaciones_SJF->rafagaEstimada) {
+        if(proceso_a->estimaciones_SJF->rafagaEstimada < proceso_b->estimaciones_SJF->rafagaEstimada && cpu_i->pid >= 0 && cpu_buscada->pid >=0 ) {
             cpu_buscada = cpu_i;
         }
     }
@@ -386,7 +393,6 @@ t_cpu* cpu_mayor_rafaga() {
     pthread_mutex_unlock(&mutex_cpu);
     return cpu_buscada;
 }
-
 //void* cpu_mayor_rafaga(void* unaCPU, void* otraCPU) {
 //    
 //    t_cpu* cpu_a = (t_cpu*) unaCPU;
