@@ -12,12 +12,12 @@ int main(int argc, char *argv[]) {
 
      // Capturamos Ctrl + C
     signal(SIGINT, cierre_de_io);
-
+    io_config_init();
     // Inicializamos un logger
     logger = log_create("io.log", "IO", true, log_level_from_string(config_io->LOG_LEVEL));
 
     // Inicializamos la configuración de IO y nos conectamos al servidor:
-    io_config_init();
+    
     io_connect(nombre);
    
     while (1)
