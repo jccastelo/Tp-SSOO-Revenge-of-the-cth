@@ -15,9 +15,14 @@ void realizar_ciclo_de_instruccion() {
         excecute(instruccion);
 
         // REVISO SI FINALIZÓ POR SYSCALLS o POR INTERRUPCION
-        finaliza = es_syscall_que_frena(instruccion->tipo);
-        if (!finaliza)
-            finaliza = check_interrupt();
+        bool hubo_syscall = es_syscall_que_frena(instruccion->tipo);
+        bool hubo_interrupcion = recibir_interrupciones();
+        if (hubo_syscall) {
+            finaliza = true;
+        } else if (hubo_interrupcion) {
+            desalojo_interrupt();
+            finaliza = true;
+        }
 
         // LIBERO LA MEMORIA
         string_array_destroy(instruccion->argv);
@@ -53,7 +58,7 @@ void excecute(t_instruccion* instruccion) {
     switch (instruccion->tipo)
     {
     case INSTR_NOOP:
-        usleep(500000);
+        usleep(500 * 1000);
         break;
     case INSTR_WRITE: 
         int direccion_logica_wr = atoi(instruccion->argv[1]);
@@ -106,6 +111,12 @@ bool check_interrupt() {
         finaliza = true;
     }
     return finaliza;
+}
+
+void desalojo_interrupt() {
+    log_warning(logger, "## Llega interrupción al puerto Interrupt");
+    guardado_cache_por_desalojo();
+    enviar_contexto_desalojo();
 }
 
 t_tipo_instruccion mapeo_string_tipo(char* tipo_instruccion) {

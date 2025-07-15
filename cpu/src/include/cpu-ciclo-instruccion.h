@@ -68,6 +68,8 @@ bool es_syscall_que_frena(t_tipo_instruccion tipo);
  */
 bool check_interrupt();
 
+void desalojo_interrupt();
+
 /**
  * @brief Mapea una cadena a un tipo de instrucción.
  * 

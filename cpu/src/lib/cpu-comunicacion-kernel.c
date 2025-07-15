@@ -43,8 +43,8 @@ void deserializar_contexto(t_buffer *buffer) {
 }
 
 bool recibir_interrupciones() {
-    op_code cod_op;
-    int recibido = recv(socket_interrupt, &cod_op, sizeof(cod_op), MSG_DONTWAIT);
+    int cod_op;
+    int recibido = recv(socket_interrupt, &cod_op, sizeof(int), MSG_DONTWAIT);
     return (recibido > 0 && cod_op == INTERRUPT);
         
 }
