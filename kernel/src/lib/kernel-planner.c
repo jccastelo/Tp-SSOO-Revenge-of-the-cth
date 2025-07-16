@@ -315,27 +315,41 @@ void sin_desalojo(t_pcb* primer_proceso) {} // null patern nos permite simplific
 
 void desalojo_SJF(t_pcb* primer_proceso) {
     
+    log_warning(logger, "A");
     t_cpu* cpu = cpu_mayor_rafaga();
+    log_warning(logger, "B");
 
     if(cpu->estado == DISPONIBLE) {
         log_debug(logger, "Se libero una CPU en medio del desalojo");
         return;
     }
+    
+    log_warning(logger, "C");
+
 
     t_pcb* proceso_cpu = NULL;
+
+    log_warning(logger, "D");
+
     if(cpu->pid >=0){
         pthread_mutex_lock(&list_procesos->mutex);    
+        log_warning(logger, "E");
         proceso_cpu = list_get(list_procesos->cola, cpu->pid);
+        log_warning(logger, "F");
         pthread_mutex_unlock(&list_procesos->mutex);
     }
     else{log_error(logger, "SE QUISO ACCEDER A PID NEGATIVO");
         return;}
 
+    log_warning(logger, "G");
+
     int64_t tiempo = temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal);
     int64_t restante = max(proceso_cpu->estimaciones_SJF->rafagaEstimada - tiempo,(int64_t)0);
 
     if (restante > primer_proceso->estimaciones_SJF->rafagaEstimada) {
+        log_warning(logger, "H");
         desalojar_proceso(cpu);
+        log_warning(logger, "I");
         log_debug(logger, "DESALOJO PAPUI");
         return;
     }
@@ -346,55 +360,65 @@ void desalojo_SJF(t_pcb* primer_proceso) {
 t_cpu* cpu_mayor_rafaga() {
     
     pthread_mutex_lock(&mutex_cpu);
+    log_warning(logger, "J");
     pthread_mutex_lock(&list_cpus->mutex);
+    log_warning(logger, "K");
     t_cpu* cpu_buscada;
     
-    
+    log_warning(logger, "L");
     int tamanio = list_size(list_cpus->cola);
     
 
-    
+    log_warning(logger, "M");
     cpu_buscada = list_get(list_cpus->cola, 0);
     
 
+    log_warning(logger, "N");
     if(cpu_buscada->estado == DISPONIBLE){     
         pthread_mutex_unlock(&list_cpus->mutex);
         pthread_mutex_unlock(&mutex_cpu);
+        log_warning(logger, "O");
         return cpu_buscada;
     }
 
     for(int i = 1; i < tamanio; i++) {
         
-          
+        log_warning(logger, "P");
         t_cpu* cpu_i = list_get(list_cpus->cola, i);
         
-
+        log_warning(logger, "Q");
         if(cpu_i->estado == DISPONIBLE){    
             pthread_mutex_unlock(&list_cpus->mutex);
             pthread_mutex_unlock(&mutex_cpu);
+            log_warning(logger, "R");
             return cpu_i;
         }
         
+        log_warning(logger, "S");
         t_pcb* proceso_a = NULL;
         if(cpu_buscada->pid >= 0){
-
+            log_warning(logger, "T");
             proceso_a = list_get(list_procesos->cola, cpu_buscada->pid);
         
         }
         else{log_error(logger, "SE QUISO ACCEDER A PID NEGATIVO");}
- 
+        log_warning(logger, "U");
         t_pcb* proceso_b = NULL;
         if(cpu_i->pid >= 0){
+            log_warning(logger, "V");
             proceso_b = list_get(list_procesos->cola, cpu_i->pid);
         }
         else{log_error(logger, "SE QUISO ACCEDER A PID NEGATIVO");}
        
-        
+        log_warning(logger, "W");
         if(proceso_a->estimaciones_SJF->rafagaEstimada < proceso_b->estimaciones_SJF->rafagaEstimada && cpu_i->pid >= 0 && cpu_buscada->pid >=0 ) {
+            log_warning(logger, "X");
             cpu_buscada = cpu_i;
         }
     }
+    log_warning(logger, "Y");
     pthread_mutex_unlock(&list_cpus->mutex);
+    log_warning(logger, "Z");
     pthread_mutex_unlock(&mutex_cpu);
     return cpu_buscada;
 }
