@@ -1,6 +1,7 @@
 #include "../include/kernel-planner.h"
 
 pthread_mutex_t mutex_traer = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_mandar = PTHREAD_MUTEX_INITIALIZER;
 
 void planner_init(){
 
@@ -153,83 +154,87 @@ void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc){
 }
 
 void traer_proceso_a_MP(){
+    
     pthread_mutex_lock(&mutex_traer);
 
-    while(!list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola)){
-        
+    while (true) {
         pthread_mutex_lock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
-        t_pcb *procesoASolicitar = list_get(planner->medium_term->queue_READY_SUSPENDED->cola,0);
-        
 
-        if(solicitar_a_memoria(desuspender_proceso,procesoASolicitar))
-        {
-            
+        if (list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola)) {
             pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
+            break;
+        }
 
+        t_pcb* procesoASolicitar = list_get(planner->medium_term->queue_READY_SUSPENDED->cola, 0);
+        pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
+
+        if(solicitar_a_memoria(memoria_init_proc, procesoASolicitar))
+        {
+            pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
             queue_process(procesoASolicitar, READY);
-            
+
         } else { 
             pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
-            break; }
-
+            break; 
+        }
     }
 
-    while(!list_is_empty(planner->long_term->queue_NEW->cola)){ 
-
+    while (true) {
         pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
-        t_pcb *procesoASolicitar = list_get(planner->long_term->queue_NEW->cola,0);
-        
+    
+        if (list_is_empty(planner->long_term->queue_NEW->cola)) {
+            pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
+            break;
+        }
 
+        t_pcb* procesoASolicitar = list_get(planner->long_term->queue_NEW->cola, 0);
+        pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
+    
         if(solicitar_a_memoria(memoria_init_proc,procesoASolicitar))
         {
-           
             pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
             queue_process(procesoASolicitar, READY);
 
         } else { 
             pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
-            break; }
+            break; 
+        }
     }
-    log_debug(logger,"NO rompi acaAAAAAAA");
+
     pthread_mutex_unlock(&mutex_traer);
     return;
 }
 
 void mandar_procesos_a_execute()
 {   
-    pthread_mutex_lock(&mutex_traer);
-    
-
-    while(!list_is_empty(planner->short_term->queue_READY->cola))
-    {
+    pthread_mutex_lock(&mutex_mandar);
+    while (true) {
         pthread_mutex_lock(&planner->short_term->queue_READY->mutex);
         
-        pthread_mutex_lock(&list_procesos->mutex);
-        t_pcb* procesoPrimero = list_get(planner->short_term->queue_READY->cola,0);
-        pthread_mutex_unlock(&list_procesos->mutex); 
-        //pthread_mutex_lock(&mutex_cpu); 
+        if (list_is_empty(planner->short_term->queue_READY->cola)) {
+            pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
+            break;
+        }
 
         t_cpu* cpu_disponible = buscar_cpu_disponible();
-        if(cpu_disponible != NULL)
-        {
-            //set_cpu(cpu_disponible->socket_dispatch,EJECUTANDO,procesoPrimero->pid); al re pedo buscarla si ya la tengo
-            pthread_mutex_lock(&cpu_disponible->mutex);
-            cpu_disponible->estado = EJECUTANDO;
-            cpu_disponible->pid = procesoPrimero->pid;
-            pthread_mutex_unlock(&cpu_disponible->mutex);
-
-            pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
-
-            queue_process(procesoPrimero, EXECUTE);
-        }else { 
-            pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
-            break; }
         
-        //pthread_mutex_unlock(&mutex_cpu); 
-    }
-    pthread_mutex_unlock(&mutex_traer);
+        if(cpu_disponible) {
+            break;
+        }
 
-    
+        pthread_mutex_lock(&list_procesos->mutex);
+        t_pcb *procesoPrimero = list_get(planner->short_term->queue_READY->cola, 0);
+        pthread_mutex_unlock(&list_procesos->mutex);
+        pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
+            
+        pthread_mutex_lock(&cpu_disponible->mutex);
+        cpu_disponible->estado = EJECUTANDO;
+        cpu_disponible->pid = procesoPrimero->pid;
+        pthread_mutex_unlock(&cpu_disponible->mutex);
+        queue_process(procesoPrimero, EXECUTE);
+    }
+
+    pthread_mutex_unlock(&mutex_mandar);
     return;
 }
 
