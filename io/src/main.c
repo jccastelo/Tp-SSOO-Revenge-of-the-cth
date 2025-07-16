@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     // Inicializamos la configuración de IO y nos conectamos al servidor:
     
     io_connect(nombre);
-   
+    log_info(logger," ## IO de nombre %s conectada y lista", nombre);
     while (1)
     {
         ciclo_de_io();
