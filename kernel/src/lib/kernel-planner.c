@@ -322,8 +322,13 @@ void desalojo_SJF(t_pcb* primer_proceso) {
         return;
     }
 
-    pthread_mutex_lock(&list_procesos->mutex);    
-    t_pcb* proceso_cpu = list_get(list_procesos->cola, cpu->pid);
+    pthread_mutex_lock(&list_procesos->mutex); 
+    
+    if(cpu->pid >= 0)
+        t_pcb* proceso_cpu = list_get(list_procesos->cola, cpu->pid);
+
+    else{log_error(logger, "SE QUISO ACCEDER A PID NEGATIVO");}
+
     pthread_mutex_unlock(&list_procesos->mutex);
 
     int64_t tiempo = temporal_gettime(proceso_cpu->estimaciones_SJF->rafagaReal);
