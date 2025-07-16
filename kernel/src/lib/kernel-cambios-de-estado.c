@@ -23,6 +23,7 @@ void queue_process(t_pcb* process, int estado){
             pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
             break;
         }
+        pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
         
         pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
         if(list_size(planner->long_term->queue_NEW->cola) == 1) {
@@ -34,6 +35,7 @@ void queue_process(t_pcb* process, int estado){
             }
             break;
         }
+        pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
 
         pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
         if(get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP && list_get(planner->long_term->queue_NEW->cola,0) == process){
@@ -45,6 +47,7 @@ void queue_process(t_pcb* process, int estado){
             }
             break;
         }
+        pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
 
         break;
 
