@@ -37,15 +37,10 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             pthread_mutex_lock(&list_procesos->mutex);
             t_pcb *process = list_get(list_procesos->cola, pid_desbloqueo);
             pthread_mutex_unlock(&list_procesos->mutex);
-
-            //Si esta en block va a ready, sino a readysuspended
-            pthread_mutex_lock(&process->mutex_estado);
             
-            if(process->queue_ESTADO_ACTUAL->cola == planner->long_term->queue_BLOCKED->cola) {   
+            if(process->queue_ESTADO_ACTUAL == planner->long_term->queue_BLOCKED) {   
                 
                 log_info(logger,"## PID: %d finalizó IO y pasa a READY",process->pid);
-               
-                pthread_mutex_unlock(&process->mutex_estado);
                 
                 queue_process(process, READY);
                 
