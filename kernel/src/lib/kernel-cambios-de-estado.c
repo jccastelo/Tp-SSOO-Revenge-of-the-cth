@@ -35,7 +35,7 @@ void queue_process(t_pcb* process, int estado){
             }
             break;
         }
-        pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
+        pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
 
         pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
         if(get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP && list_get(planner->long_term->queue_NEW->cola,0) == process){
@@ -47,7 +47,7 @@ void queue_process(t_pcb* process, int estado){
             }
             break;
         }
-        pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
+        pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
 
         break;
 
@@ -70,16 +70,10 @@ void queue_process(t_pcb* process, int estado){
             cpu_disponible->estado = EJECUTANDO;
             cpu_disponible->pid = process->pid;
             pthread_mutex_unlock(&cpu_disponible->mutex);
-        }
-        
-        //pthread_mutex_unlock(&mutex_cpu); 
 
-        if(cpu_disponible != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
-        { 
             queue_process(process, EXECUTE);
-            
+  
         } else { // Si el proceso que entro esta primero ahi se fija si desaloja
-            
             pthread_mutex_lock(&planner->short_term->queue_READY->mutex);            
             t_pcb* primero = list_get(planner->short_term->queue_READY->cola,0);
             pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
@@ -209,7 +203,6 @@ void queue_process(t_pcb* process, int estado){
         
         if(solicitar_a_memoria(memoria_delete_process, process))
         {
-            pthread_mutex_unlock(&process->mutex_estado);
             carnicero(process);
         }
         else{log_debug(logger, "Error al pasar proceso a exit");}
