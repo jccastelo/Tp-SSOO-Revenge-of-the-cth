@@ -84,7 +84,7 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo,int pid_ejecutando)
 
 t_cpu* buscar_cpu_disponible(){
 
-
+    pthread_mutex_lock(&list_cpus->mutex);
     int cantidad_cpus = list_size(list_cpus->cola);
    
     for(int i = 0; i < cantidad_cpus ; i++)
@@ -97,10 +97,11 @@ t_cpu* buscar_cpu_disponible(){
         {
     
             log_debug(logger,"HAY CPU");
+            pthread_mutex_unlock(&list_cpus->mutex);
             return cpu;
         }
     }
-
+    pthread_mutex_unlock(&list_cpus->mutex);
      log_debug(logger,"NO HAY CPU");
     return NULL;
 }
