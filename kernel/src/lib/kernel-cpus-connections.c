@@ -56,24 +56,13 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo,int pid_ejecutando)
     {   
        
         t_cpu *cpu = list_get(list_cpus->cola,i);
-        
 
         pthread_mutex_lock(&cpu->mutex);
         if(cpu->socket_dispatch == cpu_socket_buscado)
         {
-
             cpu->estado = estado_nuevo;
-            cpu->pid =pid_ejecutando;
+            cpu->pid = pid_ejecutando;
 
-            //if(cantidad_cpus >1 && estado_nuevo == EJECUTANDO)
-            //{
-                
-                //list_remove(list_cpus->cola,i);
-                //list_add(list_cpus->cola,cpu);
-            //   
-            //}
-
-            //pthread_mutex_unlock(&list_cpus->mutex);
             pthread_mutex_unlock(&cpu->mutex);
             return;
         }
@@ -86,13 +75,13 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo,int pid_ejecutando)
 t_cpu* buscar_cpu_disponible(){
 
     int cantidad_cpus = list_size(list_cpus->cola);
-   log_error(logger, "Buscando CPU disponible");
+    log_error(logger, "Buscando CPU disponible");
     for(int i = 0; i < cantidad_cpus ; i++)
     {   
         t_cpu *cpu = list_get(list_cpus->cola,i);
         
         pthread_mutex_lock(&cpu->mutex);
-        if(cpu->estado == DISPONIBLE)
+        if(cpu->estado == DISPONIBLE || cpu->pid < 0)
         {
             log_debug(logger,"HAY CPU");
 
