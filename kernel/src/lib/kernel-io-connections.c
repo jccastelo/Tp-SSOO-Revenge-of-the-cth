@@ -47,35 +47,38 @@ void gestionar_io(t_buffer *buffer)
 
     
     t_IO *ioBuscada = buscar_io(ioNombre);
-    
+
     if (ioBuscada != NULL)
     {
         t_buffer *buffer_io = crear_buffer_io(milisegundos, pid_a_io);
 
-        t_IO_instancia *instancia_io_libre = buscar_instancia_libre(ioBuscada);
-
         pthread_mutex_lock(&ioBuscada->procesos_esperando->mutex);
+        list_add(ioBuscada->procesos_esperando->cola, buffer_io);
         int tamanio = list_size(ioBuscada->procesos_esperando->cola);
         pthread_mutex_unlock(&ioBuscada->procesos_esperando->mutex);
 
-        if (tamanio == 0 && instancia_io_libre != NULL) {
-            
-            pthread_mutex_lock(&ioBuscada->procesos_esperando->mutex);
-            list_add(ioBuscada->procesos_esperando->cola, buffer_io);
-            pthread_mutex_unlock(&ioBuscada->procesos_esperando->mutex);
-            
-            int socket_io_libre = instancia_io_libre->socket;
-            
-            enviar_proceso_io(socket_io_libre);
+        log_error(logger, "Se agrego el proceso a la cola de la IO");
 
-            //pthread_mutex_unlock(&mutex_io);
-        }
-        else {   
+        if (tamanio == 1) {
 
-            pthread_mutex_lock(&ioBuscada->procesos_esperando->mutex);
-            list_add(ioBuscada->procesos_esperando->cola, buffer_io);
-            pthread_mutex_unlock(&ioBuscada->procesos_esperando->mutex);
+            t_IO_instancia *instancia_io_libre = buscar_instancia_libre(ioBuscada);
 
+            if(instancia_io_libre != NULL) {
+                log_error(logger, "CAntidad la procesos esparando %d", list_size(ioBuscada->procesos_esperando->cola));
+                log_error(logger, "Cantidad de IO %d", list_size(list_ios->cola));
+                log_error(logger, "Cantidad de instancias IO %d", list_size(ioBuscada->instancias_IO->cola));
+
+                pthread_mutex_lock(&ioBuscada->procesos_esperando->mutex);
+                t_buffer* pid_y_milisegundos = (t_buffer*)list_remove(ioBuscada->procesos_esperando->cola, 0);
+                pthread_mutex_unlock(&ioBuscada->procesos_esperando->mutex);
+
+                send(instancia_io_libre->socket, &pid_y_milisegundos->size, sizeof(int), 0);
+                send(instancia_io_libre->socket, pid_y_milisegundos->stream, pid_y_milisegundos->size, 0);
+                
+                instancia_io_libre->proceso = pid_a_io;
+                
+                free(pid_y_milisegundos);
+            }
             //pthread_mutex_unlock(&mutex_io);
         }
     }
@@ -168,6 +171,7 @@ int recibir_pid(t_buffer *buffer, int io_socket)
 
 void enviar_proceso_io(int io_socket)
 {
+    log_error(logger, "Enviando a IO...");
     pthread_mutex_lock(&list_ios->mutex);
     int cant_ios = list_size(list_ios->cola);
     for (int i = 0; i < cant_ios; i++) {
@@ -177,18 +181,23 @@ void enviar_proceso_io(int io_socket)
         pthread_mutex_lock(&ios->instancias_IO->mutex);
         int cant_instancias = list_size(ios->instancias_IO->cola);
         for (int j = 0; j < cant_instancias; j++) {
-            
             t_IO_instancia *io = list_get(ios->instancias_IO->cola, j);
 
             if (io->socket == io_socket) {
                 
+                log_error(logger, "Encontro la instancia del socket");
+
                 pthread_mutex_lock(&ios->procesos_esperando->mutex);
                 int cant_procesos_esperando = list_size(ios->procesos_esperando->cola);
+                log_error(logger, "CAntidad la procesos esparando %d", cant_procesos_esperando);
+                log_error(logger, "Cantidad de IO %d", list_size(list_ios->cola));
+                log_error(logger, "Cantidad de instancias IO %d", list_size(ios->instancias_IO->cola));
 
-                if(cant_procesos_esperando) {
+                if(cant_procesos_esperando > 0) {
+
+                    log_error(logger, "Hay procesos esperando");
 
                     t_buffer* pid_y_milisegundos = (t_buffer*)list_remove(ios->procesos_esperando->cola, 0);
-                    pthread_mutex_unlock(&ios->procesos_esperando->mutex);
 
                     send(io_socket, &pid_y_milisegundos->size, sizeof(int), 0);
                     send(io_socket, pid_y_milisegundos->stream, pid_y_milisegundos->size, 0);

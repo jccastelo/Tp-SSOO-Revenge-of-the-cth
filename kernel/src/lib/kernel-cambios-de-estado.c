@@ -239,11 +239,13 @@ void cambiar_estado(void (*algoritmo_planificador)(t_pcb* process, t_list* estad
         }
     }
 
+
+    log_error(logger, "llego hasta donde rompe");
     // Cerramos el mutex y replanificamos la cola del estado al que pasamos agregando el pcb
     pthread_mutex_lock(&sgteEstado->mutex);
     algoritmo_planificador(process, sgteEstado->cola);
     pthread_mutex_unlock(&sgteEstado->mutex);
-
+    log_error(logger, "paso donde rompe");
     // Cambiamos el estado del pcb
     process->queue_ESTADO_ACTUAL = sgteEstado;
 

@@ -170,11 +170,9 @@ void traer_proceso_a_MP(){
 
         if(solicitar_a_memoria(memoria_init_proc, procesoASolicitar))
         {
-            pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
             queue_process(procesoASolicitar, READY);
 
         } else { 
-            pthread_mutex_unlock(&planner->medium_term->queue_READY_SUSPENDED->mutex);
             break; 
         }
     }
@@ -192,11 +190,9 @@ void traer_proceso_a_MP(){
     
         if(solicitar_a_memoria(memoria_init_proc,procesoASolicitar))
         {
-            pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
             queue_process(procesoASolicitar, READY);
 
         } else { 
-            pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
             break; 
         }
     }
@@ -215,16 +211,17 @@ void mandar_procesos_a_execute()
             pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
             break;
         }
-
+        
+        pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
+        
         t_cpu* cpu_disponible = buscar_cpu_disponible();
         
         if(cpu_disponible) {
             break;
         }
-
-        pthread_mutex_lock(&list_procesos->mutex);
+        
+        pthread_mutex_lock(&planner->short_term->queue_READY->mutex);
         t_pcb *procesoPrimero = list_get(planner->short_term->queue_READY->cola, 0);
-        pthread_mutex_unlock(&list_procesos->mutex);
         pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
             
         pthread_mutex_lock(&cpu_disponible->mutex);

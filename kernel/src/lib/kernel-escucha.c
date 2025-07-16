@@ -186,7 +186,6 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
                 
                 log_debug(logger," DUMP ERROR");
 
-                pthread_mutex_lock(&process->mutex_estado);
                 queue_process(process, EXIT);
             }
             break;
