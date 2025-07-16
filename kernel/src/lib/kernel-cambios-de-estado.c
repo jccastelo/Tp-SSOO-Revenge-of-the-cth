@@ -152,6 +152,14 @@ void queue_process(t_pcb* process, int estado){
 
     case READY_SUSPENDED:
         pthread_mutex_lock(&process->mutex_estado);
+
+        if(strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"BLOCKED_SUSPENDED"))
+        {
+            pthread_mutex_unlock(&process->mutex_estado);
+            break;
+        }
+
+
         log_info(logger,"## PID: %d Pasa del estado %s al estado READY_SUSPENDED",process->pid,estadoActual);
 
         process->metricas_de_estado->ready_suspended += 1;
