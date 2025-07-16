@@ -319,6 +319,12 @@ void desalojo_SJF(t_pcb* primer_proceso) {
     t_cpu* cpu = cpu_mayor_rafaga();
     log_warning(logger, "B");
 
+    if(cpu == NULL)
+    {
+        log_error(logger,"CPU NULL");
+        return;
+    }
+
     if(cpu->estado == DISPONIBLE) {
         log_debug(logger, "Se libero una CPU en medio del desalojo");
         return;
@@ -331,7 +337,7 @@ void desalojo_SJF(t_pcb* primer_proceso) {
 
     log_warning(logger, "D");
 
-    if(cpu->pid >=0){
+    if(cpu->pid >=0 && cpu->pid < 400){
         pthread_mutex_lock(&list_procesos->mutex);    
         log_warning(logger, "E");
         proceso_cpu = list_get(list_procesos->cola, cpu->pid);
@@ -363,7 +369,7 @@ t_cpu* cpu_mayor_rafaga() {
     log_warning(logger, "J");
     pthread_mutex_lock(&list_cpus->mutex);
     log_warning(logger, "K");
-    t_cpu* cpu_buscada;
+    t_cpu* cpu_buscada=NULL;
     
     log_warning(logger, "L");
     int tamanio = list_size(list_cpus->cola);
@@ -396,7 +402,7 @@ t_cpu* cpu_mayor_rafaga() {
         
         log_warning(logger, "S");
         t_pcb* proceso_a = NULL;
-        if(cpu_buscada->pid >= 0){
+        if(cpu_buscada->pid >= 0 && cpu_buscada->pid < 400){
             log_warning(logger, "T");
             proceso_a = list_get(list_procesos->cola, cpu_buscada->pid);
         
@@ -404,17 +410,30 @@ t_cpu* cpu_mayor_rafaga() {
         else{log_error(logger, "SE QUISO ACCEDER A PID NEGATIVO");}
         log_warning(logger, "U");
         t_pcb* proceso_b = NULL;
-        if(cpu_i->pid >= 0){
+        if(cpu_i->pid >= 0 && cpu_i->pid < 400){
             log_warning(logger, "V");
             proceso_b = list_get(list_procesos->cola, cpu_i->pid);
         }
         else{log_error(logger, "SE QUISO ACCEDER A PID NEGATIVO");}
        
         log_warning(logger, "W");
-        if(proceso_a->estimaciones_SJF->rafagaEstimada < proceso_b->estimaciones_SJF->rafagaEstimada && cpu_i->pid >= 0 && cpu_buscada->pid >=0 ) {
-            log_warning(logger, "X");
-            cpu_buscada = cpu_i;
-        }
+
+        if(proceso_a ==NULL || proceso_b == NULL){
+            pthread_mutex_unlock(&list_cpus->mutex);
+            pthread_mutex_unlock(&mutex_cpu);
+            log_error(logger,"ALGUN PROCESO NULL");
+            return NULL; }
+
+        log_error(logger,"RAfagas pid ?? sin  %"PRId64,proceso_a->estimaciones_SJF->rafagaEstimada );
+        log_error(logger,"RAfagas pid ?? son  %"PRId64,proceso_b->estimaciones_SJF->rafagaEstimada );
+
+        if(proceso_a->estimaciones_SJF->rafagaEstimada < proceso_b->estimaciones_SJF->rafagaEstimada 
+            && cpu_i->pid >= 0 && cpu_i->pid < 400 && cpu_buscada->pid < 400 && cpu_buscada->pid >=0 ) {
+
+                log_warning(logger, "X");
+                cpu_buscada = cpu_i;
+            }
+        
     }
     log_warning(logger, "Y");
     pthread_mutex_unlock(&list_cpus->mutex);
