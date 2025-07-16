@@ -108,23 +108,22 @@ void queue_process(t_pcb* process, int estado){
         cambiar_estado(queue_FIFO, process, planner->queue_EXECUTE);
         t_cpu* cpu_a_ocupar = buscar_mi_cpu(process->pid);
 
-        if(cpu_a_ocupar != NULL) // busca la CPU disponible y envia el proceso
+        if(cpu_a_ocupar == NULL) // busca la CPU disponible y envia el proceso
         {
-            pthread_mutex_lock(&cpu_a_ocupar->mutex);
-            enviar_proceso_cpu(cpu_a_ocupar->socket_dispatch, process);
-            pthread_mutex_unlock(&cpu_a_ocupar->mutex);
-
-            if(planner->short_term->algoritmo_planificador == queue_SJF){
-                
-                process->estimaciones_SJF->rafagaReal = temporal_create();
-                temporal_resume(process->estimaciones_SJF->rafagaReal);
-            }
-
-        } else {
-
             log_debug(logger, "PARA WACHO NO HAY CPU DISPONIBLE"); 
             queue_process(process,READY); 
+            break;
         } //NO puede haber procesos en EXECUTE que no estan ejecutando    
+
+        pthread_mutex_lock(&cpu_a_ocupar->mutex);
+        enviar_proceso_cpu(cpu_a_ocupar->socket_dispatch, process);
+        pthread_mutex_unlock(&cpu_a_ocupar->mutex);
+
+        if(planner->short_term->algoritmo_planificador == queue_SJF){
+            
+            process->estimaciones_SJF->rafagaReal = temporal_create();
+            temporal_resume(process->estimaciones_SJF->rafagaReal);
+        }
         break;
 
     case BLOCKED:
