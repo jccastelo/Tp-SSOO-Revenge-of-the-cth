@@ -85,18 +85,15 @@ void set_cpu(int cpu_socket_buscado,int estado_nuevo,int pid_ejecutando)
 
 t_cpu* buscar_cpu_disponible(){
 
-
     int cantidad_cpus = list_size(list_cpus->cola);
-   
+   log_error(logger, "Buscando CPU disponible");
     for(int i = 0; i < cantidad_cpus ; i++)
     {   
-        
         t_cpu *cpu = list_get(list_cpus->cola,i);
         
         pthread_mutex_lock(&cpu->mutex);
         if(cpu->estado == DISPONIBLE)
         {
-    
             log_debug(logger,"HAY CPU");
 
             pthread_mutex_unlock(&cpu->mutex);
@@ -150,14 +147,10 @@ void enviar_proceso_cpu(int cpu_socket, t_pcb* process){
 }
 
 void desalojar_proceso(t_cpu* cpu){
-    
-    pthread_mutex_lock(&cpu->mutex);
 
     t_paquete* paquete = crear_paquete(INTERRUPT); // NO SE SI ESTE CODIGO DE OPERACION ESTA BIEN
     
     enviar_paquete(paquete, cpu->socket_interrupt);
-
-    pthread_mutex_unlock(&cpu->mutex);
 }
 
 t_pcb* recibir_proceso(t_buffer* buffer){
