@@ -416,7 +416,7 @@ t_cpu* cpu_mayor_rafaga() {
         //log_warning(logger, "S");
         t_pcb* proceso_a = NULL;
         if(cpu_buscada->pid >= 0 && cpu_buscada->pid < cantidad_procesos){
-            log_warning(logger, "T");
+            //log_warning(logger, "T");
             proceso_a = list_get(list_procesos->cola, cpu_buscada->pid);
         
         }
@@ -425,7 +425,7 @@ t_cpu* cpu_mayor_rafaga() {
         //log_warning(logger, "U");
         t_pcb* proceso_b = NULL;
         if(cpu_i->pid >= 0 && cpu_i->pid < cantidad_procesos){
-            log_warning(logger, "V");
+            //log_warning(logger, "V");
             proceso_b = list_get(list_procesos->cola, cpu_i->pid);
         }
         else{log_error(logger, "SE QUISO ACCEDER A PID NEGATIVO");}

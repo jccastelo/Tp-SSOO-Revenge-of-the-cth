@@ -85,13 +85,13 @@ void swap_in(char* pid_key, int pid, int client_socket) {
             fseek(archivo_swap, entry->offset_swap, SEEK_SET);
             fread(contenido, config_memoria->TAM_PAGINA, 1, archivo_swap);
             memcpy(espacio_usuario + free_frame_id * config_memoria->TAM_PAGINA, contenido, config_memoria->TAM_PAGINA);
-            log_debug(logger, 
+            /*log_debug(logger, 
             "Swap_in exitoso: PID %d, página %d cargada en frame %d. Espacio de usuario actual: %s", 
                 pid, 
                 index_frames, 
                 free_frame_id, 
                 mem_hexstring(espacio_usuario, config_memoria->TAM_MEMORIA)
-            );
+            );*/
         }
 
         list_iterate(metadata_swap, closure_swap_in);
