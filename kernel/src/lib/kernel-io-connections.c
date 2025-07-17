@@ -41,6 +41,7 @@ void gestionar_io(t_buffer *buffer)
     pthread_mutex_unlock(&list_procesos->mutex);
 
     process->pc = pc_PID;
+    
 
     log_info(logger,"## PID: %d - Bloqueado por IO: %s", process->pid,ioNombre);
     queue_process(process, BLOCKED);
@@ -88,6 +89,7 @@ void gestionar_io(t_buffer *buffer)
         pthread_mutex_unlock(&mutex_io);
         queue_process(process_to_delate, EXIT);
     }
+    
 }
 
 t_buffer *crear_buffer_io(int milisegundos,int  pid_a_io)
@@ -191,6 +193,7 @@ void enviar_proceso_io(int io_socket)
                     
                     memcpy(&(io->proceso), pid_y_milisegundos->stream, sizeof(int));
                     
+                    free(pid_y_milisegundos->stream);
                     free(pid_y_milisegundos);
                 }
 
@@ -256,6 +259,7 @@ void desencolarProcesosEsperando(t_IO *ios_estructura)
 
         //log_info(logger, "PID A ELIMINAR: %d, ELEMENTOS RESTANTES: %d",pid_a_remover, tamano_lista > i);
 
+        free(pid_milisegundos->stream);
         free(pid_milisegundos);
         
         queue_process(list_get(list_procesos->cola,pid_a_remover), EXIT);
@@ -295,7 +299,7 @@ void recibir_io(t_buffer* buffer, int socket) {
         pthread_mutex_lock(&ioBuscada->instancias_IO->mutex);
         list_add_in_index(ioBuscada->instancias_IO->cola,0,nueva_instancia_io);
         pthread_mutex_unlock(&ioBuscada->instancias_IO->mutex);
-
+        
         log_debug(logger, "Llego una nueva INSTANCIA de IO de nombre %s Y SOCKET: %d ", ioBuscada->nombre,nueva_instancia_io->socket );
         
     }
