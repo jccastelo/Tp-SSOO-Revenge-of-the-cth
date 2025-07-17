@@ -145,7 +145,9 @@ t_IO *buscar_io(char *ioNombreBuscado)
 
     for (int i = 0; i < list_size(list_ios->cola); i++)
     {
+         pthread_mutex_lock(&list_ios->mutex);
          encontrado  = list_get(list_ios->cola, i);
+         pthread_mutex_unlock(&list_ios->mutex);
 
         if (strcmp(encontrado->nombre, ioNombreBuscado) == 0)
         {
@@ -172,11 +174,15 @@ void enviar_proceso_io(int io_socket)
 
     for (int i = 0; i < list_size(list_ios->cola); i++)
     {
+        pthread_mutex_lock(&list_ios->mutex);
         t_IO *ios = list_get(list_ios->cola, i);
+        pthread_mutex_unlock(&list_ios->mutex);
 
         for (int j = 0; j < list_size(ios->instancias_IO->cola); j++)
         {
+            pthread_mutex_lock(&ios->instancias_IO->mutex);
             t_IO_instancia *io = list_get(ios->instancias_IO->cola, j);
+            pthread_mutex_unlock(&ios->instancias_IO->mutex);
 
             if (io->socket == io_socket)
             {
@@ -207,15 +213,22 @@ void eliminar_instancia(int io_socket)
     
     for (int i = 0; i < list_size(list_ios->cola); i++)
     {
+        pthread_mutex_lock(&list_ios->mutex);
         t_IO *ios = list_get(list_ios->cola, i);
+        pthread_mutex_unlock(&list_ios->mutex);
 
         for (int j = 0; j < list_size(ios->instancias_IO->cola); j++)
         {
+            pthread_mutex_lock(&ios->instancias_IO->mutex);
             t_IO_instancia *io = list_get(ios->instancias_IO->cola, j);
+            pthread_mutex_unlock(&ios->instancias_IO->mutex);
 
             if (io->socket == io_socket)
             {
+                pthread_mutex_lock(&ios->instancias_IO->mutex);
                 list_remove(ios->instancias_IO->cola,j);
+                pthread_mutex_unlock(&ios->instancias_IO->mutex);
+
                 carnicero_de_instancias_io(io);
 
                 if (list_is_empty(ios->instancias_IO->cola))
