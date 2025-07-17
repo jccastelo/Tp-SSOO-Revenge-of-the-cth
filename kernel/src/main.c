@@ -40,20 +40,16 @@ int main(int argc, char *argv[]) {
 
     // //Nos conectamos a la memoria como clientes
     kernel_memory_connection();
-   
-    
     
     log_info(logger,"## Kernel esperando confirmacion para iniciar");
     getchar();
 
     // INICIO PRIMER PROCESO
     init_fist_process(archivo_pseudocodigo,Tamanio_proc);
-
-    // Nota: Esto es un parche para evitar que el programa termine inmediatamente.
-    // Ya que detachamos los hilos, no podemos esperar a que terminen.
     
-
     pthread_mutex_lock(&mutex_control_kernel);
 
+    pthread_mutex_destroy(&mutex_control_kernel);
+    
     return 0;
 }
