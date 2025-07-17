@@ -17,17 +17,22 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_tiempo->metrica_actual = process->metricas_de_tiempo->NEW;
 
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW); 
-        pthread_mutex_unlock(&process->mutex_estado);
+        
+        pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
+        t_pcb *primer_Proceos =list_get(planner->long_term->queue_NEW->cola,0);
+        pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
 
         if(list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola) && // READY_SUSP vacia => pueden entrar los de NEW
            (list_size(planner->long_term->queue_NEW->cola) == 1 || // Si es el unico en la cola => se le pregunta a memoria si puede entrar
-           (get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP && list_get(planner->long_term->queue_NEW->cola,0) == process))) // Sino, en el caso de PMCP => si esta primero le pregunta a memoria
+           (get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP && primer_Proceos== process))) // Sino, en el caso de PMCP => si esta primero le pregunta a memoria
             {
                 if(solicitar_a_memoria(memoria_init_proc, process))
                 {
+                    pthread_mutex_unlock(&process->mutex_estado);
                     queue_process(process, READY);
-                }
-            }
+                }else{pthread_mutex_unlock(&process->mutex_estado);}
+
+            }else{pthread_mutex_unlock(&process->mutex_estado);}
 
         break;
 
@@ -99,6 +104,7 @@ void queue_process(t_pcb* process, int estado){
 
     case BLOCKED:
         pthread_mutex_lock(&process->mutex_estado);
+        process->posible_suspension =true;
         log_info(logger,"## PID: %d Pasa del estado %s al estado BLOCKED",process->pid,estadoActual);
 
         process->metricas_de_estado->blocked += 1;
@@ -114,7 +120,7 @@ void queue_process(t_pcb* process, int estado){
     case BLOCKED_SUSPENDED:
         pthread_mutex_lock(&process->mutex_estado);
 
-        if(strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"BLOCKED"))
+        if(strcmp(get_NombreDeEstado(process->queue_ESTADO_ACTUAL),"BLOCKED")|| process->posible_suspension==false)
         {
         if(process->hilo_activo){
             {
