@@ -4,6 +4,8 @@ pthread_mutex_t mutex_control_kernel = PTHREAD_MUTEX_INITIALIZER;
 
 int main(int argc, char *argv[]) {
 
+    //KERNEL SIN LEAAAAKS!!!
+
     pthread_mutex_lock(&mutex_control_kernel);
 
     char *archivo_pseudocodigo;
