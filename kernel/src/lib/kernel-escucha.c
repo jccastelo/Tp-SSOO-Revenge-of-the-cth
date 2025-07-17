@@ -34,7 +34,9 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             enviar_proceso_io(io_socket);
 
             // Con el pid busco el proceso 
+            pthread_mutex_lock(&list_procesos->mutex);
             t_pcb *process = list_get(list_procesos->cola, pid_desbloqueo);
+            pthread_mutex_unlock(&list_procesos->mutex);
 
             //Si esta en block va a ready, sino a readysuspended
             pthread_mutex_lock(&process->mutex_estado);
@@ -54,7 +56,11 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
         
             //Si habia pid lo mando a exit
             if(pid_fin >= 0){
+
+                pthread_mutex_lock(&list_procesos->mutex);
                 t_pcb *process = list_get(list_procesos->cola, pid_fin);
+                pthread_mutex_unlock(&list_procesos->mutex);
+
                 queue_process(process, EXIT);
             }
 

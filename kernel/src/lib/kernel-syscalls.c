@@ -1,5 +1,7 @@
 #include "../include/kernel-syscalls.h"
 
+pthread_mutex_t creando_proceso = PTHREAD_MUTEX_INITIALIZER;
+
 t_pcb *process_init(){
 
     t_pcb *new_process = malloc(sizeof(t_pcb));
@@ -59,9 +61,13 @@ t_pcb *process_init(){
 
 void recibir_y_crear_proceso(t_buffer *buffer){
 
+    pthread_mutex_lock(&creando_proceso);
+
     t_pcb *process =  process_init();
 
     cargar_proceso(process, buffer);
+
+    pthread_mutex_unlock(&creando_proceso);
 
     queue_process(process, NEW);
 }
@@ -103,7 +109,9 @@ void delate_process(t_buffer *buffer){
 
     memcpy(&pid_delate, buffer->stream, sizeof(int)); 
 
+    pthread_mutex_lock(&list_procesos->mutex);
     t_pcb *process = list_get(list_procesos->cola, pid_delate); //Obtengo el proceso a eliminar de la lista global
+    pthread_mutex_unlock(&list_procesos->mutex);
 
     queue_process(process,EXIT); 
 }
