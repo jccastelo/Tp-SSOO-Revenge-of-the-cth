@@ -71,6 +71,7 @@ typedef struct {
     int pid;
     int pc;
     bool hilo_activo;
+    bool posible_suspension;
     t_monitor* queue_ESTADO_ACTUAL;
     t_metricas_de_estados *metricas_de_estado;
     t_metricas_de_tiempo *metricas_de_tiempo;
