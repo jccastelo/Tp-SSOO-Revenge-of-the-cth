@@ -40,7 +40,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             pthread_mutex_unlock(&list_procesos->mutex);
 
             log_debug(logger,"## PID: %d LLEGA DE IO",process->pid);
-            if(process->pid > 300){log_debug(logger,"## YA habia terminado este proceso"); break;}
+            if(process->pid > 300 || process->pid < 0){log_debug(logger,"## YA habia terminado este proceso"); break;}
             //Si esta en block va a ready, sino a readysuspended
             pthread_mutex_lock(&process->mutex_estado);
             process->posible_suspension =false;

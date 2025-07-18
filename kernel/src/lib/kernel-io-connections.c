@@ -44,15 +44,13 @@ void gestionar_io(t_buffer *buffer)
 
     log_info(logger,"## PID: %d - Bloqueado por IO: %s", process->pid,ioNombre);
     queue_process(process, BLOCKED);
-
     
     t_IO *ioBuscada = buscar_io(ioNombre);
-    
+   
     if (ioBuscada != NULL)
     {
         t_buffer *buffer_io = crear_buffer_io(milisegundos, pid_a_io);
 
-        
         t_IO_instancia *instancia_io_libre = buscar_instancia_libre(ioBuscada);
 
         if (list_size(ioBuscada->procesos_esperando->cola) == 0 && instancia_io_libre != NULL)
@@ -63,7 +61,6 @@ void gestionar_io(t_buffer *buffer)
             
             int socket_io_libre = instancia_io_libre->socket;
             
-
             enviar_proceso_io(socket_io_libre);
 
             pthread_mutex_unlock(&mutex_io);
@@ -88,6 +85,8 @@ void gestionar_io(t_buffer *buffer)
         pthread_mutex_unlock(&mutex_io);
         queue_process(process_to_delate, EXIT);
     }
+    free(ioNombre);
+    return;
 }
 
 t_buffer *crear_buffer_io(int milisegundos,int  pid_a_io)
@@ -311,6 +310,7 @@ void recibir_io(t_buffer* buffer, int socket) {
         list_add_in_index(ioBuscada->instancias_IO->cola,0,nueva_instancia_io);
         pthread_mutex_unlock(&ioBuscada->instancias_IO->mutex);
 
+        free(ioNombre);
         log_debug(logger, "Llego una nueva INSTANCIA de IO de nombre %s Y SOCKET: %d ", ioBuscada->nombre,nueva_instancia_io->socket );
         
     }
@@ -342,7 +342,9 @@ void recibir_io(t_buffer* buffer, int socket) {
         pthread_mutex_unlock(&list_ios->mutex);
 
         log_debug(logger, "Llego una Nueva IO de nombre %s Y SOCKET: %d ", ioNueva->nombre,nueva_instancia_io->socket );
-    }   
+    }
+
+    return;
 }
 
 void actualizarIO_a_libre(int pid_desbloqueo) {

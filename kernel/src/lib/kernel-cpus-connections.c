@@ -147,6 +147,8 @@ void desalojar_proceso(t_cpu* cpu){
     t_paquete* paquete = crear_paquete(INTERRUPT); // NO SE SI ESTE CODIGO DE OPERACION ESTA BIEN
     
     enviar_paquete(paquete, cpu->socket_interrupt);
+
+    eliminar_paquete(paquete);
 }
 
 t_pcb* recibir_proceso(t_buffer* buffer){

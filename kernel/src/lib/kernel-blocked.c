@@ -46,7 +46,7 @@ void* timer_de_blockeo(void* arg)
     if (proceso_esta_en_lista(planner->long_term->queue_BLOCKED->cola, process)&& process->hilo_activo &&process->posible_suspension) {
 
         pthread_mutex_lock(&process->mutex_estado);
-        if(process->queue_ESTADO_ACTUAL == planner->long_term->queue_BLOCKED )
+        if(process->queue_ESTADO_ACTUAL == planner->long_term->queue_BLOCKED &&process->posible_suspension)
         {
              pthread_mutex_unlock(&process->mutex_estado);
             queue_process(process, BLOCKED_SUSPENDED);

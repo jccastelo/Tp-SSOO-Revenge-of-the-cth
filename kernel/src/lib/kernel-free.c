@@ -1,7 +1,10 @@
 
 #include "../include/kernel-free.h"
 
+pthread_mutex_t mutex_eliminando_proceso = PTHREAD_MUTEX_INITIALIZER;
+
 void carnicero(t_pcb* process){
+    pthread_mutex_lock(&mutex_eliminando_proceso);
 
     pthread_mutex_lock(&process->queue_ESTADO_ACTUAL->mutex);
     list_remove_element(process->queue_ESTADO_ACTUAL->cola, process);
@@ -19,16 +22,36 @@ void carnicero(t_pcb* process){
     free(process->archivo);    
     free(process->metricas_de_estado);
 
-    free(process->metricas_de_tiempo->NEW);
-    free(process->metricas_de_tiempo->READY);
-    free(process->metricas_de_tiempo->EXECUTE);
-    free(process->metricas_de_tiempo->BLOCKED);
-    free(process->metricas_de_tiempo->BLOCKED_SUSPENDED);
-    free(process->metricas_de_tiempo->READY_SUSPENDED);
+    log_debug(logger,"A");
+
+    temporal_destroy(process->metricas_de_tiempo->NEW);
+    temporal_destroy(process->metricas_de_tiempo->READY);
+    temporal_destroy(process->metricas_de_tiempo->EXECUTE);
+    temporal_destroy(process->metricas_de_tiempo->BLOCKED);
+    temporal_destroy(process->metricas_de_tiempo->BLOCKED_SUSPENDED);
+    temporal_destroy(process->metricas_de_tiempo->READY_SUSPENDED);
 
     free(process->metricas_de_tiempo);    
 
+    log_debug(logger,"b");
+
+    free(process->estimaciones_SJF);
+
+    log_debug(logger,"x");
+
+    if (process->hilo_activo) {
+        pthread_cancel(process->hilo_block);
+        pthread_detach(process->hilo_block);
+    }
+    
+
+    log_debug(logger,"c");
+    pthread_mutex_destroy(&process->mutex_estado);
+
     free(process);
+
+    pthread_mutex_unlock(&mutex_eliminando_proceso);
+
 }
 
 void log_metricas(t_pcb* process){
@@ -101,7 +124,7 @@ void terminar_kernel(){
         pthread_mutex_destroy(&io->procesos_esperando->mutex);
         list_destroy_and_destroy_elements(io->procesos_esperando->cola, free);       
     }
-
+    free(list_ios->cola);
     free(list_ios);
 
     log_debug(logger,"Liberando planificador...");
@@ -171,8 +194,12 @@ void terminar_kernel(){
     pthread_mutex_destroy(&mutex_memoria_envio_pid);
     pthread_mutex_destroy(&mutex_traer);
     pthread_mutex_destroy(&mutex_creacion_de_proceso);
+    pthread_mutex_destroy(&mutex_eliminando_proceso);
 
     log_debug(logger,"Kernel liberado");
+
+    log_destroy(logger);
+
     pthread_mutex_unlock(&mutex_control_kernel);
     exit(EXIT_SUCCESS);
 }   

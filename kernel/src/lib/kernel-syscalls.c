@@ -52,8 +52,7 @@ t_pcb *process_init(){
     temporal_stop(new_process->metricas_de_tiempo->BLOCKED_SUSPENDED); 
     new_process->metricas_de_tiempo->READY_SUSPENDED = temporal_create(); 
     temporal_stop(new_process->metricas_de_tiempo->READY_SUSPENDED);
-    new_process->metricas_de_tiempo->metrica_actual = temporal_create(); 
-    temporal_stop(new_process->metricas_de_tiempo->metrica_actual);
+    new_process->metricas_de_tiempo->metrica_actual = NULL;
 
     new_process->estimaciones_SJF->rafagaReal = NULL;
     
@@ -62,7 +61,7 @@ t_pcb *process_init(){
 
 void recibir_y_crear_proceso(t_buffer *buffer){
 
-     pthread_mutex_lock(&mutex_creacion_de_proceso);
+    pthread_mutex_lock(&mutex_creacion_de_proceso);
     t_pcb *process =  process_init();
 
     cargar_proceso(process, buffer);
@@ -96,7 +95,6 @@ void cargar_proceso(t_pcb* process, t_buffer* buffer){
     if(desplazamiento < buffer->size) 
     {log_debug(logger,"Hay informacion sin deserializar en INIC_PROC"); }
     else{ log_debug(logger,"Se inicializo proceso PID: %d ",process->pid ); }
-    //sleep(1);
 
 }
 
@@ -109,9 +107,13 @@ void delate_process(t_buffer *buffer){
 
     log_debug(logger,"PID A eliminar %d",pid_delate);
 
+    if(pid_delate>300 || pid_delate<0){ log_debug(logger,"No se puede eliminar este PID"); return;}
+
     pthread_mutex_lock(&list_procesos->mutex);
     t_pcb *process = list_get(list_procesos->cola, pid_delate); //Obtengo el proceso a eliminar de la lista global
     pthread_mutex_unlock(&list_procesos->mutex);
+
+    if(process->pid>300 || process->pid <0){ log_debug(logger,"No se puede eliminar este PID"); return;}
 
     log_debug(logger,"PRoceso obtenido a eliminar %d ",process->pid);
 

@@ -9,6 +9,7 @@ void queue_process(t_pcb* process, int estado){
     switch(estado)
     {
     case NEW:
+
         pthread_mutex_lock(&process->mutex_estado);
         log_info(logger,"## PID: %d,Tamnio %d - Se crea el proceso - Estado: NEW", process->pid,process->tamanio_proceso);
         
@@ -17,24 +18,28 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_tiempo->metrica_actual = process->metricas_de_tiempo->NEW;
 
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW); 
-        pthread_mutex_unlock(&process->mutex_estado);
+        
+        pthread_mutex_lock(&mutex_traer);
 
         pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
-        t_pcb *primer_Proceos =list_get(planner->long_term->queue_NEW->cola,0);
+        t_pcb *primer_Proceos = list_get(planner->long_term->queue_NEW->cola,0);
         pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
 
         if(list_is_empty(planner->medium_term->queue_READY_SUSPENDED->cola) && // READY_SUSP vacia => pueden entrar los de NEW
            (list_size(planner->long_term->queue_NEW->cola) == 1 || // Si es el unico en la cola => se le pregunta a memoria si puede entrar
-           (get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP && primer_Proceos== process))) // Sino, en el caso de PMCP => si esta primero le pregunta a memoria
+           (get_algoritm(config_kernel->ALGORITMO_INGRESO_A_READY) == PMCP && primer_Proceos == process))) // Sino, en el caso de PMCP => si esta primero le pregunta a memoria
             {
                 if(solicitar_a_memoria(memoria_init_proc, process))
                 {
-                    
+                    pthread_mutex_unlock(&mutex_traer);
+                    pthread_mutex_unlock(&process->mutex_estado);
                     queue_process(process, READY);
                 }
 
             }
 
+        pthread_mutex_unlock(&mutex_traer);
+        pthread_mutex_unlock(&process->mutex_estado);
         break;
 
     case READY:
@@ -45,7 +50,7 @@ void queue_process(t_pcb* process, int estado){
         actualizarTiempo(&(process->metricas_de_tiempo->metrica_actual),&(process->metricas_de_tiempo->READY));
         
         cambiar_estado(planner->short_term->algoritmo_planificador, process, planner->short_term->queue_READY);
-        pthread_mutex_unlock(&process->mutex_estado);
+        
 
         pthread_mutex_lock(&mutex_cpu); 
 
@@ -57,8 +62,10 @@ void queue_process(t_pcb* process, int estado){
         
         pthread_mutex_unlock(&mutex_cpu);
 
+
         if(cpu_disponible != NULL) // si llega a READY y hay una CPU disponible va a EXECUTE
         { 
+            pthread_mutex_unlock(&process->mutex_estado);
             queue_process(process, EXECUTE);
             
         } else if(planner->short_term->algoritmo_desalojo == desalojo_SJF) {
@@ -66,6 +73,8 @@ void queue_process(t_pcb* process, int estado){
             pthread_mutex_lock(&planner->short_term->queue_READY->mutex);
             t_pcb *pcb = list_get(planner->short_term->queue_READY->cola,0);
             pthread_mutex_unlock(&planner->short_term->queue_READY->mutex);
+            
+            pthread_mutex_unlock(&process->mutex_estado);
 
             if (pcb == process)
             { // Si el proceso que entro esta primero ahi se fija si desaloja
@@ -75,7 +84,8 @@ void queue_process(t_pcb* process, int estado){
                 pthread_mutex_unlock(&mutex_desalojo); // Si tiene desalojo ejecuta, sino null pattern 
                 log_error(logger, "INTENO DESALOJO TERMINADO");
             }
-        }
+
+        }else{pthread_mutex_unlock(&process->mutex_estado);}
         
         break;
 

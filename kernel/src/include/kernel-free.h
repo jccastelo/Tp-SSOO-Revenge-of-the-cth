@@ -14,4 +14,6 @@ void carnicero_de_instancias_io(t_IO_instancia* instancia_io);
 void carnicero_de_io(t_IO* IO);
 void terminar_kernel();
 void carnicero_final(void * proceso);
+
+extern pthread_mutex_t mutex_eliminando_proceso;
 #endif //KERNEL_FREE_H
