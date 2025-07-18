@@ -32,12 +32,17 @@ void init_process(int client_socket) {
     // Enviamos la respuesta indicando si el proceso fue creado correctamente o no
     log_debug(logger, "PID: %d - Proceso %s para crearse", id_process, status_process);
     send(client_socket, &request, sizeof(request), 0);
+
+    // Liberamos la memoria dinámica de las estructuras y variables asociadas utilizadas en la función: OK
+    list_destroy(free_frames);
+    free(file_process);
 }
 
 void access_to_page_tables(int client_socket) {
     // Se recibe la dirección física, representada por las entradas por nivel asociadas al proceso.
     int id_process;
     t_list *entries_per_levels = rcv_entries_per_levels(client_socket, &id_process);
+    char *id_process_key = string_itoa(id_process);
 
     // Logueamos la información del proceso y las entradas recibidas:
     log_info(logger, "PID: %d - Acceso a tablas de páginas", id_process);
@@ -45,25 +50,31 @@ void access_to_page_tables(int client_socket) {
     // Buscamos el frame correspondiente a partir del ID de proceso y las entradas obtenidas
     int searched_frame = find_frame_from_entries(id_process, entries_per_levels);
 
-    aumentar_contador(metricas_por_procesos, TABLAS_REQUESTS, string_itoa(id_process));
+    aumentar_contador(metricas_por_procesos, TABLAS_REQUESTS, id_process_key);
     log_debug(logger, "PID: %d - Frame encontrado: %d", id_process, searched_frame);
 
     // Enviar el frame encontrado al cliente que lo solicitó, y liberamos memoria
     send(client_socket, &searched_frame, sizeof(int), 0);
-    list_destroy(entries_per_levels);
+    list_destroy_and_destroy_elements(entries_per_levels, free);
+    free(id_process_key);
 }
 
 void write_in_user_spaces(int client_socket) {
     int id_process;
     int physical_address;
-    char* content_to_write;
+    char *content_to_write;
 
     // Inicializamos el espacio de usuario para el proceso:
     rcv_physical_memory_and_content_to_write(client_socket, &id_process, &physical_address, &content_to_write);
+    char *id_process_key = string_itoa(id_process);
     write_memory(client_socket, id_process, content_to_write, physical_address);
 
     // Logueamos el contenido del espacio de usuario después de la escritura:
-    aumentar_contador(metricas_por_procesos, MEM_WRITE_REQUESTS, string_itoa(id_process));
+    aumentar_contador(metricas_por_procesos, MEM_WRITE_REQUESTS, id_process_key);
+
+    // Liberamos la memoria dinámica de las variables asociadas utilizadas en la función: OK
+    free(content_to_write);
+    free(id_process_key);
 }
 
 void read_in_user_spaces(int client_socket) {
@@ -73,8 +84,12 @@ void read_in_user_spaces(int client_socket) {
 
     // Inicializamos el espacio de usuario para el proceso:
     rcv_physical_memory_and_quantity_bytes(client_socket, &id_process, &physical_address, &quantity_bytes);
+    char *id_process_key = string_itoa(id_process);
     read_memory(client_socket, id_process, quantity_bytes, physical_address);
-    aumentar_contador(metricas_por_procesos, MEM_READ_REQUESTS, string_itoa(id_process));
+    aumentar_contador(metricas_por_procesos, MEM_READ_REQUESTS, id_process_key);
+
+    // Liberamos la memoria dinámica de las variables asociadas utilizadas en la función: OK
+    free(id_process_key);
 }
 
 void send_process_instruction(int cliente_socket) {
@@ -82,15 +97,19 @@ void send_process_instruction(int cliente_socket) {
     int id_process;
     int program_counter;
     char *instruction;
-    
+
     // Llamamos a la función que recibe y configura los valores necesarios para el proceso. Luego, enviamos la instrucción correspondiente:
     rcv_instruction_consumer(cliente_socket, &id_process, &program_counter);
-    log_debug(logger, " ## PID: %d - Obtener instrucción: %d", id_process, program_counter);
+    char *id_process_key = string_itoa(id_process);
+    log_info(logger, "## PID: %d - Obtener instrucción: %d", id_process, program_counter);
 
     // Obtenemos la instrucción del proceso y la enviamos al consumidor:
     get_instruction(cliente_socket, id_process, program_counter, &instruction);
     send_instruction_consumer(cliente_socket, id_process, program_counter, instruction);
-    aumentar_contador(metricas_por_procesos, INSTRS_REQUESTS, string_itoa(id_process));
+    aumentar_contador(metricas_por_procesos, INSTRS_REQUESTS, id_process_key);
+
+    // Liberamos la memoria dinámica de las variables asociadas utilizadas en la función: OK
+    free(id_process_key);
 }
 
 
@@ -108,7 +127,7 @@ void suspend_process(int client_socket) {
 
     // Obtenemos los marcos ocupados del proceso, y creamos :
     t_list *frames_as_busy_process = get_frames_from_entries(id_process);
-    t_list* swap_metadata_proceso = list_create();
+    t_list *swap_metadata_proceso = list_create();
 
     void closure_swap_out(void *frame) {
         int frame_id = (int)(intptr_t)frame;
@@ -126,14 +145,21 @@ void suspend_process(int client_socket) {
         entrada->nro_pagina = frame_id;
         entrada->offset_swap = pointer_location;
         list_add(swap_metadata_proceso, entrada);
+
+        // Liberamos la memoria dinámica de las variables asociadas utilizadas en la función: OK
+        free(buffer);
     }
 
     // Ejecutamos el swap out sobre los frames ocupados del proceso, liberamos los frames y actualizamos el diccionario de metadata de swap
     list_iterate(frames_as_busy_process, closure_swap_out);
     mark_frames_as_free(frames_as_busy_process);
     dictionary_put(diccionario_swap_metadata, id_process_key, swap_metadata_proceso);
-    dictionary_remove(all_process_page_tables, id_process_key);
     
+    // Liberamos la memoria dinámica de las estructuras y variables asociadas utilizadas en la función: OK
+    delete_page_tables(id_process_key);
+    list_destroy(frames_as_busy_process);
+    free(id_process_key);
+
     // Mandamos respuesta a kernel:
     int resquest = OK;
     send(client_socket, &resquest, sizeof(resquest), 0);
@@ -151,7 +177,7 @@ void dump_process(int client_socket) {
     int id_process = rcv_only_pid(client_socket);
     
     // Logueamos la solicitud de dump:
-    log_error(logger, "## PID: %d - Memory Dump solicitado", id_process);
+    log_info(logger, "## PID: %d - Memory Dump solicitado", id_process);
 
     // Creamos el archivo de dump con el nombre del PID:
     char *filename = string_from_format("%sdump_%d.bin", config_memoria->DUMP_PATH, id_process);
@@ -174,16 +200,19 @@ void dump_process(int client_socket) {
         // Copiamos el contenido del espacio de usuario al buffer:
         memcpy(buffer, espacio_usuario + frame_id * config_memoria->TAM_PAGINA, config_memoria->TAM_PAGINA);
         fwrite(buffer, config_memoria->TAM_PAGINA, 1, archivo_dump);
+
+        // Liberamos la memoria dinámica de las variables asociadas utilizadas en la función: OK
+        free(buffer);
     }
 
     // Iteramos sobre los marcos ocupados y escribimos su contenido en el archivo de dump:
     list_iterate(frames_as_busy, closure_dump);
     fclose(archivo_dump);
 
-    // Liberamos la lista de marcos ocupados, y enviamos la respuesta al cliente:
+    // Liberamos la lista de marcos ocupados, y enviamos la respuesta al cliente: OK
     list_destroy(frames_as_busy);
+    free(filename);
     send(client_socket, &resquest, sizeof(resquest), 0);
-    log_error(logger, "## PID: %d - Memory DUMP ACABADOOOO", id_process);
 }
 
 void finish_process(int client_socket) {

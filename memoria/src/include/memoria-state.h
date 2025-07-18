@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <utils/logger.h>
 #include <commons/collections/dictionary.h>
+#include <commons/collections/list.h>
 #include <signal.h>
 
 // Incluimos bibliotecas propias:
@@ -39,34 +40,36 @@ extern FILE* archivo_swap;
 void memoria_state_init(void);
 
 /**
- * @brief Maneja el cierre ordenado del programa ante la señal SIGINT (Ctrl+C).
+ * @brief Libera todos los recursos utilizados por el módulo de memoria y finaliza el programa.
  *
- * Esta función se ejecuta cuando el programa recibe la señal SIGINT y realiza
- * la liberación ordenada de todos los recursos utilizados, asegurando evitar fugas de memoria
- * o archivos abiertos. Las acciones realizadas son:
+ * Esta función realiza un cierre ordenado del módulo de memoria cuando se recibe una señal de terminación
+ * (como SIGINT). Libera estructuras dinámicas, destruye diccionarios, libera memoria asignada,
+ * cierra archivos y evita fugas de recursos.
  *
- * - Cerrar el archivo de swap abierto.
- * - Liberar la memoria reservada para el espacio de usuario.
- * - Destruir el bitmap de frames.
- * - Destruir los diccionarios de métricas e instrucciones por proceso.
- * - Recorrer y destruir todas las tablas de páginas de los procesos.
- * - Destruir la configuración general de memoria.
+ * Las acciones realizadas incluyen:
+ * - Liberación de instrucciones por proceso.
+ * - Liberación de métricas por proceso.
+ * - Liberación de metadatos de swap.
+ * - Destrucción recursiva de tablas de páginas por proceso.
+ * - Destrucción de la configuración de memoria.
+ * - Liberación del bitmap de frames.
+ * - Cierre del archivo de swap.
+ * - Liberación de los bloques de memoria reservados.
  *
- * @param signal Señal recibida (se espera SIGINT).
+ * @param signal Señal recibida que dispara la rutina de apagado (por convención, SIGINT).
  */
-void cerrar_programa(int signal);
+void memory_handle_shutdown(int signal);
 
 /**
- * @brief Configura el manejador de la señal SIGINT para realizar un cierre ordenado.
+ * @brief Configura el manejador de señal para el apagado controlado del módulo de memoria.
  *
- * Esta función establece `cerrar_programa` como el handler de la señal SIGINT,
- * que se genera al presionar Ctrl+C. Se utiliza la estructura `sigaction`
- * para registrar la función y limpiar correctamente la máscara de señales.
+ * Registra la función `cerrar_programa` como handler de la señal SIGINT (Ctrl+C), utilizando la estructura `sigaction`.
+ * Esta configuración permite interceptar interrupciones del usuario y realizar un cierre ordenado de la memoria
+ * en lugar de finalizar abruptamente.
  *
- * Si ocurre un error al registrar el handler, se imprime un mensaje de error
- * y el programa finaliza con código de error 1.
+ * Si ocurre un error al registrar el handler, se imprime un mensaje de error por consola y el programa se termina
+ * inmediatamente con código de salida 1.
  */
-void configurar_senial_cierre();
-
+void memory_setup_shutdown_signal();
 
 #endif // CPU_STATE_H_

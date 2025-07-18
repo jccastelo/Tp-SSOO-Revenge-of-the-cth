@@ -7,8 +7,7 @@ void memoria_servers_init(void) {
 
     // Inicializamos la estructura de servidores:
     setup_server("Memoria", config_memoria->IP_MEMORIA, puerto ,  set_escucha_id);
-     // Rellenar variable de IP 
-     free(puerto);
+    free(puerto);
 }
 
 void set_escucha_id (int id_server) {

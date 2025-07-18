@@ -73,6 +73,7 @@ void swap_in(char* pid_key, int pid, int client_socket) {
         resquest = ERROR;
         status = "ERROR";
         dictionary_put(diccionario_swap_metadata, pid_key, metadata_swap);
+        list_destroy(metadata_swap);
     } else {
         void closure_swap_in(void *entry_swap) {
             // Inicializamos variables:
@@ -85,27 +86,29 @@ void swap_in(char* pid_key, int pid, int client_socket) {
             fseek(archivo_swap, entry->offset_swap, SEEK_SET);
             fread(contenido, config_memoria->TAM_PAGINA, 1, archivo_swap);
             memcpy(espacio_usuario + free_frame_id * config_memoria->TAM_PAGINA, contenido, config_memoria->TAM_PAGINA);
-            /*log_debug(logger, 
-            "Swap_in exitoso: PID %d, página %d cargada en frame %d. Espacio de usuario actual: %s", 
-                pid, 
-                index_frames, 
-                free_frame_id, 
-                mem_hexstring(espacio_usuario, config_memoria->TAM_MEMORIA)
-            );*/
+
+            // Liberamos la memoria dinámica de las variables asociadas utilizadas en la función: OK
+            free(contenido);
         }
 
         list_iterate(metadata_swap, closure_swap_in);
         resquest = OK;
         status = "OK";
 
-        // Obtenemos la tabla de páginas raíz del proceso, la populamos con marcos libres y actualizamos métricas relacionadas a escrituras en memoria y operaciones de swap in
-       // t_list *root_table = get_root_table(pid);
-        setup_page_tables( pid, marcos_libres);
+        // Creamos la tabla de páginas raíz del proceso, la populamos con marcos libres y actualizamos métricas relacionadas a escrituras en memoria y operaciones de swap in
+        setup_page_tables(pid, marcos_libres);
         aumentar_contador(metricas_por_procesos, MEM_WRITE_REQUESTS, pid_key);
         aumentar_contador(metricas_por_procesos, SWAP_IN_REQUESTS, pid_key);
-    }
 
-    log_error(logger, "Proceso PID %d: swap-in finalizado con estado %s", pid, status);
+        // Liberamos la memoria dinámica de las estructuras: OK
+        list_destroy_and_destroy_elements(metadata_swap, free);
+    }
+    
+    // Liberamos la memoria dinámica de las estructuras y variables asociadas utilizadas en la función: OK
+    list_destroy(marcos_libres);
+    free(pid_key);
+
+    log_info(logger, "Proceso PID %d: swap-in finalizado con estado %s", pid, status);
     send(client_socket, &resquest, sizeof(resquest), 0);
 } 
 

@@ -12,7 +12,6 @@
 #include "memoria-processes.h"
 #include "swap-funtions.h"
 #include "memoria-processes.h"
-#include "memoria-page-tables-operations.h"
 #include "locks-swap.h"
 #include "memoria-state.h"
 /**

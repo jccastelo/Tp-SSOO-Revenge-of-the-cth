@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
     // Inicializamos la configuración del memoria, y las variables globales:
     // configurar_senial_cierre();
     memoria_config_init(config_path);
+    memory_setup_shutdown_signal();
     memoria_state_init();
 
     // Inicializamos el server y comenzamos a escuchar:

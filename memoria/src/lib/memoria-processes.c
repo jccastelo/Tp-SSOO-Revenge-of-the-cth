@@ -17,30 +17,45 @@ t_process_in_memory *initialization_process() {
 
 void add_process_to_memory(int id_process) {
     // Se convierte el ID del proceso a string para usarlo como clave, y se inicializa su estructura en memoria
-    char* key_id_process = string_itoa(id_process);
+    char *key_id_process = string_itoa(id_process);
     t_process_in_memory *new_process = initialization_process();
 
     // Se guarda en el diccionario global de procesos activos:
     dictionary_put(metricas_por_procesos, key_id_process, new_process);
+
+    // Liberamos la memoria dinámica de las variables asociadas utilizadas en la función: OK
+    free(key_id_process);
 }
 
 int is_process_end(int id_process) {
     t_process_in_memory *process;
     t_list *frames_as_busy;
+    t_list *swap_metadata;
 
     // Convertimos el id a string para buscar y remover el proceso del diccionario de métricas
     char *key_id_process = string_itoa(id_process);
     process = dictionary_remove(metricas_por_procesos, key_id_process);
+    swap_metadata = dictionary_remove(diccionario_swap_metadata, key_id_process);
 
     // Obtenemos los frames ocupados por el proceso y los marcamos como libres
-    if(!dictionary_remove(diccionario_swap_metadata, key_id_process)) {   
+    if(!swap_metadata) {   
         frames_as_busy = get_frames_from_entries(id_process);
         mark_frames_as_free(frames_as_busy);
-    } else
-        log_debug(logger, "El proceso PID: %d fue suspendido y se procede a finalizar sin liberar ningún marco", id_process);
+        list_destroy(frames_as_busy);
+        delete_page_tables(key_id_process);
+    } else {
+        log_info(logger, "El proceso PID: %d fue suspendido y se procede a finalizar sin liberar ningún marco", id_process);
+        list_destroy_and_destroy_elements(swap_metadata, free);
+    }
 
     // Mostramos los contadores del proceso:
     imprimir_contadores_del_proceso(id_process, process);
+
+    // Liberamos la memoria dinámica de las estructuras y variables asociadas utilizadas en la función: OK
+    t_list *instructions = dictionary_remove(instrucciones_por_procesos, key_id_process);
+    list_destroy_and_destroy_elements(instructions, free);
+    free(key_id_process);
+    free(process);
 
     return OK;
 }
