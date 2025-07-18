@@ -27,6 +27,7 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
         case DESBLOQUEO_IO:
             // REcibo el pid (no hace falta paquete)
             int pid_desbloqueo = recibir_pid(new_buffer, io_socket);
+            log_debug(logger,"## PID: %d OBTENIDO DE IO",pid_desbloqueo);
 
             actualizarIO_a_libre(pid_desbloqueo);
 
@@ -34,10 +35,16 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             enviar_proceso_io(io_socket);
 
             // Con el pid busco el proceso 
+            pthread_mutex_lock(&list_procesos->mutex);
             t_pcb *process = list_get(list_procesos->cola, pid_desbloqueo);
+            pthread_mutex_unlock(&list_procesos->mutex);
 
+            log_debug(logger,"## PID: %d LLEGA DE IO",process->pid);
+            if(process->pid > 300 || process->pid < 0){log_debug(logger,"## YA habia terminado este proceso"); break;}
             //Si esta en block va a ready, sino a readysuspended
             pthread_mutex_lock(&process->mutex_estado);
+            process->posible_suspension =false;
+
             if(process->queue_ESTADO_ACTUAL->cola == planner->long_term->queue_BLOCKED->cola) 
             {   log_info(logger,"## PID: %d finalizó IO y pasa a READY",process->pid);
                  pthread_mutex_unlock(&process->mutex_estado);
@@ -54,7 +61,9 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
         
             //Si habia pid lo mando a exit
             if(pid_fin >= 0){
+                pthread_mutex_lock(&list_procesos->mutex);
                 t_pcb *process = list_get(list_procesos->cola, pid_fin);
+                pthread_mutex_unlock(&list_procesos->mutex);
                 queue_process(process, EXIT);
             }
 
@@ -67,9 +76,10 @@ void kernel_server_io_handler(int io_socket, int operation, const char *server_n
             log_debug(logger, "Operación no válida para el servidor IO: %d", operation);
             break;
     }
-    if(new_buffer != NULL){
+    
+        free(new_buffer->stream);
         free(new_buffer);
-    }
+    
     return;
 }
 
@@ -102,9 +112,9 @@ void kernel_server_interrupt_handler(int cpu_socket, int operation, const char *
             break;
     }
 
-    if(new_buffer != NULL){
+        free(new_buffer->stream);
         free(new_buffer);
-    }
+    
     return;
 }
 
@@ -154,7 +164,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             
             log_debug(logger,"SOLITO DUMP");
             if(solicitar_a_memoria(avisar_dump_memory, process))
-            {
+            {   process->posible_suspension =false;
                 if(process->hilo_activo){
                     pthread_cancel(process->hilo_block);
                     }
@@ -196,7 +206,7 @@ void kernel_server_dispatch_handler(int cpu_socket, int operation, const char *s
             log_debug(logger, "Operación no válida para el servidor HANDLER: %d", operation);
             break;
     }
-
+    free(new_buffer->stream);
     free(new_buffer);
 
     return;

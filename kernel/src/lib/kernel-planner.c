@@ -147,9 +147,19 @@ void init_fist_process(char *archivo_pseudocodigo,int Tamanio_proc){
     memcpy(new_buffer->stream + desplazamiento, &Tamanio_proc, sizeof(int));
     desplazamiento += sizeof(int);
 
-    //Llamada de la syscall INIC_PROC
-    recibir_y_crear_proceso(new_buffer);
+    //Crenado primero proceso
+    pthread_mutex_lock(&mutex_creacion_de_proceso);
+    t_pcb *process =  process_init();
+
+    cargar_proceso(process, new_buffer);
+    pthread_mutex_unlock(&mutex_creacion_de_proceso);
+
+    //LIberando primer buffer
+    free(new_buffer->stream);
     free(new_buffer);
+
+    queue_process(process, NEW);
+    return;
 }
 
 void traer_proceso_a_MP(){

@@ -10,6 +10,8 @@ void kernel_memory_connection(void) {
     char *puerto_memoria = string_itoa(config_kernel->PUERTO_MEMORIA);
 
     setup_connection_with_server("MEMORIA", config_kernel->IP_MEMORIA, puerto_memoria, set_socket_memoria);
+
+    free(puerto_memoria);
 }
 
 void set_socket_memoria(int socket) {

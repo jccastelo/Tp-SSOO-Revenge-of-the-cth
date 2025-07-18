@@ -44,15 +44,13 @@ void gestionar_io(t_buffer *buffer)
 
     log_info(logger,"## PID: %d - Bloqueado por IO: %s", process->pid,ioNombre);
     queue_process(process, BLOCKED);
-
     
     t_IO *ioBuscada = buscar_io(ioNombre);
-    
+   
     if (ioBuscada != NULL)
     {
         t_buffer *buffer_io = crear_buffer_io(milisegundos, pid_a_io);
 
-        
         t_IO_instancia *instancia_io_libre = buscar_instancia_libre(ioBuscada);
 
         if (list_size(ioBuscada->procesos_esperando->cola) == 0 && instancia_io_libre != NULL)
@@ -63,7 +61,6 @@ void gestionar_io(t_buffer *buffer)
             
             int socket_io_libre = instancia_io_libre->socket;
             
-
             enviar_proceso_io(socket_io_libre);
 
             pthread_mutex_unlock(&mutex_io);
@@ -88,6 +85,8 @@ void gestionar_io(t_buffer *buffer)
         pthread_mutex_unlock(&mutex_io);
         queue_process(process_to_delate, EXIT);
     }
+    free(ioNombre);
+    return;
 }
 
 t_buffer *crear_buffer_io(int milisegundos,int  pid_a_io)
@@ -145,7 +144,9 @@ t_IO *buscar_io(char *ioNombreBuscado)
 
     for (int i = 0; i < list_size(list_ios->cola); i++)
     {
+         pthread_mutex_lock(&list_ios->mutex);
          encontrado  = list_get(list_ios->cola, i);
+         pthread_mutex_unlock(&list_ios->mutex);
 
         if (strcmp(encontrado->nombre, ioNombreBuscado) == 0)
         {
@@ -172,11 +173,15 @@ void enviar_proceso_io(int io_socket)
 
     for (int i = 0; i < list_size(list_ios->cola); i++)
     {
+        pthread_mutex_lock(&list_ios->mutex);
         t_IO *ios = list_get(list_ios->cola, i);
+        pthread_mutex_unlock(&list_ios->mutex);
 
         for (int j = 0; j < list_size(ios->instancias_IO->cola); j++)
         {
+            pthread_mutex_lock(&ios->instancias_IO->mutex);
             t_IO_instancia *io = list_get(ios->instancias_IO->cola, j);
+            pthread_mutex_unlock(&ios->instancias_IO->mutex);
 
             if (io->socket == io_socket)
             {
@@ -191,6 +196,7 @@ void enviar_proceso_io(int io_socket)
                     
                     memcpy(&(io->proceso), pid_y_milisegundos->stream, sizeof(int));
                     
+                    free(pid_y_milisegundos->stream);
                     free(pid_y_milisegundos);
                 }
 
@@ -207,15 +213,22 @@ void eliminar_instancia(int io_socket)
     
     for (int i = 0; i < list_size(list_ios->cola); i++)
     {
+        pthread_mutex_lock(&list_ios->mutex);
         t_IO *ios = list_get(list_ios->cola, i);
+        pthread_mutex_unlock(&list_ios->mutex);
 
         for (int j = 0; j < list_size(ios->instancias_IO->cola); j++)
         {
+            pthread_mutex_lock(&ios->instancias_IO->mutex);
             t_IO_instancia *io = list_get(ios->instancias_IO->cola, j);
+            pthread_mutex_unlock(&ios->instancias_IO->mutex);
 
             if (io->socket == io_socket)
             {
+                pthread_mutex_lock(&ios->instancias_IO->mutex);
                 list_remove(ios->instancias_IO->cola,j);
+                pthread_mutex_unlock(&ios->instancias_IO->mutex);
+
                 carnicero_de_instancias_io(io);
 
                 if (list_is_empty(ios->instancias_IO->cola))
@@ -256,6 +269,7 @@ void desencolarProcesosEsperando(t_IO *ios_estructura)
 
         //log_info(logger, "PID A ELIMINAR: %d, ELEMENTOS RESTANTES: %d",pid_a_remover, tamano_lista > i);
 
+        free(pid_milisegundos->stream);
         free(pid_milisegundos);
         
         queue_process(list_get(list_procesos->cola,pid_a_remover), EXIT);
@@ -296,6 +310,7 @@ void recibir_io(t_buffer* buffer, int socket) {
         list_add_in_index(ioBuscada->instancias_IO->cola,0,nueva_instancia_io);
         pthread_mutex_unlock(&ioBuscada->instancias_IO->mutex);
 
+        free(ioNombre);
         log_debug(logger, "Llego una nueva INSTANCIA de IO de nombre %s Y SOCKET: %d ", ioBuscada->nombre,nueva_instancia_io->socket );
         
     }
@@ -327,7 +342,9 @@ void recibir_io(t_buffer* buffer, int socket) {
         pthread_mutex_unlock(&list_ios->mutex);
 
         log_debug(logger, "Llego una Nueva IO de nombre %s Y SOCKET: %d ", ioNueva->nombre,nueva_instancia_io->socket );
-    }   
+    }
+
+    return;
 }
 
 void actualizarIO_a_libre(int pid_desbloqueo) {

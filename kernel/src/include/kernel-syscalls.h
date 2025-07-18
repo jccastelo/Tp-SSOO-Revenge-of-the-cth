@@ -18,4 +18,6 @@ t_pcb *process_init();
 void cargar_proceso(t_pcb* procces, t_buffer* buffer);
 
 void delate_process(t_buffer *buffer);
+
+extern pthread_mutex_t mutex_creacion_de_proceso;
 #endif //KERNEL_SYSCALLS_H
