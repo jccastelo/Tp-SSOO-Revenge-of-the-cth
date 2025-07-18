@@ -25,6 +25,8 @@ void conection_strategy_persistence(void * args) {
             client_handler(client_socket, operation, server_name);
         }
     }
+
+    free(args_t);
 }
 
 void conection_strategy_once(void * args) {
@@ -42,6 +44,8 @@ void conection_strategy_once(void * args) {
         log_debug(logger, "Error al recibir la operacion");
 
     client_handler(client_socket, operation, server_name);
+
+    free(args_t);
 }
 
 

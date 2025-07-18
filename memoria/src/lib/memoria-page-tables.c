@@ -10,6 +10,9 @@ void setup_page_tables(int id_process, t_list *free_frames) {
 
     // Construimos la tabla de páginas asignando frames bajo demanda
     populate_page_table(free_frames, page_table_root);
+
+    // Liberamos la memoria dinámica de las variables asociadas utilizadas en la función: OK
+    free(key_id_process);
 }
 
 void populate_page_table(t_list *free_frames, t_list *page_table_root) {
@@ -136,5 +139,32 @@ t_list *get_root_table(int id_process) {
     char *key_id_process = string_itoa(id_process);
 
     // Obtenemos la tabla de páginas raíz asociada al proceso desde el diccionario global
-    return dictionary_get(all_process_page_tables, key_id_process);
+    t_list *root_table = dictionary_get(all_process_page_tables, key_id_process);
+    
+    // Liberamos la memoria dinámica de las variables asociadas utilizadas en la función: OK
+    free(key_id_process);
+
+    return root_table;
+}
+
+void delete_page_tables(char *id_process_key) {
+    // Obtenemos la tabla de páginas raíz asociada al proceso desde el diccionario global
+    t_list *root_table = dictionary_remove(all_process_page_tables, id_process_key);
+    destroy_page_table_structure(root_table, 1, config_memoria->CANTIDAD_NIVELES);
+}
+
+void destroy_page_table_structure(t_list* current_node, int current_level, int total_levels) {
+    if (current_node == NULL) return;
+
+    if (current_level < total_levels) {
+        // Función auxiliar para destruir cada sublista del nivel actual
+        void destroy_child(void* child_node) {
+            destroy_page_table_structure((t_list*)child_node, current_level + 1, total_levels);
+        }
+
+        list_destroy_and_destroy_elements(current_node, destroy_child);
+    } else {
+        // Último nivel: los elementos son enteros (cast a void*), no hace falta liberar individualmente
+        list_destroy(current_node);
+    }
 }

@@ -16,10 +16,13 @@ void loading_process_instructions(int id_process, char *file_procces) {
     // Lee e interpreta las instrucciones contenidas en el archivo
     t_list *process_instructions = read_pseudocode_file(pseudocode_file);
     load_process_instructions_in_instrucciones_por_procesos(id_process, process_instructions);
+
+    free(file_procces);  // ¡Liberación agregada!
 }
 
 void associate_instructions_folder_path(char **file_procces) {
     char *new_path = string_from_format("%s%s", config_memoria->PATH_INSTRUCCIONES, *file_procces);
+    // free(*file_procces);
     *file_procces = new_path;
 }
 
@@ -43,8 +46,9 @@ t_list *read_pseudocode_file(FILE *pseudocode_file) {
         list_add(process_instructions, strdup(instruction));
     }
     
-    // Liberamos memoria:
+    // Liberamos memoria: 
     fclose(pseudocode_file);
+    free(instruction);
 
     return process_instructions;
 }
@@ -52,6 +56,7 @@ t_list *read_pseudocode_file(FILE *pseudocode_file) {
 void load_process_instructions_in_instrucciones_por_procesos(int id_process, t_list *process_instructions) {
     char *key_procces = string_itoa(id_process);
     dictionary_put(instrucciones_por_procesos, key_procces, process_instructions);
+    free(key_procces);
 }
 
 void get_instruction(int client_socket, int id_process, int program_counter, char **instruction) {

@@ -122,6 +122,7 @@ void read_memory(int client_socket, int id_process, int quantity_bytes, int phys
         quantity_bytes, 
         process_status
     );
-    log_info(logger, "## PID: %d - Contenido leído: \"%s\"", id_process, (char *)buffer);
+
     send_read_content(client_socket, buffer, response);
+    free(buffer);
 }
