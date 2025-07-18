@@ -17,7 +17,8 @@ void queue_process(t_pcb* process, int estado){
         process->metricas_de_tiempo->metrica_actual = process->metricas_de_tiempo->NEW;
 
         cambiar_estado(planner->long_term->algoritmo_planificador, process, planner->long_term->queue_NEW); 
-        
+        pthread_mutex_unlock(&process->mutex_estado);
+
         pthread_mutex_lock(&planner->long_term->queue_NEW->mutex);
         t_pcb *primer_Proceos =list_get(planner->long_term->queue_NEW->cola,0);
         pthread_mutex_unlock(&planner->long_term->queue_NEW->mutex);
@@ -28,11 +29,11 @@ void queue_process(t_pcb* process, int estado){
             {
                 if(solicitar_a_memoria(memoria_init_proc, process))
                 {
-                    pthread_mutex_unlock(&process->mutex_estado);
+                    
                     queue_process(process, READY);
-                }else{pthread_mutex_unlock(&process->mutex_estado);}
+                }
 
-            }else{pthread_mutex_unlock(&process->mutex_estado);}
+            }
 
         break;
 
