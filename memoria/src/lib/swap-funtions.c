@@ -104,10 +104,10 @@ void swap_in(char* pid_key, int pid, int client_socket) {
         
         // Liberamos la memoria dinámica de las estructuras y variables asociadas utilizadas en la función: OK
         list_destroy(marcos_libres);
+        usleep(config_memoria->RETARDO_SWAP * 1000); // Simulamos retardo de escritura
     }
 
     free(pid_key);
-    usleep(config_memoria->RETARDO_SWAP * 1000); // Simulamos retardo de escritura
     log_info(logger, "Proceso PID %d: swap-in finalizado con estado %s", pid, status);
     send(client_socket, &resquest, sizeof(resquest), 0);
 } 
