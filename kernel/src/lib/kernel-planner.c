@@ -331,7 +331,7 @@ void desalojo_SJF(t_pcb* primer_proceso) {
 
     if(cpu == NULL)
     {
-        log_error(logger,"CPU NULL");
+        log_debug(logger,"CPU NULL");
         return;
     }
 
@@ -354,7 +354,7 @@ void desalojo_SJF(t_pcb* primer_proceso) {
         //log_warning(logger, "F");
         pthread_mutex_unlock(&list_procesos->mutex);
     }
-    else{log_error(logger, "SE QUISO ACCEDER A PID NEGATIVO");
+    else{log_debug(logger, "SE QUISO ACCEDER A PID NEGATIVO");
         return;}
 
     //log_warning(logger, "G");
@@ -411,7 +411,7 @@ t_cpu* cpu_mayor_rafaga() {
         {
              pthread_mutex_unlock(&list_cpus->mutex);
             pthread_mutex_unlock(&mutex_cpu);
-            log_error(logger, "CPU NULL TOMADA");
+            log_debug(logger, "CPU NULL TOMADA");
             return NULL;
         }
         
@@ -430,7 +430,7 @@ t_cpu* cpu_mayor_rafaga() {
             proceso_a = list_get(list_procesos->cola, cpu_buscada->pid);
         
         }
-        else{log_error(logger, "SE QUISO ACCEDER A PID NEGATIVO");}
+        else{log_debug(logger, "SE QUISO ACCEDER A PID NEGATIVO");}
 
         //log_warning(logger, "U");
         t_pcb* proceso_b = NULL;
@@ -438,23 +438,23 @@ t_cpu* cpu_mayor_rafaga() {
             //log_warning(logger, "V");
             proceso_b = list_get(list_procesos->cola, cpu_i->pid);
         }
-        else{log_error(logger, "SE QUISO ACCEDER A PID NEGATIVO");}
+        else{log_debug(logger, "SE QUISO ACCEDER A PID NEGATIVO");}
        
         //log_warning(logger, "W");
 
         if(proceso_a ==NULL || proceso_b == NULL){
             pthread_mutex_unlock(&list_cpus->mutex);
             pthread_mutex_unlock(&mutex_cpu);
-            log_error(logger,"ALGUN PROCESO NULL");
+            log_debug(logger,"ALGUN PROCESO NULL");
             return NULL; }
 
         if(proceso_a->pid < 0 || proceso_a->pid > cantidad_procesos
          || proceso_b->pid > cantidad_procesos || proceso_b->pid <0 ){
             pthread_mutex_unlock(&list_cpus->mutex);
             pthread_mutex_unlock(&mutex_cpu);
-            log_error(logger,"PID: %d", proceso_a->pid );
-            log_error(logger,"PID: %d", proceso_b->pid );
-            log_error(logger,"ALGUN PROCESO con PID INVALIDO");
+            log_debug(logger,"PID: %d", proceso_a->pid );
+            log_debug(logger,"PID: %d", proceso_b->pid );
+            log_debug(logger,"ALGUN PROCESO con PID INVALIDO");
             return NULL; 
         }
 

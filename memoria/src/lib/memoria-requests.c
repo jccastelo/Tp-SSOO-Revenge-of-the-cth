@@ -159,7 +159,7 @@ void suspend_process(int client_socket) {
     delete_page_tables(id_process_key);
     list_destroy(frames_as_busy_process);
     free(id_process_key);
-    usleep(config_memoria->RETARDO_SWAP * 1000);
+   
 
     // Mandamos respuesta a kernel:
     log_info(logger, "El proceso con PID %d ha sido suspendido y sus datos se han guardado en swap.", id_process);
