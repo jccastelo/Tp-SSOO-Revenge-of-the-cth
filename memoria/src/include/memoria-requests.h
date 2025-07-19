@@ -3,6 +3,7 @@
 
 // Incluimos las biblotecas externas:
 #include <commons/memory.h>
+#include <time.h>
 
 // Incluimos las biblotecas internas:
 #include "memoria-protocols.h"
@@ -14,6 +15,7 @@
 #include "memoria-processes.h"
 #include "locks-swap.h"
 #include "memoria-state.h"
+
 /**
  * @brief Inicializa un proceso en el servidor en respuesta a una solicitud del kernel.
  * 
@@ -69,9 +71,6 @@ void dump_process(int client_socket);
  * @param client_socket Socket del cliente que solicita la finalización (usado para recibir el PID).
  */
 void finish_process(int client_socket); 
-
-
-
 
 /**
  * @brief Atiende una solicitud de acceso a las tablas de páginas por parte de un cliente.

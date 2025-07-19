@@ -14,10 +14,11 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
             finish_process(client_socket);
         break;
         case GET_INSTRUCTION:
+            usleep(config_memoria->RETARDO_MEMORIA * 1000);
             send_process_instruction(client_socket);
         break; 
         case SUSPENDER:
-            log_info(logger, "## Kernel Conectado - FD del socket: %d", client_socket);
+            log_info(logger, "## Kernel Conectado - FD del socket: %d", client_socket);  
             suspend_process(client_socket);
         break; 
         case DESUSPENDER:
@@ -32,9 +33,11 @@ void memoria_server_escucha_handler(int client_socket, int operation, const char
             access_to_page_tables(client_socket);
         break;
         case WRITE_MEM:
+            usleep(config_memoria->RETARDO_MEMORIA * 1000);
             write_in_user_spaces(client_socket);
         break;
         case READ_MEM:
+            usleep(config_memoria->RETARDO_MEMORIA * 1000);
             read_in_user_spaces(client_socket);
         break;
         case MEMORY_CONFIG:

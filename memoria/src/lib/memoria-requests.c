@@ -34,8 +34,8 @@ void init_process(int client_socket) {
     send(client_socket, &request, sizeof(request), 0);
 
     // Liberamos la memoria dinámica de las estructuras y variables asociadas utilizadas en la función: OK
-    list_destroy(free_frames);
-    free(file_process);
+    // list_destroy(free_frames);
+    // free(file_process);
 }
 
 void access_to_page_tables(int client_socket) {
@@ -159,8 +159,11 @@ void suspend_process(int client_socket) {
     delete_page_tables(id_process_key);
     list_destroy(frames_as_busy_process);
     free(id_process_key);
+    usleep(config_memoria->RETARDO_SWAP * 1000);
 
     // Mandamos respuesta a kernel:
+    log_info(logger, "El proceso con PID %d ha sido suspendido y sus datos se han guardado en swap.", id_process);
+    usleep(config_memoria->RETARDO_SWAP * 1000); // Simulamos retardo de escritura
     int resquest = OK;
     send(client_socket, &resquest, sizeof(resquest), 0);
 }
@@ -180,7 +183,7 @@ void dump_process(int client_socket) {
     log_info(logger, "## PID: %d - Memory Dump solicitado", id_process);
 
     // Creamos el archivo de dump con el nombre del PID:
-    char *filename = string_from_format("%sdump_%d.bin", config_memoria->DUMP_PATH, id_process);
+    char *filename = string_from_format("%s%d%ld.dmp", config_memoria->DUMP_PATH, id_process, time(NULL));
     FILE *archivo_dump = fopen(filename, "wb");
 
     // Obtenemos el lista de marcos ocupados por el proceso:

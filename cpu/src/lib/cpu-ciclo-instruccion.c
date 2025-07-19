@@ -34,7 +34,7 @@ void realizar_ciclo_de_instruccion() {
 char* fetch_instruction() {
     conseguir_siguiente_instruccion();
     char* instruccion = devolver_instruccion_a_ejecutar();
-    usleep(100 * 1000);
+    //usleep(500 * 1000);
     log_info(logger, "## PID: %d - FETCH - Program Counter: %d", contexto->pid, contexto->pc);
     return instruccion;
 }
